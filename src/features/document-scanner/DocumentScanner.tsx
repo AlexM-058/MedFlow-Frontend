@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   captureMedicalDocument,
   describeCaptureMethod,
@@ -26,11 +26,13 @@ export function DocumentScanner({
   const [method, setMethod] = useState<ScanCaptureMethod | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Revoke only an unconfirmed draft on unmount. A confirmed document's URL
+  // belongs to the onConfirm consumer and must stay valid.
+  const draftRef = useRef<ScannedDocument | null>(null);
   useEffect(() => {
-    return () => {
-      revokeScannedDocumentUri(draft);
-    };
+    draftRef.current = draft;
   }, [draft]);
+  useEffect(() => () => revokeScannedDocumentUri(draftRef.current), []);
 
   const clearDraft = useCallback(() => {
     revokeScannedDocumentUri(draft);
@@ -73,6 +75,7 @@ export function DocumentScanner({
   const handleUse = () => {
     if (!draft) return;
     const confirmed = draft;
+    draftRef.current = null;
     setDraft(null);
     setPhase('idle');
     onConfirm(confirmed);
