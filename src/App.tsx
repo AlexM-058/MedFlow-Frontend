@@ -1,6 +1,7 @@
 import { useState, useSyncExternalStore, type ComponentType } from 'react';
 import { AppHeader } from './components/AppHeader';
 import { ChatPage } from './features/chat/ChatPage';
+import { DocumentScannerPage } from './features/document-scanner';
 import { PatientSuggestionPanel } from './features/patient-suggestions';
 import { ThemeProvider } from './theme/ThemeProvider';
 
@@ -17,7 +18,10 @@ function subscribeToRoute(onChange: () => void) {
 }
 
 function getRoute() {
-  return window.location.hash === '#/doctor' ? 'doctor' : 'patient';
+  const hash = window.location.hash;
+  if (hash === '#/doctor') return 'doctor';
+  if (hash === '#/scan') return 'scan';
+  return 'patient';
 }
 
 const exampleSuggestion = {
@@ -58,6 +62,8 @@ export default function App() {
             <a className="button-secondary" href="#/patient">Return to patient demo</a>
           </main>
         )
+      ) : route === 'scan' ? (
+        <DocumentScannerPage />
       ) : (
         <PatientWorkspace />
       )}
