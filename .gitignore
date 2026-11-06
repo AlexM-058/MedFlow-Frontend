@@ -30,3 +30,7 @@ dist-ssr
 .venv/
 __pycache__/
 .cursor/worktrees/
+*.jks
+*.keystore
+keystore.properties
+key.properties
