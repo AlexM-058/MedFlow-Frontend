@@ -1,0 +1,20 @@
+import type { ChatMessage } from './types';
+
+const SENDER_LABEL: Record<ChatMessage['sender'], string> = {
+  ai: 'MedFlow AI',
+  patient: 'You',
+};
+
+export function MessageItem({ message }: { message: ChatMessage }) {
+  const isPatient = message.sender === 'patient';
+
+  return (
+    <li className={`message message--${message.sender}`}>
+      <p className={isPatient ? 'visually-hidden' : 'message__meta'}>
+        <span className="message__sender">{SENDER_LABEL[message.sender]}</span>
+        {message.simulated && <span className="message__tag">Simulated</span>}
+      </p>
+      <p className={isPatient ? 'message__bubble' : 'message__text'}>{message.text}</p>
+    </li>
+  );
+}
