@@ -7,13 +7,13 @@ const dayKeyFormat = new Intl.DateTimeFormat('en-CA', {
   month: '2-digit',
   day: '2-digit',
 });
-const timeFormat = new Intl.DateTimeFormat('en-GB', {
+const timeFormat = new Intl.DateTimeFormat('ro-RO', {
   timeZone: DEMO_TIME_ZONE,
   hour: '2-digit',
   minute: '2-digit',
   hourCycle: 'h23',
 });
-const dateFormat = new Intl.DateTimeFormat('en-GB', {
+const dateFormat = new Intl.DateTimeFormat('ro-RO', {
   timeZone: DEMO_TIME_ZONE,
   day: '2-digit',
   month: 'short',
@@ -31,19 +31,19 @@ function dayDifference(fromKey: string, toKey: string): number {
   return Math.round((to - from) / 86_400_000);
 }
 
-/** "Today, 09:42" | "Yesterday" | "04 Nov 2026" */
+/** "Astăzi, 09:42" | "Ieri" | "04 nov. 2026" */
 export function formatLastContact(iso: string, now: Date): string {
   const instant = new Date(iso);
   const diff = dayDifference(dayKey(instant), dayKey(now));
-  if (diff === 0) return `Today, ${timeFormat.format(instant)}`;
-  if (diff === 1) return 'Yesterday';
+  if (diff === 0) return `Astăzi, ${timeFormat.format(instant)}`;
+  if (diff === 1) return 'Ieri';
   return dateFormat.format(instant);
 }
 
-/** "Today" | "Tomorrow" | "09 Nov 2026" for a YYYY-MM-DD follow-up date. */
+/** "Astăzi" | "Mâine" | "09 nov. 2026" for a YYYY-MM-DD follow-up date. */
 export function formatFollowUp(dateOnly: string, now: Date): string {
   const diff = dayDifference(dayKey(now), dateOnly);
-  if (diff === 0) return 'Today';
-  if (diff === 1) return 'Tomorrow';
+  if (diff === 0) return 'Astăzi';
+  if (diff === 1) return 'Mâine';
   return dateFormat.format(new Date(`${dateOnly}T12:00:00Z`));
 }

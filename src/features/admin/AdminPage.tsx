@@ -6,7 +6,7 @@ import { useAdminPanel } from './useAdminPanel';
 import './admin.css';
 import { brand } from '../../brand/brand.config';
 
-const DATE = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+const DATE = new Intl.DateTimeFormat('ro-RO', { dateStyle: 'medium', timeStyle: 'short' });
 const formatDate = (iso: string | null) => {
   if (!iso) return null;
   const time = Date.parse(iso);
@@ -21,23 +21,23 @@ export function AdminPage() {
   return (
     <section className="admin-page" aria-labelledby="admin-title">
       <header className="admin-page__heading">
-        <p className="admin-eyebrow">{brand.productName.toUpperCase()} ADMINISTRATION</p>
-        <h1 id="admin-title">Doctor onboarding</h1>
-        <p>Invite doctors after their professional details have been verified. Doctor access is granted only when the invited Google account accepts the invitation.</p>
+        <p className="admin-eyebrow">ADMINISTRARE {brand.productName.toUpperCase()}</p>
+        <h1 id="admin-title">Înrolarea medicilor</h1>
+        <p>Invitați medicii după verificarea datelor lor profesionale. Accesul de medic se acordă numai atunci când contul Google invitat acceptă invitația.</p>
       </header>
 
       {panel.phase === 'checking' || panel.phase === 'signed-out' ? (
-        <p className="admin-card" role="status">Checking administrator access…</p>
+        <p className="admin-card" role="status">Se verifică accesul de administrator…</p>
       ) : panel.phase === 'error' ? (
         <div className="admin-error" role="alert">
           <p>{panel.error}</p>
-          <button type="button" className="ui-button ui-button--secondary" onClick={panel.retry}>Try again</button>
+          <button type="button" className="ui-button ui-button--secondary" onClick={panel.retry}>Încercați din nou</button>
         </div>
       ) : panel.phase === 'denied' ? (
         <section className="admin-card" aria-labelledby="admin-denied-title">
-          <h2 id="admin-denied-title">Access restricted</h2>
-          <p>{profile?.email ? `${profile.email} is not a ${brand.productName} administrator.` : `This account is not a ${brand.productName} administrator.`} Administrator access is granted by the {brand.productName} team during onboarding; it cannot be requested from this page.</p>
-          <a className="admin-link" href="#/patient">Go to your account</a>
+          <h2 id="admin-denied-title">Acces restricționat</h2>
+          <p>{profile?.email ? `${profile.email} nu este administrator ${brand.productName}.` : `Acest cont nu este administrator ${brand.productName}.`} Accesul de administrator este acordat de echipa {brand.productName} la înrolare și nu poate fi solicitat de pe această pagină.</p>
+          <a className="admin-link" href="#/patient">Mergeți la contul dumneavoastră</a>
         </section>
       ) : (
         <>
@@ -78,11 +78,11 @@ function InviteForm({ panel }: { panel: Panel }) {
     if (!panel.created) return;
     try {
       await navigator.clipboard.writeText(panel.created.link);
-      setCopyStatus('Invitation link copied.');
+      setCopyStatus('Linkul invitației a fost copiat.');
     } catch {
       linkRef.current?.focus();
       linkRef.current?.select();
-      setCopyStatus('Copying is blocked in this browser. The link is selected; copy it with your keyboard.');
+      setCopyStatus('Copierea este blocată în acest browser. Linkul este selectat; copiați-l de la tastatură.');
     }
   }
 
@@ -113,15 +113,15 @@ function InviteForm({ panel }: { panel: Panel }) {
 
   return (
     <section className="admin-card" aria-labelledby={`${baseId}-title`}>
-      <h2 id={`${baseId}-title`}>Invite a doctor</h2>
+      <h2 id={`${baseId}-title`}>Invitați un medic</h2>
       <form className="admin-form" onSubmit={(event) => void submit(event)} noValidate>
-        {field('email', 'Google account email', 'email', 'off')}
-        {field('fullName', 'Full name')}
-        {field('specialty', 'Specialty')}
-        {field('clinic', 'Clinic')}
+        {field('email', 'E-mailul contului Google', 'email', 'off')}
+        {field('fullName', 'Nume complet')}
+        {field('specialty', 'Specialitate')}
+        {field('clinic', 'Clinică')}
         <div className="admin-actions">
           <button type="submit" className="ui-button ui-button--primary" disabled={panel.creating} aria-busy={panel.creating}>
-            {panel.creating ? 'Creating invitation…' : 'Create invitation'}
+            {panel.creating ? 'Se creează invitația…' : 'Creați invitația'}
           </button>
         </div>
       </form>
@@ -129,9 +129,9 @@ function InviteForm({ panel }: { panel: Panel }) {
 
       {panel.created && (
         <div className="admin-link-panel" role="region" aria-labelledby={`${baseId}-link-title`}>
-          <h3 id={`${baseId}-link-title`}>Invitation link</h3>
-          <p>Send this link only to the invited doctor. It is shown once and will not be shown again after you leave or sign out.</p>
-          <label className="visually-hidden" htmlFor={`${baseId}-link`}>Invitation link</label>
+          <h3 id={`${baseId}-link-title`}>Linkul invitației</h3>
+          <p>Trimiteți acest link numai medicului invitat. Este afișat o singură dată și nu va mai fi afișat după ce părăsiți pagina sau vă deconectați.</p>
+          <label className="visually-hidden" htmlFor={`${baseId}-link`}>Linkul invitației</label>
           <input
             ref={linkRef}
             id={`${baseId}-link`}
@@ -141,8 +141,8 @@ function InviteForm({ panel }: { panel: Panel }) {
             onFocus={(event) => event.currentTarget.select()}
           />
           <div className="admin-actions">
-            <button type="button" className="ui-button ui-button--primary" onClick={() => void copy()}>Copy link</button>
-            <button type="button" className="ui-button ui-button--secondary" onClick={() => { setCopyStatus(null); panel.dismissLink(); }}>Done</button>
+            <button type="button" className="ui-button ui-button--primary" onClick={() => void copy()}>Copiați linkul</button>
+            <button type="button" className="ui-button ui-button--secondary" onClick={() => { setCopyStatus(null); panel.dismissLink(); }}>Gata</button>
           </div>
         </div>
       )}
@@ -158,14 +158,14 @@ function InvitationList({ panel }: { panel: Panel }) {
   return (
     <section className="admin-card" aria-labelledby={titleId} aria-busy={panel.refreshing}>
       <div className="admin-card__heading">
-        <h2 id={titleId}>Invitations</h2>
+        <h2 id={titleId}>Invitații</h2>
         <button type="button" className="ui-button ui-button--secondary" onClick={panel.refresh} disabled={panel.refreshing} aria-busy={panel.refreshing}>
-          {panel.refreshing ? 'Refreshing…' : 'Refresh'}
+          {panel.refreshing ? 'Se actualizează…' : 'Actualizați'}
         </button>
       </div>
-      {panel.listError && <p className="admin-error" role="alert">{panel.listError}{panel.invitations.length > 0 ? ' Showing the last loaded list.' : ''}</p>}
+      {panel.listError && <p className="admin-error" role="alert">{panel.listError}{panel.invitations.length > 0 ? ' Se afișează ultima listă încărcată.' : ''}</p>}
       {panel.invitations.length === 0 ? (
-        !panel.listError && <p>{panel.refreshing ? 'Loading invitations…' : 'No invitations yet.'}</p>
+        !panel.listError && <p>{panel.refreshing ? 'Se încarcă invitațiile…' : 'Nu există încă nicio invitație.'}</p>
       ) : (
         <ul className="admin-list">
           {panel.invitations.map((invitation) => (
@@ -199,7 +199,7 @@ function InvitationRow({ invitation, revoking, error, confirming, onAsk, onCance
         <p>{invitation.specialty} · {invitation.clinic}</p>
         <p className="admin-meta">{invitation.email}</p>
         <p className="admin-meta">
-          {invitation.status === 'accepted' && accepted ? `Accepted ${accepted}` : expires ? `${invitation.status === 'pending' ? 'Expires' : 'Expiry'} ${expires}` : null}
+          {invitation.status === 'accepted' && accepted ? `Acceptată la ${accepted}` : expires ? `${invitation.status === 'pending' ? 'Expiră la' : 'Data expirării:'} ${expires}` : null}
         </p>
       </div>
       <p className={`admin-badge admin-badge--${invitation.status}`}>{STATUS_LABEL[invitation.status]}</p>
@@ -209,14 +209,14 @@ function InvitationRow({ invitation, revoking, error, confirming, onAsk, onCance
           {confirming ? (
             <>
               <button type="button" className="ui-button ui-button--danger" onClick={onConfirm}>
-                Confirm revoke<span className="visually-hidden"> invitation for {invitation.fullName}</span>
+                Confirmați revocarea<span className="visually-hidden"> invitației pentru {invitation.fullName}</span>
               </button>
-              <button type="button" className="ui-button ui-button--secondary" onClick={onCancel}>Keep invitation</button>
+              <button type="button" className="ui-button ui-button--secondary" onClick={onCancel}>Păstrați invitația</button>
             </>
           ) : (
             <button type="button" className="ui-button ui-button--secondary" onClick={onAsk} disabled={revoking} aria-busy={revoking}>
-              {revoking ? 'Revoking…' : error ? 'Try revoking again' : 'Revoke'}
-              <span className="visually-hidden"> invitation for {invitation.fullName}</span>
+              {revoking ? 'Se revocă…' : error ? 'Încercați din nou revocarea' : 'Revocați'}
+              <span className="visually-hidden"> invitația pentru {invitation.fullName}</span>
             </button>
           )}
         </div>

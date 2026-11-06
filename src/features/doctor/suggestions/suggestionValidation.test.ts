@@ -12,7 +12,7 @@ import {
 const validPhoto = { name: 'rash-photo.JPG', type: 'image/jpeg', size: 2 * MB };
 
 test('blank message is rejected', () => {
-  assertEqual(validateSuggestion({ message: '', photo: null }), { message: 'Enter a message for the patient.' });
+  assertEqual(validateSuggestion({ message: '', photo: null }), { message: 'Introduceți un mesaj pentru pacient.' });
 });
 
 test('whitespace-only message is rejected', () => {
@@ -22,7 +22,7 @@ test('whitespace-only message is rejected', () => {
 
 test('message over the limit is rejected', () => {
   const errors = validateSuggestion({ message: 'a'.repeat(SUGGESTION_MESSAGE_MAX + 1), photo: null });
-  assertEqual(errors.message, `Shorten the message to ${SUGGESTION_MESSAGE_MAX} characters or fewer.`);
+  assertEqual(errors.message, `Scurtați mesajul la cel mult ${SUGGESTION_MESSAGE_MAX} de caractere.`);
 });
 
 test('message exactly at the limit with surrounding spaces is valid', () => {
@@ -39,22 +39,22 @@ test('wrong file type is rejected', () => {
     message: 'Hello',
     photo: { name: 'notes.pdf', type: 'application/pdf', size: 1000 },
   });
-  assertEqual(errors, { photo: 'Choose a JPG or PNG file.' });
+  assertEqual(errors, { photo: 'Alegeți un fișier JPG sau PNG.' });
 });
 
 test('image with mismatched MIME type is rejected', () => {
   const errors = validateSuggestion({ message: 'Hello', photo: { name: 'photo.png', type: 'image/gif', size: 1000 } });
-  assertEqual(errors.photo, 'Choose a JPG or PNG file.');
+  assertEqual(errors.photo, 'Alegeți un fișier JPG sau PNG.');
 });
 
 test('photo over 10 MB is rejected', () => {
   const errors = validateSuggestion({ message: 'Hello', photo: { ...validPhoto, size: 10 * MB + 1 } });
-  assertEqual(errors.photo, 'The file is larger than 10 MB.');
+  assertEqual(errors.photo, 'Fișierul depășește 10 MB.');
 });
 
 test('empty photo is rejected', () => {
   const errors = validateSuggestion({ message: 'Hello', photo: { ...validPhoto, size: 0 } });
-  assertEqual(errors.photo, 'The selected file is empty.');
+  assertEqual(errors.photo, 'Fișierul selectat este gol.');
 });
 
 test('valid photo with valid message has no errors', () => {
@@ -69,10 +69,10 @@ test('both errors are reported together', () => {
 });
 
 test('character counter reports trimmed length and overflow', () => {
-  assertEqual(describeMessageLength('  abc  '), `3 of ${SUGGESTION_MESSAGE_MAX} characters`);
+  assertEqual(describeMessageLength('  abc  '), `3 din ${SUGGESTION_MESSAGE_MAX} de caractere`);
   assertEqual(
     describeMessageLength('a'.repeat(SUGGESTION_MESSAGE_MAX + 5)),
-    `${SUGGESTION_MESSAGE_MAX + 5} of ${SUGGESTION_MESSAGE_MAX} characters — 5 over the limit`,
+    `${SUGGESTION_MESSAGE_MAX + 5} din ${SUGGESTION_MESSAGE_MAX} de caractere — cu 5 peste limită`,
   );
 });
 

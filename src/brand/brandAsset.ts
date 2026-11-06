@@ -9,4 +9,4 @@ export function brandAsset(path: string): string {
 export const brandSlug = brand.productName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'app';
 
 /** Standard support sentence used by error messages. */
-export const supportContact = `Please contact ${brand.productName} support at ${brand.support.email}.`;
+export const supportContact = `Vă rugăm să contactați echipa de suport ${brand.productName} la ${brand.support.email}.`;

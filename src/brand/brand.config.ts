@@ -34,7 +34,7 @@ export interface BrandConfig {
 
 export const brand: BrandConfig = {
   productName: 'MedFlow',
-  assistantName: 'MedFlow Assistant',
+  assistantName: 'Asistentul MedFlow',
   logo: {
     light: 'brand/medflow-logo-placeholder-light.svg',
     dark: 'brand/medflow-logo-placeholder-dark.svg',

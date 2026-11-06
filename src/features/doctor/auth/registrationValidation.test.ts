@@ -70,7 +70,7 @@ test('password needs at least 8 characters', () => {
 
 test('password confirmation must match', () => {
   const errors = validateRegistration(valid({ confirmPassword: 'different-123' }));
-  assertEqual(errors.confirmPassword, 'Passwords do not match.');
+  assertEqual(errors.confirmPassword, 'Parolele nu coincid.');
   assertEqual(firstInvalidField(errors, REGISTRATION_FIELD_ORDER), 'confirmPassword');
 });
 
@@ -82,7 +82,7 @@ test('credential file type is checked', () => {
   const errors = validateRegistration(
     valid({ credentialFile: { name: 'notes.docx', type: 'application/msword', size: 1000 } }),
   );
-  assertEqual(errors.credentialFile, 'Choose a PDF, JPG or PNG file.');
+  assertEqual(errors.credentialFile, 'Alegeți un fișier PDF, JPG sau PNG.');
   assertEqual(
     validateRegistration(valid({ credentialFile: { name: 'scan.JPG', type: 'image/jpeg', size: 1000 } })).credentialFile,
     undefined,
@@ -93,13 +93,13 @@ test('credential file size is checked', () => {
   const big = validateRegistration(
     valid({ credentialFile: { name: 'scan.png', type: 'image/png', size: 10 * MB + 1 } }),
   );
-  assertEqual(big.credentialFile, 'The file is larger than 10 MB.');
+  assertEqual(big.credentialFile, 'Fișierul depășește 10 MB.');
   const edge = validateRegistration(
     valid({ credentialFile: { name: 'scan.png', type: 'image/png', size: 10 * MB } }),
   );
   assertEqual(edge.credentialFile, undefined);
   const empty = validateRegistration(valid({ credentialFile: { name: 'scan.png', type: 'image/png', size: 0 } }));
-  assertEqual(empty.credentialFile, 'The selected file is empty.');
+  assertEqual(empty.credentialFile, 'Fișierul selectat este gol.');
 });
 
 test('login requires email and password, checks email format', () => {

@@ -27,17 +27,17 @@ export const EMPTY_FORM: InvitationForm = { email: '', fullName: '', specialty: 
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const LIMITS: Record<keyof InvitationForm, number> = { email: 320, fullName: 200, specialty: 200, clinic: 300 };
-const LABELS: Record<keyof InvitationForm, string> = { email: 'Email', fullName: 'Full name', specialty: 'Specialty', clinic: 'Clinic' };
+const LABELS: Record<keyof InvitationForm, string> = { email: 'E-mailul', fullName: 'Numele complet', specialty: 'Specialitatea', clinic: 'Clinica' };
 
 /** Same limits as the backend and database; the server still validates everything. */
 export function validateInvitationForm(form: InvitationForm): InvitationFormErrors {
   const errors: InvitationFormErrors = {};
   for (const key of Object.keys(LIMITS) as (keyof InvitationForm)[]) {
     const value = form[key].trim();
-    if (!value) errors[key] = `${LABELS[key]} is required.`;
-    else if (value.length > LIMITS[key]) errors[key] = `${LABELS[key]} must be at most ${LIMITS[key]} characters.`;
+    if (!value) errors[key] = `${LABELS[key]} este obligatoriu.`;
+    else if (value.length > LIMITS[key]) errors[key] = `${LABELS[key]} poate avea cel mult ${LIMITS[key]} de caractere.`;
   }
-  if (!errors.email && !EMAIL.test(form.email.trim())) errors.email = 'Enter a valid email address, for example name@clinic.ro.';
+  if (!errors.email && !EMAIL.test(form.email.trim())) errors.email = 'Introduceți o adresă de e-mail validă, de exemplu nume@clinica.ro.';
   return errors;
 }
 
@@ -51,10 +51,10 @@ export function normalizeForm(form: InvitationForm): InvitationForm {
 }
 
 export const STATUS_LABEL: Record<InvitationStatus, string> = {
-  pending: 'Waiting for the doctor',
-  accepted: 'Accepted',
-  expired: 'Expired',
-  revoked: 'Revoked',
+  pending: 'Se așteaptă răspunsul medicului',
+  accepted: 'Acceptată',
+  expired: 'Expirată',
+  revoked: 'Revocată',
 };
 
 /** Pending first (soonest to expire first), then the rest, newest expiry first. */

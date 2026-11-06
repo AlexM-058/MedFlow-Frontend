@@ -16,14 +16,14 @@ export const CREDENTIAL_FILE_RULE: FileRule = {
   mimeTypes: ['application/pdf', 'image/jpeg', 'image/png'],
   extensions: ['.pdf', '.jpg', '.jpeg', '.png'],
   maxBytes: 10 * MB,
-  label: 'PDF, JPG or PNG',
+  label: 'PDF, JPG sau PNG',
 };
 
 export const SUGGESTION_PHOTO_RULE: FileRule = {
   mimeTypes: ['image/jpeg', 'image/png'],
   extensions: ['.jpg', '.jpeg', '.png'],
   maxBytes: 10 * MB,
-  label: 'JPG or PNG',
+  label: 'JPG sau PNG',
 };
 
 /** Value for an <input type="file" accept> attribute. */
@@ -37,11 +37,11 @@ export function validateFile(file: { name: string; type: string; size: number },
   const extension = dot >= 0 ? file.name.slice(dot).toLowerCase() : '';
   const typeOk = file.type ? rule.mimeTypes.includes(file.type) : true;
   if (!rule.extensions.includes(extension) || !typeOk) {
-    return `Choose a ${rule.label} file.`;
+    return `Alegeți un fișier ${rule.label}.`;
   }
-  if (file.size === 0) return 'The selected file is empty.';
+  if (file.size === 0) return 'Fișierul selectat este gol.';
   if (file.size > rule.maxBytes) {
-    return `The file is larger than ${Math.round(rule.maxBytes / MB)} MB.`;
+    return `Fișierul depășește ${Math.round(rule.maxBytes / MB)} MB.`;
   }
   return null;
 }

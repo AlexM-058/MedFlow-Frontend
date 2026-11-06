@@ -3,9 +3,9 @@ import { THEME_PREFERENCES, type ThemePreference } from './themeContract';
 import { useTheme } from './themeContext';
 
 const LABELS: Record<ThemePreference, string> = {
-  light: 'Light',
-  dark: 'Dark',
-  system: 'System',
+  light: 'Luminos',
+  dark: 'Întunecat',
+  system: 'Sistem',
 };
 
 export function ThemeSelector() {
@@ -14,7 +14,7 @@ export function ThemeSelector() {
 
   return (
     <fieldset className="theme-selector">
-      <legend className="visually-hidden">Theme</legend>
+      <legend className="visually-hidden">Temă</legend>
       {THEME_PREFERENCES.map((option) => (
         <label key={option} className="theme-selector__option">
           <input

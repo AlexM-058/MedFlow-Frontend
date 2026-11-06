@@ -1,0 +1,1 @@
+export { IntakeChatPanel } from './IntakeChatPanel';

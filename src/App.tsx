@@ -10,6 +10,7 @@ import { PatientConnectPage, PatientAccountPage } from './features/connections';
 import { AdminPage } from './features/admin';
 import { ChatPage } from './features/chat/ChatPage';
 import { DocumentScannerPage } from './features/document-scanner';
+import { CareScenarioPage } from './features/care-scenario';
 import { PatientSuggestionPanel } from './features/patient-suggestions';
 import { ThemeProvider } from './theme/ThemeProvider';
 
@@ -27,7 +28,7 @@ const DoctorAccountWorkspace = doctorModules['./features/doctor/index.ts']?.Doct
 const exampleSuggestion = {
   id: 'demo-suggestion-1',
   doctorName: 'Dr. Elena Marin',
-  text: 'Please bring your questions and any previous appointment notes to our next visit. You can use this space to prepare an update for your care team.',
+  text: 'Vă rugăm să aduceți la următoarea vizită întrebările dumneavoastră și notițele de la consultațiile anterioare. Puteți folosi acest spațiu pentru a pregăti un mesaj pentru echipa dumneavoastră de îngrijire.',
   createdAt: '2026-11-06T09:30:00+02:00',
 };
 
@@ -36,7 +37,7 @@ function PatientWorkspace() {
 
   return (
     <div className="app">
-      <a className="skip-link" href="#patient-content">Skip to conversation</a>
+      <a className="skip-link" href="#patient-content">Treceți la conversație</a>
       <AppHeader />
       <div id="patient-content" className={`patient-workspace${suggestionOpen ? ' patient-workspace--with-suggestion' : ''}`} tabIndex={-1}>
         <ChatPage onOpenSuggestion={() => setSuggestionOpen(true)} suggestionOpen={suggestionOpen} />
@@ -48,14 +49,14 @@ function PatientWorkspace() {
 
 function VerifiedDoctor() {
   const { profile } = useAuth();
-  if (profile?.role !== 'doctor') return <section className="account-card"><h1>Doctor access is invitation only</h1><p>Open the invitation sent by the {brand.productName} team and sign in with the invited Google account. Selecting this page does not grant doctor access.</p><a href="#/patient">Go to your patient account</a><AccountSessionControls /></section>;
+  if (profile?.role !== 'doctor') return <section className="account-card"><h1>Accesul medicilor se face doar pe bază de invitație</h1><p>Deschideți invitația trimisă de echipa {brand.productName} și autentificați-vă cu contul Google invitat. Accesarea acestei pagini nu oferă drepturi de medic.</p><a href="#/patient">Mergeți la contul de pacient</a><AccountSessionControls /></section>;
   if (DoctorAccountWorkspace) return <DoctorAccountWorkspace profile={profile} onExit={() => navigate('/patient')} />;
-  return <section className="account-card"><h1>Welcome, {profile.fullName}</h1><p>Your doctor account has been verified. The QR and connection-request workspace is being integrated separately. No patient data is displayed in this preview.</p><AccountSessionControls /></section>;
+  return <section className="account-card"><h1>Bun venit, {profile.fullName}</h1><p>Contul dumneavoastră de medic a fost verificat. Spațiul pentru codul QR și cererile de conectare este integrat separat. În această previzualizare nu sunt afișate date ale pacienților.</p><AccountSessionControls /></section>;
 }
 
 function PatientAccount() {
   const { profile } = useAuth();
-  if (profile?.role === 'doctor') return <section className="account-card"><h1>Your doctor account is ready</h1><a className="ui-button ui-button--primary" href="#/doctor">Open doctor workspace</a><AccountSessionControls /></section>;
+  if (profile?.role === 'doctor') return <section className="account-card"><h1>Contul dumneavoastră de medic este pregătit</h1><a className="ui-button ui-button--primary" href="#/doctor">Deschideți spațiul de lucru al medicului</a><AccountSessionControls /></section>;
   return <><PatientAccountPage /><AccountSessionControls /></>;
 }
 
@@ -68,9 +69,10 @@ function Routes() {
   const route = useSyncExternalStore(subscribeToRoute, readAppRoute, () => '/home');
   if (route === '/home' || route === '/') return <AccountLayout><AccountEntryPage /></AccountLayout>;
   if (route === '/demo/patient') return <PatientWorkspace />;
-  if (route === '/demo/doctor') return DoctorApp ? <DoctorApp onExit={() => navigate('/demo/patient')} /> : <AccountLayout><p role="status">The doctor demo is not available yet.</p></AccountLayout>;
+  if (route === '/demo/doctor') return DoctorApp ? <DoctorApp onExit={() => navigate('/demo/patient')} /> : <AccountLayout><p role="status">Demo-ul pentru medic nu este disponibil încă.</p></AccountLayout>;
   if (route === '/demo/scan') return <DocumentScannerPage />;
-  if (route === '/auth/callback') return <AccountLayout><p role="status">Completing Google sign-in…</p></AccountLayout>;
+  if (route === '/demo/care') return <CareScenarioPage />;
+  if (route === '/auth/callback') return <AccountLayout><p role="status">Se finalizează autentificarea cu Google…</p></AccountLayout>;
   const connect = /^\/connect\/([^/]+)$/.exec(route);
   const invitation = /^\/doctor\/invite\/([^/]+)$/.exec(route);
   return (
@@ -81,7 +83,7 @@ function Routes() {
         <AuthBoundary destination="/admin"><AdminPage /></AuthBoundary>
       ) : route === '/patient' || route === '/login' ? (
         <AuthBoundary destination="/patient"><PatientAccount /></AuthBoundary>
-      ) : <section className="account-card"><h1>Page not found</h1><a href="#/patient">Return to {brand.productName}</a></section>}
+      ) : <section className="account-card"><h1>Pagina nu a fost găsită</h1><a href="#/patient">Înapoi la {brand.productName}</a></section>}
     </AccountLayout>
   );
 }

@@ -82,6 +82,10 @@ These demo routes make no medical backend calls, storage uploads or real AI call
   The **Doctor demo** link and browser Back/Forward work with hash navigation.
 - `#/demo/scan`: local document capture from camera/files, preview and explicit
   confirmation. Documents stay local; this demo does not upload to the backend.
+- `#/demo/care`: complete synthetic care scenario (context, prescription review,
+  confirmed reminders, intake, doctor summary and feedback). State is in memory
+  and resets on reload; see `src/features/care-scenario/HANDOFF.md` and the root
+  `DEMO_RUNBOOK.md`. This route does not call live AI or persist to Supabase.
 
 The root `HANDOFF.md` is the current continuation checklist; `WORK_ALLOCATION.md`
 defines ownership. Claude handles most implementation; Codex handles connected

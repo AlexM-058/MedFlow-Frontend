@@ -24,9 +24,9 @@ export interface SuggestionErrors {
 /** Returns an error for the message, or null when it can be sent. */
 export function validateSuggestionMessage(message: string): string | null {
   const trimmed = message.trim();
-  if (trimmed.length === 0) return 'Enter a message for the patient.';
+  if (trimmed.length === 0) return 'Introduceți un mesaj pentru pacient.';
   if (trimmed.length > SUGGESTION_MESSAGE_MAX) {
-    return `Shorten the message to ${SUGGESTION_MESSAGE_MAX} characters or fewer.`;
+    return `Scurtați mesajul la cel mult ${SUGGESTION_MESSAGE_MAX} de caractere.`;
   }
   return null;
 }
@@ -54,7 +54,7 @@ export function hasSuggestionErrors(errors: SuggestionErrors): boolean {
 export function describeMessageLength(message: string): string {
   const length = message.trim().length;
   if (length > SUGGESTION_MESSAGE_MAX) {
-    return `${length} of ${SUGGESTION_MESSAGE_MAX} characters — ${length - SUGGESTION_MESSAGE_MAX} over the limit`;
+    return `${length} din ${SUGGESTION_MESSAGE_MAX} de caractere — cu ${length - SUGGESTION_MESSAGE_MAX} peste limită`;
   }
-  return `${length} of ${SUGGESTION_MESSAGE_MAX} characters`;
+  return `${length} din ${SUGGESTION_MESSAGE_MAX} de caractere`;
 }

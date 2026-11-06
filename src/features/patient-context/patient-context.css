@@ -1,0 +1,128 @@
+/* Patient context panel: allergies, conditions, current medication. Tokens only. */
+.patient-context {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+  padding: clamp(var(--space-4), 3vw, var(--space-6));
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-decorative);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  overflow-wrap: anywhere;
+}
+
+.patient-context p,
+.patient-context h2,
+.patient-context h3 { margin: 0; }
+
+.patient-context-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-3);
+  min-width: 0;
+}
+
+.patient-context-title { font-size: clamp(1.25rem, 3vw, 1.5rem); line-height: 1.25; min-width: 0; }
+.patient-context-intro,
+.patient-context-status { line-height: var(--line-height); }
+
+.patient-context-group { display: grid; gap: var(--space-3); min-width: 0; }
+.patient-context-group + .patient-context-group {
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border-decorative);
+}
+.patient-context-group-title { font-size: 1.125rem; line-height: 1.3; }
+.patient-context-empty { color: var(--color-text-secondary); }
+
+.patient-context-list { display: grid; gap: var(--space-3); margin: 0; padding: 0; list-style: none; min-width: 0; }
+
+.patient-context-item {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-decorative);
+  border-radius: var(--radius-sm);
+}
+.patient-context-item--conflict { border-color: var(--status-error-border); border-width: 2px; }
+
+.patient-context-item-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.patient-context-item-text { flex: 1 1 12rem; min-width: 0; font-weight: 600; line-height: 1.4; }
+
+.patient-context-chip {
+  flex: 0 0 auto;
+  padding: 0.125rem 0.625rem;
+  border: 1px solid var(--color-border-control);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-subtle);
+  color: var(--status-on-tint);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  line-height: 1.5;
+}
+.patient-context-chip--confirmed { background: var(--status-success-bg); border-color: var(--status-success-border); }
+.patient-context-chip--unconfirmed { border-style: dashed; }
+.patient-context-chip--unknown { background: var(--status-warning-bg); border-color: var(--status-warning-border); }
+.patient-context-chip--conflict { background: var(--status-error-bg); border-color: var(--status-error-border); }
+
+/* Secondary gray text only on the white item surface. */
+.patient-context-meta,
+.patient-context-hint { color: var(--color-text-secondary); font-size: var(--font-size-sm); line-height: 1.45; }
+
+.patient-context-quote {
+  margin: 0;
+  padding-left: var(--space-3);
+  border-left: 3px solid var(--color-border-control);
+  font-style: italic;
+}
+
+.patient-context-conflict,
+.patient-context-error {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--status-error-border);
+  border-radius: var(--radius-sm);
+  background: var(--status-error-bg);
+  color: var(--status-on-tint);
+}
+.patient-context-note { white-space: pre-wrap; }
+.patient-context-conflict-action { font-weight: 700; }
+
+.patient-context-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.patient-context .ui-button { justify-self: start; }
+
+.patient-context-add { display: grid; gap: var(--space-1); min-width: 0; }
+.patient-context-add-label { font-weight: 600; }
+.patient-context-add-row { display: flex; flex-wrap: wrap; gap: var(--space-2); min-width: 0; }
+
+.patient-context-input {
+  flex: 1 1 14rem;
+  min-width: 0;
+  min-height: 2.75rem;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-control);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+}
+.patient-context-input:focus-visible { outline: 3px solid var(--color-focus-ring); outline-offset: 2px; }
+.patient-context-input[aria-invalid='true'] { border-color: var(--status-error-border); border-width: 2px; }
+
+.patient-context-field-error { color: var(--status-error-text); font-size: var(--font-size-sm); font-weight: 600; }
+
+@media (forced-colors: active) {
+  .patient-context-chip { border-color: CanvasText; }
+}

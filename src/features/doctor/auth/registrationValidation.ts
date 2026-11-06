@@ -49,12 +49,12 @@ export const REGISTRATION_FIELD_ORDER: readonly RegistrationField[] = [
 
 /** Synthetic specialty options for the demo form. */
 export const SPECIALTY_OPTIONS: readonly string[] = [
-  'Family medicine',
-  'Internal medicine',
-  'Cardiology',
-  'Pediatrics',
-  'Dermatology',
-  'Other',
+  'Medicină de familie',
+  'Medicină internă',
+  'Cardiologie',
+  'Pediatrie',
+  'Dermatologie',
+  'Altă specialitate',
 ];
 
 export const PASSWORD_MIN_LENGTH = 8;
@@ -75,8 +75,8 @@ export function isValidPhone(value: string): boolean {
 }
 
 function emailError(value: string): string | undefined {
-  if (!value.trim()) return 'Enter your work email.';
-  if (!isValidEmail(value)) return 'Enter an email address like name@clinic.com.';
+  if (!value.trim()) return 'Introduceți adresa de e-mail de serviciu.';
+  if (!isValidEmail(value)) return 'Introduceți o adresă de e-mail de forma nume@clinica.ro.';
   return undefined;
 }
 
@@ -84,42 +84,42 @@ export function validateLogin(values: LoginValues): LoginErrors {
   const errors: LoginErrors = {};
   const email = emailError(values.email);
   if (email) errors.email = email;
-  if (!values.password) errors.password = 'Enter your password.';
+  if (!values.password) errors.password = 'Introduceți parola.';
   return errors;
 }
 
 export function validateRegistration(values: RegistrationValues): RegistrationErrors {
   const errors: RegistrationErrors = {};
 
-  if (!values.fullName.trim()) errors.fullName = 'Enter your full name.';
+  if (!values.fullName.trim()) errors.fullName = 'Introduceți numele complet.';
 
   const email = emailError(values.email);
   if (email) errors.email = email;
 
   if (!values.phone.trim()) {
-    errors.phone = 'Enter your phone number.';
+    errors.phone = 'Introduceți numărul de telefon.';
   } else if (!isValidPhone(values.phone)) {
-    errors.phone = `Enter a phone number with at least ${PHONE_MIN_DIGITS} digits (digits, spaces and + only).`;
+    errors.phone = `Introduceți un număr de telefon cu cel puțin ${PHONE_MIN_DIGITS} cifre (doar cifre, spații și +).`;
   }
 
-  if (!values.specialty) errors.specialty = 'Select your specialty.';
-  if (!values.licenseNumber.trim()) errors.licenseNumber = 'Enter your medical license number.';
-  if (!values.institution.trim()) errors.institution = 'Enter your clinic or hospital.';
+  if (!values.specialty) errors.specialty = 'Selectați specialitatea.';
+  if (!values.licenseNumber.trim()) errors.licenseNumber = 'Introduceți numărul de înregistrare profesională.';
+  if (!values.institution.trim()) errors.institution = 'Introduceți clinica sau spitalul.';
 
   if (!values.password) {
-    errors.password = 'Create a password.';
+    errors.password = 'Creați o parolă.';
   } else if (values.password.length < PASSWORD_MIN_LENGTH) {
-    errors.password = `Use at least ${PASSWORD_MIN_LENGTH} characters.`;
+    errors.password = `Folosiți cel puțin ${PASSWORD_MIN_LENGTH} caractere.`;
   }
 
   if (!values.confirmPassword) {
-    errors.confirmPassword = 'Re-enter your password.';
+    errors.confirmPassword = 'Introduceți din nou parola.';
   } else if (values.password !== values.confirmPassword) {
-    errors.confirmPassword = 'Passwords do not match.';
+    errors.confirmPassword = 'Parolele nu coincid.';
   }
 
   if (!values.credentialFile) {
-    errors.credentialFile = 'Attach your medical license or certificate.';
+    errors.credentialFile = 'Atașați dovada calității de medic (certificat sau drept de liberă practică).';
   } else {
     const fileError = validateFile(values.credentialFile, CREDENTIAL_FILE_RULE);
     if (fileError) errors.credentialFile = fileError;

@@ -33,7 +33,7 @@ export function DoctorDialog({
   initialFocusRef,
   preventClose = false,
   wide = false,
-  closeLabel = 'Close',
+  closeLabel = 'Închide',
 }: DoctorDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);

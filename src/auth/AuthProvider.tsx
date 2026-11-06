@@ -20,11 +20,11 @@ function exchangeCallback(): Promise<Session> {
   if (!callbackExchange) {
     callbackExchange = (async () => {
       const params = new URLSearchParams(window.location.search);
-      if (params.has('error')) throw new Error('Google sign-in was cancelled or could not be completed. Please try again.');
+      if (params.has('error')) throw new Error('Autentificarea cu Google a fost anulată sau nu a putut fi finalizată. Vă rugăm să încercați din nou.');
       const code = params.get('code');
-      if (!code || !supabase) throw new Error('This sign-in link is incomplete. Please start Google sign-in again.');
+      if (!code || !supabase) throw new Error('Linkul de autentificare este incomplet. Vă rugăm să reluați autentificarea cu Google.');
       const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-      if (error || !data.session) throw new Error('This sign-in link has expired or was already used. Please sign in again in this browser.');
+      if (error || !data.session) throw new Error('Linkul de autentificare a expirat sau a fost deja folosit. Vă rugăm să vă autentificați din nou în acest browser.');
       return data.session;
     })();
   }
@@ -63,14 +63,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     try {
       const profile = await accountApi.getMe(session.access_token, controller.signal);
-      if (profile.id !== session.user.id) throw new AccountApiError('The account identity could not be verified.', 502, 'INVALID_RESPONSE');
+      if (profile.id !== session.user.id) throw new AccountApiError('Identitatea contului nu a putut fi verificată.', 502, 'INVALID_RESPONSE');
       if (mounted.current && id === requestId.current) setState({ status: 'ready', session, profile, error: null });
     } catch (error) {
       if (!mounted.current || id !== requestId.current || controller.signal.aborted) return;
       if (error instanceof AccountApiError && error.status === 401) {
-        setState({ status: 'signed-out', session: null, profile: null, error: 'Your session has expired. Please sign in again.' });
+        setState({ status: 'signed-out', session: null, profile: null, error: 'Sesiunea dumneavoastră a expirat. Vă rugăm să vă autentificați din nou.' });
       } else {
-        setState({ status: 'error', session, profile: null, error: error instanceof AccountApiError ? error.message : 'Your account could not be loaded. Please try again.' });
+        setState({ status: 'error', session, profile: null, error: error instanceof AccountApiError ? error.message : 'Contul dumneavoastră nu a putut fi încărcat. Vă rugăm să încercați din nou.' });
       }
     }
   }, []);
@@ -83,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (!mounted.current) return;
           finishCallbackUrl('/patient');
           try { window.sessionStorage.removeItem(AUTH_RETURN_KEY); } catch { /* Storage may be disabled. */ }
-          setState({ status: 'unconfigured', session: null, profile: null, error: `Google sign-in is not configured in this environment. ${supportContact}` });
+          setState({ status: 'unconfigured', session: null, profile: null, error: `Autentificarea cu Google nu este configurată în acest mediu. ${supportContact}` });
         });
       }
       return () => { mounted.current = false; };
@@ -107,7 +107,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (callback) session = await exchangeCallback();
         else {
           const result = await client.auth.getSession();
-          if (result.error) throw new Error('Your session could not be restored. Please sign in again.');
+          if (result.error) throw new Error('Sesiunea dumneavoastră nu a putut fi restaurată. Vă rugăm să vă autentificați din nou.');
           session = result.data.session;
         }
         if (!active) return;
@@ -124,7 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           try { window.sessionStorage.removeItem(AUTH_RETURN_KEY); } catch { /* Storage may be disabled. */ }
           finishCallbackUrl(destination);
         }
-        setState({ status: 'signed-out', session: null, profile: null, error: error instanceof Error ? error.message : 'Sign-in could not be completed.' });
+        setState({ status: 'signed-out', session: null, profile: null, error: error instanceof Error ? error.message : 'Autentificarea nu a putut fi finalizată.' });
       }
     }
     void initialize();
@@ -134,9 +134,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       activeToken.current = null;
       invalidateProfile();
       void client.auth.signOut({ scope: 'local' }).then(() => {
-        if (active && activeToken.current === null) setState({ status: 'signed-out', session: null, profile: null, error: 'Your session has expired. Please sign in again.' });
+        if (active && activeToken.current === null) setState({ status: 'signed-out', session: null, profile: null, error: 'Sesiunea dumneavoastră a expirat. Vă rugăm să vă autentificați din nou.' });
       });
-      setState({ status: 'signed-out', session: null, profile: null, error: 'Your session has expired. Please sign in again.' });
+      setState({ status: 'signed-out', session: null, profile: null, error: 'Sesiunea dumneavoastră a expirat. Vă rugăm să vă autentificați din nou.' });
     }
     window.addEventListener('medflow:session-expired', expire);
     return () => {
@@ -149,21 +149,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [loadProfile, invalidateProfile]);
 
   const signInWithGoogle = useCallback(async (destination: string) => {
-    if (!supabase) throw new Error(`Google sign-in is not configured yet. ${supportContact}`);
+    if (!supabase) throw new Error(`Autentificarea cu Google nu este încă configurată. ${supportContact}`);
     try { window.sessionStorage.setItem(AUTH_RETURN_KEY, encodeReturn(destination)); } catch {
-      throw new Error('Allow session storage in this browser to sign in and return to your invitation or doctor link.');
+      throw new Error('Permiteți stocarea sesiunii în acest browser pentru a vă autentifica și a reveni la invitația sau la linkul medicului.');
     }
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: `${window.location.origin}${callbackPath(import.meta.env.BASE_URL)}`, scopes: 'openid email profile', queryParams: { prompt: 'select_account' } },
     });
-    if (error) throw new Error('Google sign-in could not be started. Please try again.');
+    if (error) throw new Error('Autentificarea cu Google nu a putut fi pornită. Vă rugăm să încercați din nou.');
   }, []);
 
   const signOut = useCallback(async () => {
     if (!supabase) return;
     const { error } = await supabase.auth.signOut({ scope: 'local' });
-    if (error) throw new Error('Sign-out could not be completed. Please try again.');
+    if (error) throw new Error('Deconectarea nu a putut fi finalizată. Vă rugăm să încercați din nou.');
     try { window.sessionStorage.removeItem(AUTH_RETURN_KEY); } catch { /* No sensitive state remains in the application. */ }
     await loadProfile(null);
   }, [loadProfile]);
@@ -176,7 +176,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) {
       invalidateProfile();
       activeToken.current = null;
-      if (mounted.current) setState({ status: 'signed-out', session: null, profile: null, error: 'Please sign in again.' });
+      if (mounted.current) setState({ status: 'signed-out', session: null, profile: null, error: 'Vă rugăm să vă autentificați din nou.' });
       return;
     }
     await loadProfile(data.session, true);

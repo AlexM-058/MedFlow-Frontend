@@ -73,7 +73,7 @@ export function useAdminPanel() {
     if (result.stale) return;
     setState((s) => {
       if (s.identity !== owner) return s;
-      if ('error' in result) return { ...s, refreshing: false, listError: message(result.error, 'Invitations could not be loaded.') };
+      if ('error' in result) return { ...s, refreshing: false, listError: message(result.error, 'Invitațiile nu au putut fi încărcate.') };
       return { ...s, refreshing: false, listError: null, invitations: result.value };
     });
   }, [run]);
@@ -83,7 +83,7 @@ export function useAdminPanel() {
     const result = await run((t, signal) => adminApi.getStatus(t, signal));
     if (result.stale) return;
     if ('error' in result) {
-      setState((s) => (s.identity === owner ? { ...s, phase: 'error', error: message(result.error, 'Administrator access could not be checked.') } : s));
+      setState((s) => (s.identity === owner ? { ...s, phase: 'error', error: message(result.error, 'Accesul de administrator nu a putut fi verificat.') } : s));
       return;
     }
     if (!result.value) {
@@ -128,7 +128,7 @@ export function useAdminPanel() {
     }
     if (result.stale) return false;
     if ('error' in result) {
-      setState((s) => (s.identity === owner ? { ...s, createError: message(result.error, 'The invitation could not be created.') } : s));
+      setState((s) => (s.identity === owner ? { ...s, createError: message(result.error, 'Invitația nu a putut fi creată.') } : s));
       // A lost answer may still have created the invitation: show the server's list.
       void loadList(owner);
       return false;
@@ -158,7 +158,7 @@ export function useAdminPanel() {
       if (s.identity !== owner) return s;
       const revoking = { ...s.revoking };
       delete revoking[id];
-      if ('error' in result) return { ...s, revoking, revokeErrors: { ...s.revokeErrors, [id]: message(result.error, 'The invitation could not be revoked.') } };
+      if ('error' in result) return { ...s, revoking, revokeErrors: { ...s.revokeErrors, [id]: message(result.error, 'Invitația nu a putut fi revocată.') } };
       return {
         ...s, revoking,
         invitations: replaceInvitation(s.invitations, result.value),

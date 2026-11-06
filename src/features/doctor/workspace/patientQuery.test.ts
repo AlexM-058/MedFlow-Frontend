@@ -69,15 +69,15 @@ test('most recent activity sorts by timestamp, newest first', () => {
 
 test('"Today, 08:15" is older than "Today, 09:42" (not label order)', () => {
   const oldest = ids(run({ sort: 'oldest' }));
-  assertEqual(formatLastContact(DEMO_PATIENTS[1].lastContactAt, DEMO_NOW), 'Today, 08:15');
-  assertEqual(formatLastContact(DEMO_PATIENTS[0].lastContactAt, DEMO_NOW), 'Today, 09:42');
+  assertEqual(formatLastContact(DEMO_PATIENTS[1].lastContactAt, DEMO_NOW), 'Astăzi, 08:15');
+  assertEqual(formatLastContact(DEMO_PATIENTS[0].lastContactAt, DEMO_NOW), 'Astăzi, 09:42');
   assertTrue(oldest.indexOf('MF-002') < oldest.indexOf('MF-001'), '08:15 before 09:42 in oldest-first');
 });
 
 test('"Yesterday" entries are ordered by timestamp and sit between today and older dates', () => {
   const recent = ids(run({ sort: 'recent' }));
-  assertEqual(formatLastContact(DEMO_PATIENTS[2].lastContactAt, DEMO_NOW), 'Yesterday');
-  assertEqual(formatLastContact(DEMO_PATIENTS[5].lastContactAt, DEMO_NOW), 'Yesterday');
+  assertEqual(formatLastContact(DEMO_PATIENTS[2].lastContactAt, DEMO_NOW), 'Ieri');
+  assertEqual(formatLastContact(DEMO_PATIENTS[5].lastContactAt, DEMO_NOW), 'Ieri');
   // A label sort would put "Yesterday" after "04 Nov 2026"/"Today"; timestamps must win.
   assertEqual(recent.slice(2, 4), ['MF-003', 'MF-006']);
   assertTrue(recent.indexOf('MF-006') < recent.indexOf('MF-007'), 'Yesterday before 04 Nov');

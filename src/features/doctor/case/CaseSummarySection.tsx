@@ -1,0 +1,124 @@
+import type { CaseSummary } from '../../care-scenario/contracts';
+import {
+  buildSummaryRows,
+  coverageLabel,
+  formatDateTime,
+  formatTime,
+  messageAnchorId,
+  summaryOriginLabel,
+  type CaseLookup,
+  type Coverage,
+} from './caseLogic';
+import type { Resource } from './useResource';
+
+interface Props {
+  summary: Resource<CaseSummary | null>;
+  onRetry: () => void;
+  lookup: CaseLookup;
+  coverage: Coverage | null;
+  onGoTo: (targetId: string) => void;
+}
+
+/** Derived summary with sources, flags and code-computed coverage. Originals stay visible elsewhere. */
+export function CaseSummarySection({ summary, onRetry, lookup, coverage, onGoTo }: Props) {
+  return (
+    <section className="care-case-card" aria-labelledby="care-case-summary-title">
+      <h3 id="care-case-summary-title" className="care-case-card__title">
+        Summary (derived — check the sources)
+      </h3>
+
+      {summary.status === 'loading' && <p role="status">Loading summary…</p>}
+
+      {summary.status === 'error' && (
+        <div className="care-case-alert care-case-alert--error" role="alert">
+          <p>The summary could not be loaded: {summary.message}</p>
+          <p>The original conversation below is complete without it.</p>
+          <button type="button" className="ui-button ui-button--secondary" onClick={onRetry}>
+            Try again
+          </button>
+        </div>
+      )}
+
+      {summary.status === 'ready' && summary.data === null && (
+        <p className="care-case-hint">No summary for this case yet. Read the original conversation.</p>
+      )}
+
+      {summary.status === 'ready' && summary.data !== null && (
+        <>
+          <p className="care-case-hint">
+            <span className="care-case-tag care-case-tag--origin">{summaryOriginLabel(summary.data.generatedBy)}</span>{' '}
+            Version {summary.data.version}, {formatDateTime(summary.data.createdAt)}. It never replaces the originals.
+          </p>
+          <ul className="care-case-summary">
+            {buildSummaryRows(summary.data, lookup).map((row) => (
+              <li key={row.id} className="care-case-summary__item">
+                <p className="care-case-summary__text">{row.text}</p>
+                {row.flags.length > 0 && (
+                  <p className="care-case-summary__flags">
+                    {row.flags.map((flag) => (
+                      <span key={flag} className={`care-case-tag care-case-tag--${flag.toLowerCase()}`}>
+                        {flag}
+                      </span>
+                    ))}
+                  </p>
+                )}
+                {row.unsourced ? (
+                  <p className="care-case-tag care-case-tag--unsourced">No source — verify</p>
+                ) : (
+                  <div className="care-case-summary__sources" role="group" aria-label="Sources">
+                    {row.links.map((link, index) =>
+                      link.targetId ? (
+                        <button
+                          key={index}
+                          type="button"
+                          className="ui-button ui-button--secondary care-case-source"
+                          onClick={() => onGoTo(link.targetId as string)}
+                        >
+                          {link.label}
+                        </button>
+                      ) : (
+                        <span key={index} className="care-case-tag care-case-tag--unsourced">
+                          {link.label}
+                        </span>
+                      ),
+                    )}
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+
+      {coverage && (
+        <div className="care-case-coverage">
+          <p className="care-case-coverage__count">
+            <strong>{coverageLabel(coverage)}</strong> by the summary (computed from its sources, not claimed by a model).
+          </p>
+          {coverage.uncited.length > 0 && (
+            <section className="care-case-alert care-case-alert--warning" aria-labelledby="care-case-uncited-title">
+              <h4 id="care-case-uncited-title" className="care-case-subtitle">
+                Not included in the summary — read the original
+              </h4>
+              <ul className="care-case-uncited">
+                {coverage.uncited.map((message) => (
+                  <li key={message.id} className="care-case-uncited__item">
+                    <p className="care-case-meta">Patient, {formatTime(message.createdAt)}</p>
+                    <p className="care-case-verbatim">{message.text}</p>
+                    <button
+                      type="button"
+                      className="ui-button ui-button--secondary care-case-source"
+                      onClick={() => onGoTo(messageAnchorId(message.id))}
+                    >
+                      Show in conversation
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </div>
+      )}
+    </section>
+  );
+}

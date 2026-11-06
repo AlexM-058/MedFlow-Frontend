@@ -12,7 +12,7 @@ export type DataSourceKind = 'live' | 'fixture';
 export type Source =
   | { kind: 'patient-input'; at: string }
   | { kind: 'message'; messageId: string; quote: string }
-  | { kind: 'document'; documentId: string; page?: number; quote?: string }
+  | { kind: 'document'; documentId: string; page?: number; quote?: string; /** Readable name, e.g. the file name. */ label?: string }
   | { kind: 'doctor'; doctorId: string; at: string };
 
 export type ConfirmationStatus = 'confirmed' | 'unconfirmed' | 'unknown' | 'conflict';
@@ -58,6 +58,10 @@ export interface IntakeMessage {
   createdAt: string;
   /** Client id used for idempotent retries of patient messages. */
   clientMessageId?: string;
+  /** Persisted outcome on a patient message, so a reloaded history still shows it. */
+  redFlag?: { message: string };
+  /** Persisted on a patient message when it was saved but the assistant could not reply. */
+  assistantFailed?: boolean;
 }
 
 export interface IntakeResult {
@@ -206,7 +210,10 @@ export interface DoctorFeedback {
   /** The doctor's own words, exactly as sent. */
   text: string;
   createdAt: string;
-  /** Set when the doctor started from an optional AI variant (always edited and signed by the doctor). */
+  /**
+   * 0-based index into DecisionVariants.options when the doctor started from an optional
+   * AI variant (always edited and signed by the doctor); null otherwise.
+   */
   basedOnVariant: number | null;
 }
 

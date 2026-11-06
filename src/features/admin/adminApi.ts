@@ -18,7 +18,7 @@ export class AdminApiError extends Error {
 }
 
 type RecordValue = Record<string, unknown>;
-const invalid = () => new AdminApiError('The admin service returned an invalid response.', 502, 'INVALID_RESPONSE');
+const invalid = () => new AdminApiError('Serviciul de administrare a trimis un răspuns nevalid.', 502, 'INVALID_RESPONSE');
 function record(value: unknown): RecordValue {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw invalid();
   return value as RecordValue;
@@ -43,21 +43,21 @@ function invitation(value: unknown): DoctorInvitation {
 
 function baseUrl(): string {
   const configured = import.meta.env.VITE_API_BASE_URL?.trim();
-  if (!configured) throw new AdminApiError(`Account services are not configured yet. ${supportContact}`, 0, 'NOT_CONFIGURED');
+  if (!configured) throw new AdminApiError(`Serviciile pentru conturi nu sunt configurate încă. ${supportContact}`, 0, 'NOT_CONFIGURED');
   const url = new URL(configured, window.location.origin);
   const local = ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname);
   if (url.username || url.password || url.search || url.hash || (url.protocol !== 'https:' && !(url.protocol === 'http:' && local))) {
-    throw new AdminApiError('The account service URL is not valid.', 0, 'NOT_CONFIGURED');
+    throw new AdminApiError('Adresa serviciului pentru conturi nu este validă.', 0, 'NOT_CONFIGURED');
   }
   return url.href.replace(/\/$/, '');
 }
 
 const MESSAGES: Record<number, string> = {
-  400: 'Check the doctor details and try again.',
-  401: 'Your session has expired. Please sign in again.',
-  403: `This account is not a ${brand.productName} administrator.`,
-  404: 'This invitation is no longer available.',
-  429: 'Too many attempts. Please wait a minute before trying again.',
+  400: 'Verificați datele medicului și încercați din nou.',
+  401: 'Sesiunea dumneavoastră a expirat. Autentificați-vă din nou.',
+  403: `Acest cont nu este administrator ${brand.productName}.`,
+  404: 'Această invitație nu mai este disponibilă.',
+  429: 'Prea multe încercări. Așteptați un minut înainte să încercați din nou.',
 };
 
 async function request(path: string, token: string, method = 'GET', body?: unknown, signal?: AbortSignal): Promise<RecordValue> {
@@ -81,13 +81,13 @@ async function request(path: string, token: string, method = 'GET', body?: unkno
     if (!response.ok) {
       const code = payload && typeof payload === 'object' && 'code' in payload && typeof payload.code === 'string' ? payload.code : 'REQUEST_FAILED';
       if (response.status === 401) window.dispatchEvent(new CustomEvent('medflow:session-expired', { detail: { token } }));
-      throw new AdminApiError(MESSAGES[response.status] ?? 'The admin service is unavailable. Please try again.', response.status, code);
+      throw new AdminApiError(MESSAGES[response.status] ?? 'Serviciul de administrare nu este disponibil. Încercați din nou.', response.status, code);
     }
     return record(payload);
   } catch (error) {
     if (error instanceof AdminApiError) throw error;
     if (signal?.aborted) throw new DOMException('Cancelled', 'AbortError');
-    throw new AdminApiError('Could not reach the admin service. Please try again.');
+    throw new AdminApiError('Serviciul de administrare nu a putut fi contactat. Încercați din nou.');
   } finally {
     clearTimeout(timeout);
     signal?.removeEventListener('abort', abort);
