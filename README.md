@@ -7,25 +7,75 @@ React + TypeScript + Vite. One responsive web app for patients and doctors
 
 ```sh
 npm install
-npm run dev        # http://localhost:5173 — opens on the patient AI chat
+npm run dev        # http://localhost:5173 — opens on Google sign-in
 npm run build      # tsc -b && vite build
 npm run lint
 ```
 
 From the superproject: `python Make.py run Frontend`.
 
-## UI preview scope
+## Authentication and QR connections
+
+Real account routes use Supabase Google OAuth with PKCE and the backend API
+contract in the root `AUTH_INTEGRATION.md`. Copy `.env.example` to `.env` and
+configure the public Supabase URL/key and `VITE_API_BASE_URL`. Secret/service-role
+keys never belong in the frontend. No new dependencies are required.
+
+- `#/home` (default): separate Patient and Doctor entry points in the same app.
+- `#/patient`: patient Google sign-in, then the verified patient's care team and
+  connection requests. Initial patient profile creation belongs to the backend.
+- `#/connect/{code}`: public doctor preview, Google sign-in if needed, then an
+  explicit request for connection. Scanning or signing in never sends a request.
+  Pending requests refresh while the tab is visible; the doctor must accept.
+- `#/doctor/invite/{token}`: Google sign-in with the invited email, followed by
+  explicit invitation acceptance. The backend validates and consumes the invite.
+- `#/doctor`: server-verified doctor access only. Claude's real QR/request module
+  plugs in through `DoctorAccountWorkspace`; until delivered, an integration-
+  pending page is shown. The existing DoctorApp is a separate synthetic demo.
+
+Configure the Supabase/Google provider and exact Supabase redirect allowlist.
+The application callback is `${APP_ORIGIN}${BASE_URL}auth/callback` (normally
+`http://localhost:5173/auth/callback` during local development). The Google Cloud
+OAuth callback points to Supabase, not this app callback. Hosting must return
+the SPA for the callback path. Login returns to a strictly allowlisted internal
+destination stored in session storage for 15 minutes; callback codes are removed
+from the URL. Real login must run in a normal browser rather than an embedded
+preview. Gmail reading scopes are not requested. Android deep links come later.
+
+All real routes fail closed if account services, configuration or role checks
+fail. They never enter a synthetic workspace as a fallback. The backend/API,
+migrations, operator invitation utility and real provider configuration remain
+separate deliverables for the backend team. See root `CLAUDE_AUTH_PLAN.md` for
+the doctor UI handoff. Do not consider mocked browser tests a live deployment.
+
+Run the return-destination checks without a test framework:
+
+```sh
+node --experimental-strip-types src/auth/navigation.test.ts
+```
+
+Check local configuration without displaying keys:
+
+```sh
+npm run auth:check
+npm run auth:check -- --online
+```
+
+The optional online check reads the existing project's public Auth settings and
+reports whether Google is enabled. It does not change Supabase settings or prove
+that the Google OAuth consent/redirect configuration or backend `/me` is ready.
+
+## Separate UI demos
 
 Patient chat and sample doctor suggestion with **local synthetic data only**.
 Assistant replies are simulated and labelled in the UI. Messages are not sent
 to a doctor or persisted; reloading or leaving the patient route clears the demo.
-No real authentication, backend calls, storage uploads or AI are connected.
+These demo routes make no medical backend calls, storage uploads or real AI calls.
 
-- `#/patient` (default): patient conversation. **Doctor suggestion · Demo** opens
+- `#/demo/patient`: patient conversation. **Doctor suggestion · Demo** opens
   a side panel on desktop and a dedicated dialog on mobile; closing it preserves
   the conversation and restores keyboard focus.
-- `#/doctor`: reserved for Claude's independently developed doctor module. Until
-  that module is present, this route shows an explicit work-in-progress page.
+- `#/demo/doctor`: Claude's independently developed synthetic doctor module.
   The **Doctor demo** link and browser Back/Forward work with hash navigation.
 
 The root `CLAUDE_PLAN.md` and `CODEX_PLAN.md` define exclusive write ownership.

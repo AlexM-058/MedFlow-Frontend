@@ -1,0 +1,1 @@
+export { SuggestionDialog } from './SuggestionDialog';

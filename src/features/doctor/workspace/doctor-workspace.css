@@ -1,0 +1,648 @@
+/*
+ * Doctor workspace (patient backlog, panels, dialogs content).
+ * Every class is `doctor-workspace-` prefixed; element selectors are scoped under
+ * .doctor-workspace or a workspace class. Consumes global and doctor tokens only.
+ *
+ * Layout:
+ *   < 48rem   single column; patient list lives in the "Patients" dialog (cards)
+ *   48–64rem  single column; inline patient cards
+ *   ≥ 64rem   sidebar + main; inline table
+ */
+
+/* ---------- Root (mobile first) ---------- */
+.doctor-workspace {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: var(--doctor-space-5);
+  width: min(100%, 60rem);
+  margin-inline: auto;
+  padding: max(var(--space-4), env(safe-area-inset-top)) max(var(--space-4), env(safe-area-inset-right))
+    max(var(--space-6), env(safe-area-inset-bottom)) max(var(--space-4), env(safe-area-inset-left));
+}
+
+.doctor-workspace > *,
+.doctor-workspace-main > * {
+  min-width: 0;
+}
+
+.doctor-workspace [tabindex='-1']:focus {
+  outline: none;
+}
+
+.doctor-workspace-skip {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: 10;
+  transform: translateY(-300%);
+}
+
+.doctor-workspace-skip:focus {
+  transform: none;
+}
+
+/* The sidebar wrapper dissolves into the single-column grid on small screens. */
+.doctor-workspace-sidebar {
+  display: contents;
+}
+
+.doctor-workspace-brand {
+  order: 1;
+  display: grid;
+  gap: var(--space-4);
+}
+
+.doctor-workspace-brand .brand-mark {
+  justify-content: center;
+}
+
+.doctor-workspace-identity {
+  order: 2;
+  display: grid;
+  gap: var(--space-1);
+  margin-top: calc(var(--space-3) * -1);
+}
+
+.doctor-workspace-identity__name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.doctor-workspace-identity__specialty {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.doctor-workspace-main {
+  order: 3;
+  display: grid;
+  align-content: start;
+  gap: var(--doctor-space-5);
+}
+
+.doctor-workspace-nav {
+  order: 4;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.doctor-workspace-account {
+  order: 5;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: calc(var(--space-3) * -1);
+}
+
+/* ---------- Navigation ---------- */
+.doctor-workspace-nav__heading {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--doctor-accent-text);
+}
+
+.doctor-workspace-nav__list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.doctor-workspace-nav__button {
+  width: 100%;
+  background: var(--color-surface);
+  border-color: var(--color-border-control);
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.doctor-workspace-nav__button:hover {
+  background: var(--color-surface-subtle);
+}
+
+.doctor-workspace-nav__button[aria-current='page'] {
+  background: var(--brand-primary);
+  border-color: var(--brand-primary);
+  color: var(--brand-on-primary);
+  font-weight: 700;
+}
+
+.doctor-workspace-account__action {
+  justify-content: flex-start;
+  padding-inline: 0;
+  font-weight: 600;
+}
+
+/* ---------- Page header ---------- */
+.doctor-workspace-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.doctor-workspace-header__text {
+  display: grid;
+  gap: var(--space-2);
+  flex: 1 1 18rem;
+  min-width: 0;
+}
+
+.doctor-workspace-title {
+  font-size: clamp(1.5rem, 1.25rem + 1.2vw, 2rem);
+  line-height: 1.2;
+}
+
+.doctor-workspace-subtitle {
+  color: var(--color-text-secondary);
+}
+
+.doctor-workspace-add {
+  flex: 1 1 100%;
+}
+
+/* ---------- Stats ---------- */
+.doctor-workspace-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.doctor-workspace-stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border-decorative);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.doctor-workspace-stat__label {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+.doctor-workspace-stat__value {
+  font-size: clamp(1.5rem, 1.3rem + 0.8vw, 1.875rem);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--doctor-accent-text);
+}
+
+/* ---------- Patient browser ---------- */
+.doctor-workspace-open-panel {
+  display: flex;
+}
+
+.doctor-workspace-inline-list {
+  display: none;
+}
+
+.doctor-workspace-browser {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.doctor-workspace-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: end;
+}
+
+.doctor-workspace-select {
+  cursor: pointer;
+}
+
+.doctor-workspace-list-heading {
+  font-size: 1.125rem;
+  line-height: 1.3;
+}
+
+.doctor-workspace-patient-name {
+  display: block;
+  font-weight: 700;
+}
+
+.doctor-workspace-patient-id {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+}
+
+/* Table (≥ 64rem only) */
+.doctor-workspace-table-wrap {
+  display: none;
+  border: 1px solid var(--color-border-decorative);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.doctor-workspace-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.9375rem;
+}
+
+.doctor-workspace-table :where(th, td) {
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.doctor-workspace-table tbody :where(th, td) {
+  border-top: 1px solid var(--color-border-decorative);
+}
+
+.doctor-workspace-table thead th {
+  background: var(--color-surface-subtle);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.doctor-workspace-table thead th:first-child {
+  border-top-left-radius: var(--radius-md);
+}
+
+.doctor-workspace-table thead th:last-child {
+  border-top-right-radius: var(--radius-md);
+}
+
+.doctor-workspace-table time {
+  white-space: nowrap;
+}
+
+.doctor-workspace-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-2);
+}
+
+.doctor-workspace-row-action {
+  padding-inline: var(--space-2);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* Cards */
+.doctor-workspace-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  gap: var(--space-3);
+}
+
+.doctor-workspace-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--color-border-decorative);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.doctor-workspace-card__name {
+  font-size: 1.0625rem;
+  line-height: 1.3;
+}
+
+.doctor-workspace-card__facts {
+  display: grid;
+  gap: var(--space-1);
+  font-size: 0.875rem;
+}
+
+.doctor-workspace-card__facts > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-1);
+}
+
+.doctor-workspace-card__facts dt {
+  color: var(--color-text-secondary);
+}
+
+.doctor-workspace-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: auto;
+  padding-top: var(--space-2);
+}
+
+.doctor-workspace-card__actions > * {
+  flex: 1 1 10rem;
+}
+
+/* States */
+.doctor-workspace-loading {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.doctor-workspace-skeleton {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.doctor-workspace-skeleton__row {
+  height: 3.5rem;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-subtle);
+  border: 1px solid var(--color-border-decorative);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .doctor-workspace-skeleton__row {
+    animation: doctor-workspace-pulse 1.2s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes doctor-workspace-pulse {
+  to {
+    opacity: 0.45;
+  }
+}
+
+.doctor-workspace-state {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.doctor-workspace-state > p {
+  flex: 1 1 16rem;
+}
+
+.doctor-workspace-empty {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  padding: var(--space-6) var(--space-4);
+  border: 1px dashed var(--color-border-control);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  text-align: center;
+}
+
+.doctor-workspace-empty__title {
+  font-weight: 700;
+}
+
+.doctor-workspace-empty .doctor-button {
+  margin-top: var(--space-2);
+}
+
+.doctor-workspace-list-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-4);
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+.doctor-workspace-list-footer > p:empty {
+  display: none;
+}
+
+/* ---------- Demo controls ---------- */
+.doctor-workspace-demo {
+  border: 1px dashed var(--color-border-control);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.doctor-workspace-demo__summary {
+  display: flex;
+  align-items: center;
+  min-height: var(--doctor-control-min);
+  padding: var(--space-2) var(--space-4);
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.doctor-workspace-demo__fieldset {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+  margin: 0;
+  padding: 0 var(--space-4) var(--space-4);
+  border: 0;
+}
+
+.doctor-workspace-demo__fieldset legend {
+  padding: 0;
+}
+
+.doctor-workspace-demo__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-4);
+}
+
+.doctor-workspace-demo__option {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--doctor-control-min);
+  cursor: pointer;
+}
+
+.doctor-workspace-demo__option input {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+  accent-color: var(--color-text);
+}
+
+/* ---------- Panels and summaries ---------- */
+.doctor-workspace-panel {
+  display: grid;
+  gap: var(--space-4);
+  max-width: 48rem;
+}
+
+.doctor-workspace-panel__text {
+  color: var(--color-text-secondary);
+}
+
+.doctor-workspace-panel__card {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border-decorative);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.doctor-workspace-panel__heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 1.125rem;
+}
+
+.doctor-workspace-details {
+  display: grid;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.doctor-workspace-details > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0 var(--space-3);
+}
+
+.doctor-workspace-details dt {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+}
+
+.doctor-workspace-summary {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.doctor-workspace-summary__heading {
+  margin-bottom: var(--space-1);
+  font-size: 1rem;
+}
+
+/* ---------- ≥ 30rem: two-column detail rows ---------- */
+@media (min-width: 30rem) {
+  .doctor-workspace-details > div {
+    grid-template-columns: minmax(7rem, 10rem) minmax(0, 1fr);
+    align-items: baseline;
+  }
+}
+
+/* ---------- ≥ 40rem ---------- */
+@media (min-width: 40rem) {
+  .doctor-workspace-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .doctor-workspace-toolbar {
+    grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr));
+  }
+
+  .doctor-workspace-add {
+    flex: 0 0 auto;
+  }
+
+  .doctor-workspace-nav__list {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* ---------- ≥ 48rem: inline list instead of the "View patients" dialog ---------- */
+@media (min-width: 48rem) {
+  .doctor-workspace {
+    padding-inline: max(var(--doctor-space-5), env(safe-area-inset-left)) max(var(--doctor-space-5), env(safe-area-inset-right));
+  }
+
+  .doctor-workspace-open-panel {
+    display: none;
+  }
+
+  .doctor-workspace-inline-list {
+    display: block;
+  }
+}
+
+/* ---------- ≥ 64rem: sidebar + table ---------- */
+@media (min-width: 64rem) {
+  .doctor-workspace {
+    grid-template-columns: minmax(13rem, 16rem) minmax(0, 1fr);
+    gap: 0;
+    width: 100%;
+    padding: 0;
+  }
+
+  .doctor-workspace-sidebar {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--doctor-space-5);
+    align-self: start;
+    min-height: 100vh;
+    min-height: 100dvh;
+    max-height: 100dvh;
+    overflow-y: auto;
+    padding: var(--doctor-space-5) var(--space-4) max(var(--doctor-space-5), env(safe-area-inset-bottom))
+      max(var(--space-4), env(safe-area-inset-left));
+    border-right: 1px solid var(--color-border-decorative);
+    background: var(--color-surface);
+  }
+
+  .doctor-workspace-brand {
+    order: 0;
+  }
+
+  .doctor-workspace-nav {
+    order: 1;
+  }
+
+  .doctor-workspace-identity {
+    order: 2;
+    margin-top: auto;
+  }
+
+  .doctor-workspace-account {
+    order: 3;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+  }
+
+  .doctor-workspace-identity__name {
+    font-size: 0.9375rem;
+  }
+
+  .doctor-workspace-nav__heading {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .doctor-workspace-nav__list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .doctor-workspace-main {
+    width: min(100%, 80rem);
+    padding: clamp(var(--doctor-space-5), 3vw, 2.5rem) max(clamp(var(--doctor-space-5), 3vw, 2.5rem), env(safe-area-inset-right))
+      max(var(--space-6), env(safe-area-inset-bottom));
+  }
+
+  .doctor-workspace-table-wrap {
+    display: block;
+  }
+
+  .doctor-workspace-cards--responsive {
+    display: none;
+  }
+}
