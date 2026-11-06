@@ -5,55 +5,35 @@
  * their own CSS files with the same rules (auth/, workspace/, suggestions/).
  */
 
-/* ---------- Module-local tokens (Light) ---------- */
+/* ---------- Module aliases of the global tokens (white-label) ----------
+ * No raw colors here: every value comes from src/styles/tokens.css, which
+ * already switches with the theme. Clinical status colors stay independent of
+ * the client brand; the accent text is derived from the brand color.
+ */
 .doctor-app {
-  /* Clinical status colors: independent of client branding. */
-  --doctor-status-review-bg: #fef3c7;
-  --doctor-status-review-text: #7a4b00;
-  --doctor-status-followup-bg: #dbeafe;
-  --doctor-status-followup-text: #1e3a8a;
-  --doctor-status-uptodate-bg: #dcfce7;
-  --doctor-status-uptodate-text: #14532d;
+  --doctor-status-review-bg: var(--status-review-bg);
+  --doctor-status-review-text: var(--status-review-text);
+  --doctor-status-followup-bg: var(--status-followup-bg);
+  --doctor-status-followup-text: var(--status-followup-text);
+  --doctor-status-uptodate-bg: var(--status-uptodate-bg);
+  --doctor-status-uptodate-text: var(--status-uptodate-text);
 
-  --doctor-error-text: #b42318;
-  --doctor-error-bg: #fdecec;
-  --doctor-success-bg: #e7f6ec;
-  --doctor-success-border: #3f8f5a;
-  --doctor-info-bg: #e6eefa;
-  --doctor-info-border: #8aa8d6;
-  --doctor-warning-bg: #fff6e0;
-  --doctor-warning-border: #c98a00;
+  --doctor-error-text: var(--status-error-text);
+  --doctor-error-bg: var(--status-error-bg);
+  --doctor-success-bg: var(--status-success-bg);
+  --doctor-success-border: var(--status-success-border);
+  --doctor-info-bg: var(--status-info-bg);
+  --doctor-info-border: var(--status-info-border);
+  --doctor-warning-bg: var(--status-warning-bg);
+  --doctor-warning-border: var(--status-warning-border);
 
-  /* Small accent text (eyebrows, numbers) with AA contrast on light surfaces. */
-  --doctor-accent-text: #35624a;
-  --doctor-aside-bg: #eef3f8;
-  --doctor-backdrop: rgb(15 23 42 / 0.55);
+  /* Small accent text (eyebrows, numbers), derived from the brand color. */
+  --doctor-accent-text: var(--brand-accent-text);
+  --doctor-aside-bg: var(--color-surface-subtle);
+  --doctor-backdrop: var(--color-backdrop);
   --doctor-control-min: 2.75rem;
   --doctor-space-5: 1.25rem;
   --doctor-form-max: 34rem;
-}
-
-/* ---------- Module-local tokens (Dark) — reads the theme, never sets it ---------- */
-:root[data-theme='dark'] .doctor-app {
-  --doctor-status-review-bg: #4a3510;
-  --doctor-status-review-text: #fde7a8;
-  --doctor-status-followup-bg: #1c3358;
-  --doctor-status-followup-text: #c7dbff;
-  --doctor-status-uptodate-bg: #173d27;
-  --doctor-status-uptodate-text: #bff0cf;
-
-  --doctor-error-text: #fda29b;
-  --doctor-error-bg: #44202a;
-  --doctor-success-bg: #173d27;
-  --doctor-success-border: #5fbf82;
-  --doctor-info-bg: #1c2f4d;
-  --doctor-info-border: #4f6f9f;
-  --doctor-warning-bg: #3f3110;
-  --doctor-warning-border: #d9a53a;
-
-  --doctor-accent-text: #a9c6b4;
-  --doctor-aside-bg: #131c2e;
-  --doctor-backdrop: rgb(2 6 23 / 0.7);
 }
 
 /* ---------- Root ---------- */
@@ -331,7 +311,8 @@ textarea.doctor-input {
 }
 
 .doctor-dialog::backdrop {
-  background: rgb(15 23 42 / 0.6);
+  /* Older engines do not inherit custom properties into ::backdrop: keep a fallback. */
+  background: var(--color-backdrop, rgb(15 23 42 / 0.6)); /* white-label: allow (neutral overlay fallback) */
 }
 
 .doctor-dialog[open] {

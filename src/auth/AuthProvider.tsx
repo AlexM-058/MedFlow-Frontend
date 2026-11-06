@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { accountApi, AccountApiError } from '../lib/accountApi';
+import { supportContact } from '../brand/brandAsset';
 import { AuthContext, type AuthContextValue, type AuthStatus } from './authContext';
 import type { AccountProfile } from './contracts';
 import { AUTH_RETURN_KEY, callbackPath, decodeReturn, encodeReturn } from './navigation';
@@ -82,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (!mounted.current) return;
           finishCallbackUrl('/patient');
           try { window.sessionStorage.removeItem(AUTH_RETURN_KEY); } catch { /* Storage may be disabled. */ }
-          setState({ status: 'unconfigured', session: null, profile: null, error: 'Google sign-in is not configured in this environment. Please contact MedFlow support.' });
+          setState({ status: 'unconfigured', session: null, profile: null, error: `Google sign-in is not configured in this environment. ${supportContact}` });
         });
       }
       return () => { mounted.current = false; };
@@ -148,7 +149,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [loadProfile, invalidateProfile]);
 
   const signInWithGoogle = useCallback(async (destination: string) => {
-    if (!supabase) throw new Error('Google sign-in is not configured yet. Please contact MedFlow support.');
+    if (!supabase) throw new Error(`Google sign-in is not configured yet. ${supportContact}`);
     try { window.sessionStorage.setItem(AUTH_RETURN_KEY, encodeReturn(destination)); } catch {
       throw new Error('Allow session storage in this browser to sign in and return to your invitation or doctor link.');
     }

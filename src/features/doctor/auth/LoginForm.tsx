@@ -3,6 +3,7 @@ import type { DoctorProfile } from '../types';
 import { DEMO_DOCTOR } from '../fixtures';
 import { DoctorDialog } from '../shared/DoctorDialog';
 import { PasswordField, TextField } from './AuthField';
+import { brand } from '../../../brand/brand.config';
 import {
   LOGIN_FIELD_ORDER,
   firstInvalidField,
@@ -104,7 +105,7 @@ export function LoginForm({ headingId, onDemoLogin, onRegister }: LoginFormProps
       </form>
 
       <p className="doctor-auth-switch">
-        New to MedFlow?{' '}
+        New to {brand.productName}?{' '}
         <button type="button" className="doctor-auth-text-button" onClick={onRegister}>
           Create a doctor account
         </button>

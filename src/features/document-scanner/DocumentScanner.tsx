@@ -135,13 +135,13 @@ export function DocumentScanner({
             )}
           </dl>
           <div className="doc-scanner__actions">
-            <button type="button" className="button-secondary" onClick={handleCancel}>
+            <button type="button" className="ui-button ui-button--secondary" onClick={handleCancel}>
               Cancel
             </button>
-            <button type="button" className="button-secondary" onClick={handleRetake}>
+            <button type="button" className="ui-button ui-button--secondary" onClick={handleRetake}>
               Retake
             </button>
-            <button type="button" className="doc-scanner__primary" onClick={handleUse}>
+            <button type="button" className="ui-button ui-button--primary doc-scanner__primary" onClick={handleUse}>
               Use Document
             </button>
           </div>
@@ -154,22 +154,23 @@ export function DocumentScanner({
           <div className="doc-scanner__actions">
             <button
               type="button"
-              className="doc-scanner__primary"
+              className="ui-button ui-button--primary doc-scanner__primary"
               disabled={phase === 'capturing'}
+              aria-busy={phase === 'capturing' || undefined}
               onClick={() => void startCapture(false)}
             >
               {phase === 'capturing' ? 'Opening camera…' : 'Scan document'}
             </button>
             <button
               type="button"
-              className="button-secondary"
+              className="ui-button ui-button--secondary"
               disabled={phase === 'capturing'}
               onClick={() => void startCapture(true)}
             >
               Choose from gallery
             </button>
             {onCancel && (
-              <button type="button" className="button-secondary" onClick={handleCancel}>
+              <button type="button" className="ui-button ui-button--secondary" onClick={handleCancel}>
                 Cancel
               </button>
             )}

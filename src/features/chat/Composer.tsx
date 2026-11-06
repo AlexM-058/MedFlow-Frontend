@@ -1,4 +1,5 @@
 import { useId, useState, type FormEvent, type KeyboardEvent } from 'react';
+import { brand } from '../../brand/brand.config';
 
 interface ComposerProps {
   /** Returns true when the message was accepted; the input is cleared only then. */
@@ -37,7 +38,7 @@ export function Composer({ onSend, isSending, disabled = false }: ComposerProps)
       <div className="composer__column">
         <div className="composer__row">
           <label htmlFor={inputId} className="visually-hidden">
-            Message to MedFlow Assistant
+            Message to {brand.assistantName}
           </label>
           <textarea
             id={inputId}
@@ -55,6 +56,7 @@ export function Composer({ onSend, isSending, disabled = false }: ComposerProps)
             type="submit"
             className="composer__send"
             disabled={!canSend}
+            aria-busy={isSending || undefined}
             aria-label={isSending ? 'Waiting for simulated reply' : 'Send message'}
           >
             <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" focusable="false">

@@ -34,8 +34,8 @@ test('SVG has a four-module quiet zone and fixed scanner-safe colors', () => {
   if (!matrix) return;
   const svg = qrMatrixToSvg(matrix);
   assertTrue(svg.includes(`viewBox="0 0 ${matrix.length + 8} ${matrix.length + 8}"`));
-  assertTrue(svg.includes('fill="#ffffff"'));
-  assertTrue(svg.includes('fill="#000000"'));
+  assertTrue(svg.includes('fill="#ffffff"')); // white-label: allow (fixed QR colors)
+  assertTrue(svg.includes('fill="#000000"')); // white-label: allow (fixed QR colors)
   assertTrue(!svg.includes(CONNECTION_URL), 'payload is encoded in modules, not SVG text');
 });
 

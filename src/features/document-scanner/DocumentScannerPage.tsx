@@ -42,7 +42,7 @@ export function DocumentScannerPage() {
             <pre className="doc-scanner-page__json">{JSON.stringify(confirmed, null, 2)}</pre>
             <button
               type="button"
-              className="button-secondary"
+              className="ui-button ui-button--secondary"
               onClick={() => setConfirmed(null)}
             >
               Clear confirmed document

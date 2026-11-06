@@ -1,4 +1,5 @@
 import type { AccountProfile, ConnectionCode, ConnectionRequest, PublicDoctor } from '../auth/contracts';
+import { supportContact } from '../brand/brandAsset';
 
 export class AccountApiError extends Error {
   readonly status: number;
@@ -40,7 +41,7 @@ function connection(value: unknown): ConnectionRequest {
 
 function baseUrl(): string {
   const configured = import.meta.env.VITE_API_BASE_URL?.trim();
-  if (!configured) throw new AccountApiError('Account services are not configured yet. Please contact MedFlow support.', 0, 'NOT_CONFIGURED');
+  if (!configured) throw new AccountApiError(`Account services are not configured yet. ${supportContact}`, 0, 'NOT_CONFIGURED');
   const url = new URL(configured, window.location.origin);
   const local = ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname);
   if (url.username || url.password || url.search || url.hash || (url.protocol !== 'https:' && !(url.protocol === 'http:' && local))) {

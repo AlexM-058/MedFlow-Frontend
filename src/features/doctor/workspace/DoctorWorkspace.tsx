@@ -10,6 +10,7 @@ import { PatientDetailsDialog } from './PatientDetailsDialog';
 import { countByStatus, DEFAULT_QUERY, STATUS_LABELS, type PatientQuery } from './patientQuery';
 import { NotConnectedPanel, SettingsPanel } from './WorkspacePanels';
 import './doctor-workspace.css';
+import { brand } from '../../../brand/brand.config';
 
 type Section = 'backlog' | 'messages' | 'documents' | 'settings';
 
@@ -274,7 +275,7 @@ export function DoctorWorkspace({ doctor, onLogout, onExit }: DoctorWorkspacePro
         <div className="doctor-workspace-panel">
           <p>
             In the full product you will invite a patient with a QR code or an invitation link.
-            The patient joins MedFlow and their case is assigned to you once the backend supports
+            The patient joins {brand.productName} and their case is assigned to you once the backend supports
             case assignment.
           </p>
           <div className="doctor-notice doctor-notice--info">

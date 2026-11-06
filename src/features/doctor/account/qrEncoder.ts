@@ -24,5 +24,5 @@ export function qrMatrixToSvg(matrix: QrMatrix, quietZone = 4): string {
       if (dark) path += `M${x + quietZone} ${y + quietZone}h1v1h-1z`;
     });
   });
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" shape-rendering="crispEdges"><rect width="${size}" height="${size}" fill="#ffffff"/><path d="${path}" fill="#000000"/></svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" shape-rendering="crispEdges"><rect width="${size}" height="${size}" fill="#ffffff"/><path d="${path}" fill="#000000"/></svg>`; // white-label: allow (QR must stay dark-on-white for scanners)
 }

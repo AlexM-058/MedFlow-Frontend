@@ -290,7 +290,7 @@
 
 /* QR stays dark-on-white in both themes for scanner contrast. */
 .doctor-account-qr__image {
-  background: #ffffff;
+  background: #ffffff; /* white-label: allow (QR must stay dark-on-white for scanners) */
   padding: var(--space-2);
   border: 1px solid var(--color-border-decorative);
 }

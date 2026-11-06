@@ -157,7 +157,8 @@
 }
 
 .doctor-workspace-subtitle {
-  color: var(--color-text-secondary);
+  /* Rule 03: on the page background or a subtle surface, use the main text color. */
+  color: var(--color-text);
 }
 
 .doctor-workspace-add {
@@ -266,7 +267,8 @@
   background: var(--color-surface-subtle);
   font-size: 0.8125rem;
   font-weight: 700;
-  color: var(--color-text-secondary);
+  /* Rule 03: on the page background or a subtle surface, use the main text color. */
+  color: var(--color-text);
   white-space: nowrap;
 }
 
@@ -412,7 +414,8 @@
   justify-content: space-between;
   gap: var(--space-1) var(--space-4);
   font-size: 0.8125rem;
-  color: var(--color-text-secondary);
+  /* Rule 03: on the page background or a subtle surface, use the main text color. */
+  color: var(--color-text);
 }
 
 .doctor-workspace-list-footer > p:empty {

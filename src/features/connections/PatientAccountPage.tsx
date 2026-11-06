@@ -30,7 +30,7 @@ export function PatientAccountPage() {
           <h2 id="connection-active-title">Connected doctors</h2>
           <button
             type="button"
-            className="connection-button connection-button--secondary"
+            className="ui-button ui-button--secondary"
             onClick={() => void careTeam.run()}
             disabled={careTeam.pending}
             aria-busy={careTeam.pending}
@@ -53,7 +53,7 @@ export function PatientAccountPage() {
           <h2 id="connection-requests-title">Connection requests</h2>
           <button
             type="button"
-            className="connection-button connection-button--secondary"
+            className="ui-button ui-button--secondary"
             onClick={connections.refresh}
             disabled={refreshing}
             aria-busy={refreshing}
@@ -65,7 +65,7 @@ export function PatientAccountPage() {
         {phase === 'loading' ? <p role="status">Loading connection requests…</p> : phase === 'error' ? (
           <div className="connection-error" role="alert">
             <p>{error}</p>
-            <button type="button" className="connection-button connection-button--secondary" onClick={connections.refresh} disabled={refreshing}>
+            <button type="button" className="ui-button ui-button--secondary" onClick={connections.refresh} disabled={refreshing}>
               {refreshing ? 'Trying again…' : 'Try again'}
             </button>
           </div>
@@ -105,7 +105,7 @@ function RequestCard({ request, connections }: { request: ConnectionRequest; con
         <div className="connection-actions">
           <button
             type="button"
-            className="connection-button connection-button--secondary"
+            className="ui-button ui-button--secondary"
             disabled={cancelling}
             aria-busy={cancelling}
             onClick={() => void connections.cancelConnection(request.id)}

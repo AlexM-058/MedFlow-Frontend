@@ -2,6 +2,8 @@ import { useId, useMemo, useRef, useState } from 'react';
 import { DoctorDialog } from '../shared/DoctorDialog';
 import { encodeQrModules, qrMatrixToSvg } from './qrEncoder';
 import { useDoctorConnectionCode } from './useDoctorConnectionCode';
+import { brand } from '../../../brand/brand.config';
+import { brandSlug } from '../../../brand/brandAsset';
 
 export function ConnectionQrPanel({ token }: { token: string | null }) {
   const { state, reload, rotate, rotating } = useDoctorConnectionCode(token);
@@ -38,7 +40,7 @@ export function ConnectionQrPanel({ token }: { token: string | null }) {
     const blobUrl = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
     const link = document.createElement('a');
     link.href = blobUrl;
-    link.download = 'medflow-connection-qr.svg';
+    link.download = `${brandSlug}-connection-qr.svg`;
     link.click();
     window.setTimeout(() => URL.revokeObjectURL(blobUrl), 0);
     setStatus('QR code downloaded.');
@@ -94,7 +96,7 @@ export function ConnectionQrPanel({ token }: { token: string | null }) {
               <img
                 className="doctor-account-qr__image"
                 src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`}
-                alt="QR code linking to your MedFlow connection page"
+                alt={`QR code linking to your ${brand.productName} connection page`}
               />
             ) : (
               <div className="doctor-account-qr__pending" role="img" aria-describedby={qrNoteId} aria-label="QR image unavailable">

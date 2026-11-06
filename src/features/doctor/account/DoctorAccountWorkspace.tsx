@@ -6,6 +6,7 @@ import { ConnectionRequestsPanel } from './ConnectionRequestsPanel';
 import { useConnectionRequests } from './useConnectionRequests';
 import '../doctor.css';
 import './doctor-account.css';
+import { brand } from '../../../brand/brand.config';
 
 export interface DoctorAccountWorkspaceProps {
   /** Server profile from /me; the app shell mounts this only for role 'doctor'. */
@@ -78,7 +79,7 @@ export function DoctorAccountWorkspace({ profile, onExit }: DoctorAccountWorkspa
             {profile.fullName}
           </h1>
           <p className="doctor-account-identity__email">{profile.email}</p>
-          <p className="doctor-account-verified">Doctor role verified by MedFlow</p>
+          <p className="doctor-account-verified">Doctor role verified by {brand.productName}</p>
         </div>
         <div className="doctor-account-actions doctor-account-header__actions">
           <button type="button" className="doctor-button doctor-button--secondary" onClick={onExit}>

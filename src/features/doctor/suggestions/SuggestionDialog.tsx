@@ -13,6 +13,7 @@ import {
   type SuggestionErrors,
 } from './suggestionValidation';
 import './doctor-suggestions.css';
+import { brand } from '../../../brand/brand.config';
 
 /** Simulated round trip. Nothing leaves the browser. */
 const DEMO_SEND_DELAY_MS = 800;
@@ -239,7 +240,7 @@ function SuggestionDialogSession({ patient, onClose }: SessionProps) {
                 Message to {patient.name} <span className="doctor-suggestion-required">(required)</span>
               </label>
               <p id={ids.messageHint} className="doctor-hint">
-                Write the suggestion yourself. MedFlow does not generate medical advice.
+                Write the suggestion yourself. {brand.productName} does not generate medical advice.
               </p>
               <textarea
                 ref={messageRef}

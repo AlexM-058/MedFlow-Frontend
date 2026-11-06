@@ -1,11 +1,13 @@
 import { useState, useSyncExternalStore, type ComponentType, type MouseEvent } from 'react';
 import { AppHeader } from './components/AppHeader';
+import { brand } from './brand/brand.config';
 import { AuthProvider } from './auth/AuthProvider';
 import { useAuth } from './auth/authContext';
 import type { AccountProfile } from './auth/contracts';
 import { readAppRoute, subscribeToRoute, navigate } from './auth/navigation';
 import { AccountEntryPage, AccountLayout, AccountSessionControls, AuthBoundary, DoctorInvitationPage } from './auth/AuthPages';
 import { PatientConnectPage, PatientAccountPage } from './features/connections';
+import { AdminPage } from './features/admin';
 import { ChatPage } from './features/chat/ChatPage';
 import { DocumentScannerPage } from './features/document-scanner';
 import { PatientSuggestionPanel } from './features/patient-suggestions';
@@ -46,14 +48,14 @@ function PatientWorkspace() {
 
 function VerifiedDoctor() {
   const { profile } = useAuth();
-  if (profile?.role !== 'doctor') return <section className="account-card"><h1>Doctor access is invitation only</h1><p>Open the invitation sent by the MedFlow team and sign in with the invited Google account. Selecting this page does not grant doctor access.</p><a href="#/patient">Go to your patient account</a><AccountSessionControls /></section>;
+  if (profile?.role !== 'doctor') return <section className="account-card"><h1>Doctor access is invitation only</h1><p>Open the invitation sent by the {brand.productName} team and sign in with the invited Google account. Selecting this page does not grant doctor access.</p><a href="#/patient">Go to your patient account</a><AccountSessionControls /></section>;
   if (DoctorAccountWorkspace) return <DoctorAccountWorkspace profile={profile} onExit={() => navigate('/patient')} />;
   return <section className="account-card"><h1>Welcome, {profile.fullName}</h1><p>Your doctor account has been verified. The QR and connection-request workspace is being integrated separately. No patient data is displayed in this preview.</p><AccountSessionControls /></section>;
 }
 
 function PatientAccount() {
   const { profile } = useAuth();
-  if (profile?.role === 'doctor') return <section className="account-card"><h1>Your doctor account is ready</h1><a className="account-button account-button--primary" href="#/doctor">Open doctor workspace</a><AccountSessionControls /></section>;
+  if (profile?.role === 'doctor') return <section className="account-card"><h1>Your doctor account is ready</h1><a className="ui-button ui-button--primary" href="#/doctor">Open doctor workspace</a><AccountSessionControls /></section>;
   return <><PatientAccountPage /><AccountSessionControls /></>;
 }
 
@@ -75,9 +77,11 @@ function Routes() {
     <AccountLayout>
       {connect ? <><PatientConnectPage key={connect[1]} code={connect[1]} /><SignedInControls /></> : invitation ? <DoctorInvitationPage key={invitation[1]} token={invitation[1]} /> : route === '/doctor' ? (
         <AuthBoundary destination="/doctor" doctor><VerifiedDoctor /></AuthBoundary>
+      ) : route === '/admin' ? (
+        <AuthBoundary destination="/admin"><AdminPage /></AuthBoundary>
       ) : route === '/patient' || route === '/login' ? (
         <AuthBoundary destination="/patient"><PatientAccount /></AuthBoundary>
-      ) : <section className="account-card"><h1>Page not found</h1><a href="#/patient">Return to MedFlow</a></section>}
+      ) : <section className="account-card"><h1>Page not found</h1><a href="#/patient">Return to {brand.productName}</a></section>}
     </AccountLayout>
   );
 }

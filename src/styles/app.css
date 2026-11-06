@@ -224,6 +224,31 @@
   cursor: pointer;
 }
 
+/* Legacy alias of .ui-button--secondary (src/styles/buttons.css): same Hover, Focus,
+   Disabled and Sending states. New markup should use the shared ui-button classes. */
+.button-secondary:hover:not(:disabled) {
+  background: var(--color-surface-subtle);
+}
+
+.button-secondary:focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.button-secondary:disabled {
+  background: var(--color-surface-subtle);
+  border-color: var(--color-border-decorative);
+  color: var(--color-text);
+  cursor: not-allowed;
+}
+
+.button-secondary[aria-busy='true'] {
+  background: var(--color-surface);
+  border-color: var(--color-border-control);
+  color: var(--color-text);
+  cursor: progress;
+}
+
 /* Composer */
 .composer {
   flex: none;
@@ -272,7 +297,7 @@
   min-width: 3rem;
   justify-content: center;
   padding: var(--space-2);
-  border: 0;
+  border: 1px solid transparent;
   border-radius: var(--radius-pill);
   background: var(--brand-primary);
   color: var(--brand-on-primary);
@@ -280,12 +305,32 @@
   cursor: pointer;
 }
 
-.composer__send:disabled {
-  cursor: not-allowed;
-  opacity: 0.55;
+/* Round send button: own size/shape, shared primary states (src/styles/buttons.css). */
+.composer__send:hover:not(:disabled) {
+  border-color: var(--brand-on-primary);
 }
 
-/* Small secondary text on the white composer surface. */
+.composer__send:focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.composer__send:disabled {
+  background: var(--color-surface-subtle);
+  border-color: var(--color-border-decorative);
+  color: var(--color-text);
+  cursor: not-allowed;
+}
+
+/* Sending: blocked while a reply is pending, keeps the brand look. */
+.composer__send[aria-busy='true'] {
+  background: var(--brand-primary);
+  border-color: transparent;
+  color: var(--brand-on-primary);
+  cursor: progress;
+}
+
+/* Small helper text on the page background, so it uses primary text. */
 .composer__hint {
   margin-top: var(--space-1);
   font-size: 0.75rem;
@@ -339,24 +384,22 @@
   letter-spacing: 0.12em;
 }
 
+/* Layout tweaks only; colors and states come from .ui-button--secondary. */
 .chat__suggestion-button {
-  display: inline-flex;
   flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: var(--space-2);
-  min-height: 2.75rem;
   padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--color-border-control);
-  border-radius: var(--radius-pill);
-  background: var(--color-surface);
   font-size: var(--font-size-sm);
-  cursor: pointer;
 }
 
-.chat__suggestion-button[aria-expanded='true'] {
+/* Open: brand look; hover keeps it and shows a visible boundary instead. */
+.chat__suggestion-button[aria-expanded='true'],
+.chat__suggestion-button[aria-expanded='true']:hover:not(:disabled) {
   background: var(--brand-primary);
   color: var(--brand-on-primary);
+}
+
+.chat__suggestion-button[aria-expanded='true']:hover:not(:disabled) {
+  border-color: var(--brand-on-primary);
 }
 
 .chat__demo-tag {

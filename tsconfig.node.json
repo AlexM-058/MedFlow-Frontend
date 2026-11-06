@@ -19,5 +19,5 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["vite.config.ts", "src/theme/themeContract.ts"]
+  "include": ["vite.config.ts", "src/theme/themeContract.ts", "src/brand/brand.config.ts"]
 }

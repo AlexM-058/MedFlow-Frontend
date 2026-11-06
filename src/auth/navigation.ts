@@ -8,7 +8,7 @@ export function isOpaqueCode(value: string): boolean {
 
 /** Exact allowlist: never accept external URLs or arbitrary redirect paths. */
 export function safeDestination(value: unknown): string {
-  if (value === '/patient' || value === '/doctor') return value;
+  if (value === '/patient' || value === '/doctor' || value === '/admin') return value;
   if (typeof value === 'string') {
     const match = /^\/(connect|doctor\/invite)\/([A-Za-z0-9_-]+)$/.exec(value);
     if (match && isOpaqueCode(match[2])) return value;

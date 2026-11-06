@@ -19,15 +19,21 @@
   font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: var(--color-text-secondary);
+  color: var(--color-text);
 }
 
+/* Header text sits on the page background, so it uses primary text. */
 .doc-scanner__hint,
 .doc-scanner__synthetic {
   margin: 0;
   font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
+  color: var(--color-text);
   line-height: var(--line-height);
+}
+
+/* Inside the white card: secondary text is allowed here. */
+.doc-scanner__synthetic {
+  color: var(--color-text-secondary);
 }
 
 .doc-scanner__error {
@@ -98,7 +104,9 @@
 .doc-scanner__meta {
   margin: 0;
   font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
+  /* On the subtle PDF placeholder surface, so primary text with a lighter weight. */
+  color: var(--color-text);
+  font-weight: 400;
 }
 
 .doc-scanner__actions {
@@ -107,24 +115,11 @@
   gap: var(--space-2);
 }
 
+/* Size tweaks only; colors and states (incl. disabled and aria-busy) come from .ui-button--primary. */
 .doc-scanner__primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 2.75rem;
   padding: var(--space-2) var(--space-4);
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: var(--brand-primary);
-  color: var(--brand-on-primary);
   font-weight: 700;
   font-size: var(--font-size-sm);
-  cursor: pointer;
-}
-
-.doc-scanner__primary:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
 }
 
 .doc-scanner-page {
@@ -149,7 +144,8 @@
 .doc-scanner-page__result p {
   margin: 0 0 var(--space-3);
   font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
+  /* On the page background, so primary text. */
+  color: var(--color-text);
 }
 
 .doc-scanner-page__json {

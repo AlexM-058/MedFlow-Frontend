@@ -8,6 +8,7 @@ import { ConnectionStatus } from './ConnectionStatus';
 import { cancelItemKey, requestItemKey, usePatientConnections } from './usePatientConnections';
 import { useProfileRefresh } from './useProfileRefresh';
 import './connections.css';
+import { supportContact } from '../../brand/brandAsset';
 
 export function PatientConnectPage({ code }: { code: string }) {
   const auth = useAuth();
@@ -73,7 +74,7 @@ export function PatientConnectPage({ code }: { code: string }) {
           <p>{current.error}</p>
           <button
             type="button"
-            className="connection-button connection-button--secondary"
+            className="ui-button ui-button--secondary"
             disabled={retryingPreview}
             aria-busy={retryingPreview}
             onClick={() => setAttempt((value) => value + 1)}
@@ -88,13 +89,13 @@ export function PatientConnectPage({ code }: { code: string }) {
           <p>{doctor.specialty}</p><p>{doctor.clinic}</p>
 
           {auth.status === 'loading' || auth.status === 'profile-loading' ? <p role="status">Verifying your account…</p> : auth.status === 'unconfigured' ? (
-            <p className="connection-error" role="alert">Google sign-in is not configured yet. Please contact MedFlow support.</p>
+            <p className="connection-error" role="alert">Google sign-in is not configured yet. {supportContact}</p>
           ) : auth.status === 'error' ? (
             <div className="connection-error" role="alert">
               <p>{auth.error ?? 'Your account could not be verified.'}</p>
               <button
                 type="button"
-                className="connection-button connection-button--secondary"
+                className="ui-button ui-button--secondary"
                 disabled={careTeam.pending}
                 aria-busy={careTeam.pending}
                 onClick={() => void careTeam.run()}
@@ -106,7 +107,7 @@ export function PatientConnectPage({ code }: { code: string }) {
             <>
               <p>Sign in with Google to continue. Scanning this code does not send a request automatically.</p>
               {(signInError ?? auth.error) && <p className="connection-error" role="alert">{signInError ?? auth.error}</p>}
-              <button type="button" className="connection-button" disabled={signingIn} aria-busy={signingIn} onClick={() => void signIn()}>
+              <button type="button" className="ui-button ui-button--primary" disabled={signingIn} aria-busy={signingIn} onClick={() => void signIn()}>
                 {signingIn ? 'Opening Google…' : 'Continue with Google'}
               </button>
             </>
@@ -153,7 +154,7 @@ function PatientConnectionState({ activeDoctor, connections, latest, pending, se
     return (
       <div className="connection-error" role="alert">
         <p>{error}</p>
-        <button type="button" className="connection-button connection-button--secondary" onClick={connections.refresh} disabled={refreshing} aria-busy={refreshing}>
+        <button type="button" className="ui-button ui-button--secondary" onClick={connections.refresh} disabled={refreshing} aria-busy={refreshing}>
           {refreshing ? 'Checking…' : 'Refresh connection status'}
         </button>
       </div>
@@ -176,7 +177,7 @@ function PatientConnectionState({ activeDoctor, connections, latest, pending, se
         <div className="connection-notice">
           <p>Your doctor accepted the request. Your care team is being updated; if this doctor does not appear yet, update it below.</p>
           <div className="connection-actions">
-            <button type="button" className="connection-button" disabled={careTeam.pending} aria-busy={careTeam.pending} onClick={() => void careTeam.run()}>
+            <button type="button" className="ui-button ui-button--primary" disabled={careTeam.pending} aria-busy={careTeam.pending} onClick={() => void careTeam.run()}>
               {careTeam.pending ? 'Updating care team…' : 'Update care team'}
             </button>
           </div>
@@ -188,7 +189,7 @@ function PatientConnectionState({ activeDoctor, connections, latest, pending, se
 
       <div className="connection-actions">
         {canRequest && (
-          <button type="button" className="connection-button" disabled={sending} aria-busy={sending} onClick={onRequest}>
+          <button type="button" className="ui-button ui-button--primary" disabled={sending} aria-busy={sending} onClick={onRequest}>
             {sending
               ? 'Sending request…'
               : send.error && send.retry
@@ -198,12 +199,12 @@ function PatientConnectionState({ activeDoctor, connections, latest, pending, se
         )}
         {pending && (
           <>
-            <button type="button" className="connection-button connection-button--secondary" onClick={connections.refresh} disabled={refreshing} aria-busy={refreshing}>
+            <button type="button" className="ui-button ui-button--secondary" onClick={connections.refresh} disabled={refreshing} aria-busy={refreshing}>
               {refreshing ? 'Checking status…' : 'Refresh status'}
             </button>
             <button
               type="button"
-              className="connection-button connection-button--secondary"
+              className="ui-button ui-button--secondary"
               disabled={cancelling}
               aria-busy={cancelling}
               onClick={() => void connections.cancelConnection(pending.id)}

@@ -4,6 +4,7 @@ import type { AuthMode, DoctorAuthProps } from '../contracts';
 import { LoginForm } from './LoginForm';
 import { RegisterForm } from './RegisterForm';
 import './doctor-auth.css';
+import { brand } from '../../../brand/brand.config';
 
 const MODES: ReadonlyArray<{ mode: AuthMode; label: string }> = [
   { mode: 'login', label: 'Log in' },
@@ -33,14 +34,14 @@ export function DoctorAuth({ mode, onModeChange, onDemoLogin, onExit }: DoctorAu
 
   return (
     <div className="doctor-auth">
-      <aside className="doctor-auth-aside" aria-label="About MedFlow for doctors">
+      <aside className="doctor-auth-aside" aria-label={`About ${brand.productName} for doctors`}>
         <BrandMark />
         <div className="doctor-auth-aside__body">
           <p className="doctor-eyebrow">Care, connected.</p>
           <p className="doctor-auth-aside__headline">The care doesn't end when the appointment does.</p>
           <p className="doctor-auth-aside__text">A shared space for your patients, follow-ups and everyday care.</p>
         </div>
-        <p className="doctor-eyebrow">MedFlow for doctors</p>
+        <p className="doctor-eyebrow">{brand.productName} for doctors</p>
       </aside>
 
       <main className="doctor-auth-main">
@@ -56,11 +57,11 @@ export function DoctorAuth({ mode, onModeChange, onDemoLogin, onExit }: DoctorAu
         <div className="doctor-auth-panel">
           <div className="doctor-auth-mobile-brand">
             <BrandMark />
-            <p className="doctor-eyebrow">MedFlow for doctors</p>
+            <p className="doctor-eyebrow">{brand.productName} for doctors</p>
           </div>
 
           <p className="doctor-notice doctor-notice--info doctor-auth-invite-note">
-            <strong>Synthetic demo.</strong> Real MedFlow doctor accounts are invitation only: the MedFlow team
+            <strong>Synthetic demo.</strong> Real {brand.productName} doctor accounts are invitation only: the {brand.productName} team
             sends you an invitation link, then you sign in with the invited Google account. The registration and
             password fields on this page are part of the demo and create no account.{' '}
             <a className="doctor-link" href="#/doctor">
