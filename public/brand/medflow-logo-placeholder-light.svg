@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="168" height="40" viewBox="0 0 168 40" role="img" aria-label="MedFlow">
+  <!-- Temporary placeholder lockup (symbol + wordmark) for the Light theme. Replace with the original MedFlow logo. -->
+  <rect width="40" height="40" rx="10" fill="#90AD9B"/>
+  <path d="M17 9h6v8h8v6h-8v8h-6v-8H9v-6h8z" fill="#172033"/>
+  <text x="52" y="28" fill="#172033" font-family="Quicksand, system-ui, 'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="700">MedFlow</text>
+</svg>
