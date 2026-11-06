@@ -1,0 +1,1 @@
+export { DoctorAuth } from './DoctorAuth';

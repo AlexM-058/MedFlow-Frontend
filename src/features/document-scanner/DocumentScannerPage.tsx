@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AppHeader } from '../../components/AppHeader';
 import { DocumentScanner } from './DocumentScanner';
+import { revokeScannedDocumentUri } from './scanDocument';
 import type { ScannedDocument } from './types';
 
 /**
@@ -8,7 +9,16 @@ import type { ScannedDocument } from './types';
  * Confirmed documents stay in local React state — no upload.
  */
 export function DocumentScannerPage() {
-  const [confirmed, setConfirmed] = useState<ScannedDocument | null>(null);
+  const [confirmed, setConfirmedState] = useState<ScannedDocument | null>(null);
+  // This page owns the confirmed document's object URL: revoke it when it is
+  // replaced, cleared or the page unmounts.
+  const confirmedRef = useRef<ScannedDocument | null>(null);
+  const setConfirmed = (next: ScannedDocument | null) => {
+    revokeScannedDocumentUri(confirmedRef.current);
+    confirmedRef.current = next;
+    setConfirmedState(next);
+  };
+  useEffect(() => () => revokeScannedDocumentUri(confirmedRef.current), []);
 
   return (
     <div className="app">
@@ -18,7 +28,7 @@ export function DocumentScannerPage() {
         <DocumentScanner
           onConfirm={(document) => setConfirmed(document)}
           onCancel={() => {
-            window.location.hash = '/patient';
+            window.location.hash = '/demo/patient';
           }}
         />
 
@@ -32,7 +42,7 @@ export function DocumentScannerPage() {
             <pre className="doc-scanner-page__json">{JSON.stringify(confirmed, null, 2)}</pre>
             <button
               type="button"
-              className="button-secondary"
+              className="ui-button ui-button--secondary"
               onClick={() => setConfirmed(null)}
             >
               Clear confirmed document

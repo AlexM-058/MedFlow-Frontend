@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { brand } from '../../brand/brand.config';
 import { getChatService, isChatSimulated } from './chatService';
 import { Composer } from './Composer';
 import { MessageList } from './MessageList';
@@ -110,7 +111,7 @@ export function ChatPage({ onOpenSuggestion, suggestionOpen = false }: ChatPageP
   return (
     <main className="chat" aria-labelledby="chat-title">
       <h1 id="chat-title" className="visually-hidden">
-        Chat with MedFlow Assistant
+        Chat with {brand.assistantName}
       </h1>
 
       {onOpenSuggestion && (
@@ -121,7 +122,7 @@ export function ChatPage({ onOpenSuggestion, suggestionOpen = false }: ChatPageP
           </div>
           <button
             type="button"
-            className="button-secondary chat__suggestion-button"
+            className="ui-button ui-button--secondary chat__suggestion-button"
             aria-expanded={suggestionOpen}
             onClick={onOpenSuggestion}
           >
@@ -147,7 +148,7 @@ export function ChatPage({ onOpenSuggestion, suggestionOpen = false }: ChatPageP
           {status === 'error' && (
             <div className="notice notice--error" role="alert">
               <p>The conversation could not be loaded.</p>
-              <button type="button" className="button-secondary" onClick={retryLoad}>
+              <button type="button" className="ui-button ui-button--secondary" onClick={retryLoad}>
                 Try again
               </button>
             </div>
@@ -163,7 +164,7 @@ export function ChatPage({ onOpenSuggestion, suggestionOpen = false }: ChatPageP
 
           {isReplying && (
             <p className="chat__status" role="status">
-              MedFlow Assistant is replying (simulated)…
+              {brand.assistantName} is replying (simulated)…
             </p>
           )}
 
@@ -175,7 +176,7 @@ export function ChatPage({ onOpenSuggestion, suggestionOpen = false }: ChatPageP
               </p>
               <button
                 type="button"
-                className="button-secondary"
+                className="ui-button ui-button--secondary"
                 disabled={isReplying}
                 aria-label={failedMessages.length === 1 ? 'Retry reply' : `Retry reply to: ${message.text}`}
                 onClick={() => handleRetry(message)}

@@ -1,0 +1,458 @@
+/*
+ * Doctor auth (login / register). Every class is `doctor-auth-` prefixed; element
+ * selectors are scoped under .doctor-auth. Consumes global and doctor tokens only.
+ * Mobile-first: single column; split panel from 64rem.
+ */
+
+.doctor-auth {
+  /* Secondary text: tinted mobile background needs full-contrast text. */
+  --doctor-auth-muted: var(--color-text);
+  --doctor-auth-pad: clamp(1rem, 5vw, 2.5rem);
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--doctor-aside-bg);
+}
+
+/* ---------- Aside (desktop only) ---------- */
+.doctor-auth-aside {
+  display: none;
+}
+
+/* ---------- Main column ---------- */
+.doctor-auth-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: max(var(--space-3), env(safe-area-inset-top)) max(var(--doctor-auth-pad), env(safe-area-inset-right))
+    max(var(--space-6), env(safe-area-inset-bottom)) max(var(--doctor-auth-pad), env(safe-area-inset-left));
+}
+
+.doctor-auth-topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  width: 100%;
+  max-width: var(--doctor-form-max);
+  margin-inline: auto;
+}
+
+.doctor-auth-exit {
+  margin-inline-start: calc(-1 * var(--space-2));
+  font-weight: 600;
+}
+
+.doctor-auth-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: var(--doctor-form-max);
+  margin: var(--space-2) auto 0;
+  min-width: 0;
+}
+
+.doctor-auth-mobile-brand {
+  display: flex;
+  flex-direction: column;
+  gap: var(--doctor-space-5);
+}
+
+.doctor-auth-mobile-brand .brand-mark {
+  justify-content: center;
+}
+
+.doctor-auth-mobile-brand .brand-mark__symbol {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* ---------- Mode toggle (desktop only) ---------- */
+.doctor-auth-toggle {
+  display: none;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.doctor-auth-toggle__button {
+  min-height: var(--doctor-control-min);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-control);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.doctor-auth-toggle__button:hover {
+  background: var(--color-surface-subtle);
+}
+
+.doctor-auth-toggle__button[aria-pressed='true'] {
+  border-color: var(--brand-primary);
+  background: var(--brand-primary);
+  color: var(--brand-on-primary);
+  font-weight: 700;
+}
+
+/* ---------- Headings ---------- */
+.doctor-auth-heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.doctor-auth-title {
+  font-size: clamp(1.625rem, 1.2rem + 1.8vw, 2rem);
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+.doctor-auth-title:focus {
+  outline: none;
+}
+
+.doctor-auth-title:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 4px;
+}
+
+.doctor-auth-subtitle {
+  color: var(--doctor-auth-muted);
+}
+
+/* ---------- Form ---------- */
+.doctor-auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.doctor-auth-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.doctor-auth-grid > * {
+  min-width: 0;
+}
+
+/* Rounded fields on mobile, per reference. */
+.doctor-auth .doctor-auth-input {
+  border-radius: var(--radius-pill);
+  padding-inline: var(--space-4);
+}
+
+.doctor-auth .doctor-hint {
+  color: var(--doctor-auth-muted);
+}
+
+.doctor-auth-select {
+  cursor: pointer;
+}
+
+.doctor-auth-password {
+  position: relative;
+  display: flex;
+  min-width: 0;
+}
+
+.doctor-auth .doctor-auth-password__input {
+  padding-inline-end: 4.75rem;
+}
+
+.doctor-auth-password__toggle {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  min-width: var(--doctor-control-min);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.doctor-auth-password__toggle[aria-pressed='true'] {
+  text-decoration-style: double;
+}
+
+.doctor-auth-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+}
+
+.doctor-auth-check {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--doctor-control-min);
+  font-size: 0.9375rem;
+  cursor: pointer;
+}
+
+.doctor-auth-check input {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+  accent-color: var(--brand-primary);
+  cursor: pointer;
+}
+
+/* Inline text action that still offers a 44px target. */
+.doctor-auth-text-button {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--doctor-control-min);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-weight: 700;
+  text-align: start;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.doctor-auth-demo-note {
+  font-size: 0.875rem;
+  color: var(--doctor-auth-muted);
+}
+
+.doctor-auth-demo-note .doctor-demo-tag {
+  margin-inline-end: var(--space-1);
+}
+
+.doctor-auth-switch {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: var(--space-1);
+  font-size: 0.9375rem;
+}
+
+/* ---------- Credential file ---------- */
+.doctor-auth-file-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.doctor-auth-dropzone {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-4);
+  padding: var(--space-4);
+  border: 1px dashed var(--color-border-control);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.doctor-auth-dropzone--invalid {
+  border-color: var(--doctor-error-text);
+  border-style: solid;
+}
+
+.doctor-auth-dropzone__icon {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--color-text);
+}
+
+.doctor-auth-dropzone__text {
+  display: flex;
+  flex: 1 1 12rem;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.doctor-auth-dropzone__title {
+  font-weight: 700;
+}
+
+/* Inside the white dropzone the regular secondary color has enough contrast. */
+.doctor-auth .doctor-auth-dropzone .doctor-hint {
+  color: var(--color-text-secondary);
+}
+
+.doctor-auth-dropzone__button {
+  flex: 1 1 100%;
+}
+
+.doctor-auth-file {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-3);
+  padding: var(--space-1) var(--space-1) var(--space-1) var(--space-4);
+  border: 1px solid var(--color-border-decorative);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.doctor-auth-file__meta {
+  min-width: 0;
+}
+
+.doctor-auth-file__name {
+  font-weight: 700;
+}
+
+.doctor-auth-file__size {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+/* ---------- Pending verification (demo) ---------- */
+.doctor-auth-pending {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.doctor-auth-summary {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border-decorative);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.doctor-auth-summary dt {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+}
+
+.doctor-auth-summary dd {
+  margin: 0;
+}
+
+/* ---------- Medium widths: let the dropzone button sit beside the text ---------- */
+@media (min-width: 30rem) {
+  .doctor-auth-dropzone__button {
+    flex: 0 0 auto;
+  }
+}
+
+/* ---------- Desktop split panel ---------- */
+@media (min-width: 64rem) {
+  .doctor-auth {
+    --doctor-auth-muted: var(--color-text-secondary);
+
+    grid-template-columns: minmax(18rem, 1fr) minmax(0, 2fr);
+    background: var(--color-surface);
+  }
+
+  .doctor-auth-aside {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--space-6);
+    min-width: 0;
+    height: 100vh;
+    height: 100dvh;
+    overflow-y: auto;
+    padding: clamp(2rem, 4vw, 3.5rem) clamp(1.5rem, 3.5vw, 3rem);
+    background: var(--doctor-aside-bg);
+    color: var(--color-text);
+  }
+
+  .doctor-auth-aside__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .doctor-auth-aside__headline {
+    font-size: clamp(1.75rem, 1rem + 1.6vw, 2.5rem);
+    font-weight: 700;
+    line-height: 1.25;
+    max-width: 16ch;
+  }
+
+  .doctor-auth-aside__text {
+    max-width: 30ch;
+  }
+
+  .doctor-auth-main {
+    justify-content: center;
+    padding-block: clamp(1.5rem, 4vw, 3rem);
+  }
+
+  .doctor-auth-topbar {
+    margin-bottom: auto;
+  }
+
+  .doctor-auth-panel {
+    margin-block: var(--doctor-space-5) auto;
+  }
+
+  .doctor-auth-mobile-brand {
+    display: none;
+  }
+
+  .doctor-auth-toggle {
+    display: grid;
+  }
+
+  /* Desktop reference uses softly rounded rectangles. */
+  .doctor-auth .doctor-auth-input {
+    border-radius: var(--radius-sm);
+    padding-inline: var(--space-3);
+  }
+
+  .doctor-auth-password__toggle {
+    border-radius: var(--radius-sm);
+  }
+
+  .doctor-auth-dropzone {
+    background: var(--color-surface-subtle);
+    border-color: var(--color-border-decorative);
+    border-style: solid;
+  }
+
+  .doctor-auth-dropzone--invalid {
+    border-color: var(--doctor-error-text);
+  }
+
+  /* On the subtle dropzone, keep full-contrast secondary text. */
+  .doctor-auth .doctor-auth-dropzone .doctor-hint {
+    color: var(--color-text);
+  }
+}
+
+/* Invitation-only explanation shown on the synthetic demo entry. */
+.doctor-auth .doctor-auth-invite-note {
+  margin: 0;
+}

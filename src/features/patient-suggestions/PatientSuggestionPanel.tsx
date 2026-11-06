@@ -92,7 +92,7 @@ export function PatientSuggestionPanel({ suggestion, onClose }: PatientSuggestio
         <span className="patient-suggestion-panel__eyebrow">Care team</span>
         <button
           ref={closeRef}
-          className="patient-suggestion-panel__close"
+          className="ui-button ui-button--secondary patient-suggestion-panel__close"
           type="button"
           onClick={onClose}
           aria-label="Close doctor suggestion"

@@ -36,6 +36,8 @@
   --brand-primary: #90ad9b;
   /* Text and icons on the primary color, identical in both themes. */
   --brand-on-primary: #172033;
+  /* Accent text derived from the brand, readable in both themes (mixed with the theme's text color). */
+  --brand-accent-text: color-mix(in srgb, var(--brand-primary) 45%, var(--color-text));
 }
 
 /* 3. Status - Light */
@@ -45,6 +47,20 @@
   --status-error-bg: #fdecec;
   --status-error-border: #b42318;
   --status-on-tint: var(--color-text);
+  --status-success-bg: #e7f6ec;
+  --status-success-border: #3f8f5a;
+  --status-warning-bg: #fff6e0;
+  --status-warning-border: #c98a00;
+  --status-error-text: #b42318;
+  /* Clinical follow-up statuses (doctor backlog). */
+  --status-review-bg: #fef3c7;
+  --status-review-text: #7a4b00;
+  --status-followup-bg: #dbeafe;
+  --status-followup-text: #1e3a8a;
+  --status-uptodate-bg: #dcfce7;
+  --status-uptodate-text: #14532d;
+  /* Overlay behind modal dialogs. */
+  --color-backdrop: rgb(15 23 42 / 0.55);
 }
 
 /* 3. Status - Dark */
@@ -53,6 +69,18 @@
   --status-info-border: #4f6f9f;
   --status-error-bg: #44202a;
   --status-error-border: #f97066;
+  --status-success-bg: #173d27;
+  --status-success-border: #5fbf82;
+  --status-warning-bg: #3f3110;
+  --status-warning-border: #d9a53a;
+  --status-error-text: #fda29b;
+  --status-review-bg: #4a3510;
+  --status-review-text: #fde7a8;
+  --status-followup-bg: #1c3358;
+  --status-followup-text: #c7dbff;
+  --status-uptodate-bg: #173d27;
+  --status-uptodate-text: #bff0cf;
+  --color-backdrop: rgb(2 6 23 / 0.7);
 }
 
 /* Typography, spacing, shape */

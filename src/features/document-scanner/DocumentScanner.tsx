@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   captureMedicalDocument,
   describeCaptureMethod,
@@ -26,11 +26,13 @@ export function DocumentScanner({
   const [method, setMethod] = useState<ScanCaptureMethod | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Revoke only an unconfirmed draft on unmount. A confirmed document's URL
+  // belongs to the onConfirm consumer and must stay valid.
+  const draftRef = useRef<ScannedDocument | null>(null);
   useEffect(() => {
-    return () => {
-      revokeScannedDocumentUri(draft);
-    };
+    draftRef.current = draft;
   }, [draft]);
+  useEffect(() => () => revokeScannedDocumentUri(draftRef.current), []);
 
   const clearDraft = useCallback(() => {
     revokeScannedDocumentUri(draft);
@@ -73,6 +75,7 @@ export function DocumentScanner({
   const handleUse = () => {
     if (!draft) return;
     const confirmed = draft;
+    draftRef.current = null;
     setDraft(null);
     setPhase('idle');
     onConfirm(confirmed);
@@ -132,13 +135,13 @@ export function DocumentScanner({
             )}
           </dl>
           <div className="doc-scanner__actions">
-            <button type="button" className="button-secondary" onClick={handleCancel}>
+            <button type="button" className="ui-button ui-button--secondary" onClick={handleCancel}>
               Cancel
             </button>
-            <button type="button" className="button-secondary" onClick={handleRetake}>
+            <button type="button" className="ui-button ui-button--secondary" onClick={handleRetake}>
               Retake
             </button>
-            <button type="button" className="doc-scanner__primary" onClick={handleUse}>
+            <button type="button" className="ui-button ui-button--primary doc-scanner__primary" onClick={handleUse}>
               Use Document
             </button>
           </div>
@@ -151,22 +154,23 @@ export function DocumentScanner({
           <div className="doc-scanner__actions">
             <button
               type="button"
-              className="doc-scanner__primary"
+              className="ui-button ui-button--primary doc-scanner__primary"
               disabled={phase === 'capturing'}
+              aria-busy={phase === 'capturing' || undefined}
               onClick={() => void startCapture(false)}
             >
               {phase === 'capturing' ? 'Opening camera…' : 'Scan document'}
             </button>
             <button
               type="button"
-              className="button-secondary"
+              className="ui-button ui-button--secondary"
               disabled={phase === 'capturing'}
               onClick={() => void startCapture(true)}
             >
               Choose from gallery
             </button>
             {onCancel && (
-              <button type="button" className="button-secondary" onClick={handleCancel}>
+              <button type="button" className="ui-button ui-button--secondary" onClick={handleCancel}>
                 Cancel
               </button>
             )}

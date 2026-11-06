@@ -6,7 +6,7 @@ export type ScannedDocument = {
   sizeBytes?: number;
 };
 
-export type ScanCaptureMethod = 'expo-document-scanner' | 'expo-image-picker' | 'capacitor-camera' | 'file-input';
+export type ScanCaptureMethod = 'camera-input' | 'gallery-input';
 
 export type ScanCaptureResult = {
   document: ScannedDocument;

@@ -1,0 +1,386 @@
+/*
+ * Doctor module — shared primitives. Every class is `doctor-` prefixed and every
+ * element selector is scoped under .doctor-app. Consumes the global semantic
+ * tokens (read-only) and defines module-local status tokens. Sub-folders add
+ * their own CSS files with the same rules (auth/, workspace/, suggestions/).
+ */
+
+/* ---------- Module aliases of the global tokens (white-label) ----------
+ * No raw colors here: every value comes from src/styles/tokens.css, which
+ * already switches with the theme. Clinical status colors stay independent of
+ * the client brand; the accent text is derived from the brand color.
+ */
+.doctor-app {
+  --doctor-status-review-bg: var(--status-review-bg);
+  --doctor-status-review-text: var(--status-review-text);
+  --doctor-status-followup-bg: var(--status-followup-bg);
+  --doctor-status-followup-text: var(--status-followup-text);
+  --doctor-status-uptodate-bg: var(--status-uptodate-bg);
+  --doctor-status-uptodate-text: var(--status-uptodate-text);
+
+  --doctor-error-text: var(--status-error-text);
+  --doctor-error-bg: var(--status-error-bg);
+  --doctor-success-bg: var(--status-success-bg);
+  --doctor-success-border: var(--status-success-border);
+  --doctor-info-bg: var(--status-info-bg);
+  --doctor-info-border: var(--status-info-border);
+  --doctor-warning-bg: var(--status-warning-bg);
+  --doctor-warning-border: var(--status-warning-border);
+
+  /* Small accent text (eyebrows, numbers), derived from the brand color. */
+  --doctor-accent-text: var(--brand-accent-text);
+  --doctor-aside-bg: var(--color-surface-subtle);
+  --doctor-backdrop: var(--color-backdrop);
+  --doctor-control-min: 2.75rem;
+  --doctor-space-5: 1.25rem;
+  --doctor-form-max: 34rem;
+}
+
+/* ---------- Root ---------- */
+.doctor-app {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  line-height: var(--line-height);
+  overflow-wrap: anywhere;
+}
+
+.doctor-app :where(h1, h2, h3, p, ul, ol, dl, dd, figure) {
+  margin: 0;
+}
+
+.doctor-app :where(ul, ol) {
+  padding: 0;
+  list-style: none;
+}
+
+.doctor-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.doctor-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--doctor-accent-text);
+}
+
+/* ---------- Buttons ---------- */
+.doctor-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--doctor-control-min);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.doctor-button--primary {
+  background: var(--brand-primary);
+  color: var(--brand-on-primary);
+}
+
+.doctor-button--primary:hover:not(:disabled) {
+  border-color: var(--brand-on-primary);
+}
+
+.doctor-button--secondary {
+  background: var(--color-surface);
+  border-color: var(--color-border-control);
+  color: var(--color-text);
+}
+
+.doctor-button--secondary:hover:not(:disabled) {
+  background: var(--color-surface-subtle);
+}
+
+/* Text-style action that still meets the 44px target. */
+.doctor-button--ghost {
+  background: transparent;
+  color: var(--color-text);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  padding-inline: var(--space-2);
+}
+
+.doctor-button--block {
+  width: 100%;
+}
+
+.doctor-button:disabled {
+  background: var(--color-surface-subtle);
+  border-color: var(--color-border-decorative);
+  color: var(--color-text);
+  cursor: not-allowed;
+}
+
+/* "Sending…" keeps the brand look while blocked. */
+.doctor-button--primary[aria-busy='true'] {
+  background: var(--brand-primary);
+  color: var(--brand-on-primary);
+  cursor: progress;
+}
+
+.doctor-app :where(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.doctor-link {
+  color: var(--color-text);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+/* ---------- Form fields ---------- */
+.doctor-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.doctor-label {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.doctor-input {
+  width: 100%;
+  min-width: 0;
+  min-height: var(--doctor-control-min);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-control);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.doctor-input::placeholder {
+  color: var(--color-text-secondary);
+  opacity: 1;
+}
+
+textarea.doctor-input {
+  min-height: 7rem;
+  resize: vertical;
+}
+
+.doctor-input[aria-invalid='true'] {
+  border-color: var(--doctor-error-text);
+  box-shadow: 0 0 0 1px var(--doctor-error-text);
+}
+
+.doctor-hint {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+.doctor-field-error {
+  display: flex;
+  gap: var(--space-1);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--doctor-error-text);
+}
+
+.doctor-field-error::before {
+  content: '!';
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 1.1em;
+  height: 1.1em;
+  margin-top: 0.15em;
+  border-radius: 50%;
+  background: var(--doctor-error-text);
+  color: var(--color-surface);
+  font-size: 0.75em;
+  font-weight: 800;
+}
+
+/* ---------- Status badge ---------- */
+.doctor-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.doctor-status--needs-review {
+  background: var(--doctor-status-review-bg);
+  color: var(--doctor-status-review-text);
+}
+
+.doctor-status--follow-up-due {
+  background: var(--doctor-status-followup-bg);
+  color: var(--doctor-status-followup-text);
+}
+
+.doctor-status--up-to-date {
+  background: var(--doctor-status-uptodate-bg);
+  color: var(--doctor-status-uptodate-text);
+}
+
+/* ---------- Notices and demo label ---------- */
+.doctor-notice {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  color: var(--color-text);
+}
+
+.doctor-notice--info {
+  background: var(--doctor-info-bg);
+  border-color: var(--doctor-info-border);
+}
+
+.doctor-notice--warning {
+  background: var(--doctor-warning-bg);
+  border-color: var(--doctor-warning-border);
+}
+
+.doctor-notice--error {
+  background: var(--doctor-error-bg);
+  border-color: var(--doctor-error-text);
+}
+
+.doctor-notice--success {
+  background: var(--doctor-success-bg);
+  border-color: var(--doctor-success-border);
+}
+
+.doctor-demo-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border-control);
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+/* ---------- Dialog (shared/DoctorDialog.tsx) ---------- */
+.doctor-dialog {
+  width: min(100% - 2rem, var(--doctor-dialog-max, 36rem));
+  max-width: none;
+  max-height: min(100dvh - 2rem, 48rem);
+  padding: 0;
+  border: 1px solid var(--color-border-decorative);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  line-height: var(--line-height);
+  overflow-wrap: anywhere;
+}
+
+.doctor-dialog--wide {
+  --doctor-dialog-max: 48rem;
+}
+
+.doctor-dialog::backdrop {
+  /* Older engines do not inherit custom properties into ::backdrop: keep a fallback. */
+  background: var(--color-backdrop, rgb(15 23 42 / 0.6)); /* white-label: allow (neutral overlay fallback) */
+}
+
+.doctor-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.doctor-dialog__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-4) var(--space-2);
+}
+
+.doctor-dialog__title {
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 1.3;
+}
+
+.doctor-dialog__description {
+  margin: var(--space-1) 0 0;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.doctor-dialog__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-2) var(--space-4) var(--space-4);
+}
+
+.doctor-dialog__footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4) calc(var(--space-4) + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--color-border-decorative);
+}
+
+@media (max-width: 47.999rem) {
+  /* Full-screen sheet on phones. */
+  .doctor-dialog {
+    width: 100%;
+    max-height: 100dvh;
+    height: 100dvh;
+    margin: 0;
+    border-radius: 0;
+    border: 0;
+  }
+
+  .doctor-dialog__footer > * {
+    flex: 1 1 10rem;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .doctor-dialog[open] {
+    animation: doctor-dialog-in 160ms ease-out;
+  }
+}
+
+@keyframes doctor-dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+}

@@ -1,0 +1,151 @@
+/* Doctor suggestion dialog. Scoped to .doctor-suggestion; consumes shared tokens only. */
+
+.doctor-suggestion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.doctor-suggestion-id {
+  white-space: nowrap;
+}
+
+.doctor-suggestion-demo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.doctor-suggestion-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--doctor-space-5);
+  min-width: 0;
+}
+
+.doctor-suggestion-required {
+  font-weight: 400;
+  color: var(--color-text-secondary);
+}
+
+.doctor-suggestion-message {
+  min-height: clamp(7rem, 22dvh, 12rem);
+}
+
+.doctor-suggestion-count {
+  align-self: flex-end;
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.doctor-suggestion-count--over {
+  color: var(--doctor-error-text);
+  font-weight: 700;
+}
+
+/* ---------- Photo ---------- */
+.doctor-suggestion-preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: var(--space-1) 0 0;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border-decorative);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-subtle);
+  min-width: 0;
+}
+
+.doctor-suggestion-preview__image {
+  display: block;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  max-height: clamp(10rem, 35dvh, 20rem);
+  margin-inline: auto;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
+
+.doctor-suggestion-preview__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-3);
+  min-width: 0;
+}
+
+.doctor-suggestion-preview__name {
+  font-weight: 700;
+  font-size: 0.875rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.doctor-suggestion-photo__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* The file input is visually hidden; its label is the visible control. */
+.doctor-suggestion-file-input:focus-visible + .doctor-suggestion-file-label {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.doctor-suggestion-file-label[aria-disabled='true'] {
+  background: var(--color-surface-subtle);
+  border-color: var(--color-border-decorative);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ---------- Demo error toggle ---------- */
+.doctor-suggestion-simulate {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 2.75rem;
+  font-size: 0.875rem;
+}
+
+.doctor-suggestion-simulate label {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 2.75rem;
+  cursor: pointer;
+}
+
+.doctor-suggestion-simulate__box {
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+  accent-color: var(--brand-primary);
+  cursor: pointer;
+}
+
+/* ---------- Result ---------- */
+.doctor-suggestion-result {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.doctor-suggestion-result:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.doctor-suggestion-result__title {
+  font-size: 1rem;
+  line-height: 1.3;
+}

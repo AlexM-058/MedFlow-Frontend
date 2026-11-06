@@ -1,7 +1,8 @@
+import { brand } from '../../brand/brand.config';
 import type { ChatMessage } from './types';
 
 const SENDER_LABEL: Record<ChatMessage['sender'], string> = {
-  ai: 'MedFlow AI',
+  ai: brand.assistantName,
   patient: 'You',
 };
 
