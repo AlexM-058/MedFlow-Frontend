@@ -6,6 +6,11 @@ import type { ChatMessage } from './types';
 
 type LoadStatus = 'loading' | 'ready' | 'error';
 
+export interface ChatPageProps {
+  onOpenSuggestion?: () => void;
+  suggestionOpen?: boolean;
+}
+
 let patientMessageCounter = 0;
 function createPatientMessage(text: string): ChatMessage {
   patientMessageCounter += 1;
@@ -17,13 +22,14 @@ function createPatientMessage(text: string): ChatMessage {
   };
 }
 
-export function ChatPage() {
+export function ChatPage({ onOpenSuggestion, suggestionOpen = false }: ChatPageProps) {
   const service = useMemo(() => getChatService(), []);
   const [status, setStatus] = useState<LoadStatus>('loading');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isReplying, setIsReplying] = useState(false);
-  /** Patient message whose reply failed; kept in the conversation, offered for retry. */
-  const [failed, setFailed] = useState<ChatMessage | null>(null);
+  /** Each failed reply remains actionable until that specific message succeeds. */
+  const [failedMessages, setFailedMessages] = useState<ChatMessage[]>([]);
+  const [loadAttempt, setLoadAttempt] = useState(0);
 
   // Refs give synchronous truth for guards (double clicks happen before re-render).
   const messagesRef = useRef<ChatMessage[]>([]);
@@ -50,24 +56,28 @@ export function ChatPage() {
     return () => {
       active = false;
     };
-  }, [service, commitMessages]);
+  }, [service, commitMessages, loadAttempt]);
 
   // Keep the newest message and pending/error state in view.
   useEffect(() => {
     const scroller = scrollRef.current;
     if (scroller) scroller.scrollTop = scroller.scrollHeight;
-  }, [messages.length, isReplying, failed]);
+  }, [messages.length, isReplying, failedMessages]);
 
   const requestReply = useCallback(
     async (patientMessage: ChatMessage) => {
       replyPendingRef.current = true;
       setIsReplying(true);
-      setFailed(null);
       try {
         const reply = await service.sendMessage(patientMessage.text, messagesRef.current);
         commitMessages([...messagesRef.current, reply]);
+        setFailedMessages((previous) => previous.filter((message) => message.id !== patientMessage.id));
       } catch {
-        setFailed(patientMessage);
+        setFailedMessages((previous) =>
+          previous.some((message) => message.id === patientMessage.id)
+            ? previous
+            : [...previous, patientMessage],
+        );
       } finally {
         replyPendingRef.current = false;
         setIsReplying(false);
@@ -88,9 +98,14 @@ export function ChatPage() {
     [commitMessages, requestReply],
   );
 
-  const handleRetry = useCallback(() => {
-    if (failed && !replyPendingRef.current) void requestReply(failed);
-  }, [failed, requestReply]);
+  const handleRetry = useCallback((message: ChatMessage) => {
+    if (!replyPendingRef.current) void requestReply(message);
+  }, [requestReply]);
+
+  function retryLoad() {
+    setStatus('loading');
+    setLoadAttempt((attempt) => attempt + 1);
+  }
 
   return (
     <main className="chat" aria-labelledby="chat-title">
@@ -98,11 +113,29 @@ export function ChatPage() {
         Chat with MedFlow Assistant
       </h1>
 
+      {onOpenSuggestion && (
+        <div className="chat__toolbar">
+          <div>
+            <p className="chat__eyebrow">CARE TEAM</p>
+            <p>Stay connected with your doctor</p>
+          </div>
+          <button
+            type="button"
+            className="button-secondary chat__suggestion-button"
+            aria-expanded={suggestionOpen}
+            onClick={onOpenSuggestion}
+          >
+            Doctor suggestion <span className="chat__demo-tag">Demo</span>
+          </button>
+        </div>
+      )}
+
       <div className="chat__scroll" ref={scrollRef}>
         <div className="chat__column">
           {isChatSimulated && (
             <p className="notice notice--info" role="note">
-              <strong>Demo mode.</strong> Assistant replies are simulated and are not medical advice.
+              <strong>Demo mode.</strong> Replies are simulated, not medical advice. Nothing is sent
+              to a doctor. Messages are kept only until you reload or leave this demo.
             </p>
           )}
 
@@ -112,12 +145,21 @@ export function ChatPage() {
             </p>
           )}
           {status === 'error' && (
-            <p className="notice notice--error" role="alert">
-              The conversation could not be loaded. Please reload the page.
-            </p>
+            <div className="notice notice--error" role="alert">
+              <p>The conversation could not be loaded.</p>
+              <button type="button" className="button-secondary" onClick={retryLoad}>
+                Try again
+              </button>
+            </div>
           )}
 
-          <MessageList messages={messages} />
+          {status === 'ready' && messages.length === 0 && (
+            <p className="chat__empty">Start a conversation by writing a message below.</p>
+          )}
+
+          {messages.length > 0 && <p className="chat__day">Demo conversation</p>}
+
+          <MessageList messages={messages} isBusy={isReplying} />
 
           {isReplying && (
             <p className="chat__status" role="status">
@@ -125,14 +167,23 @@ export function ChatPage() {
             </p>
           )}
 
-          {failed && !isReplying && (
-            <div className="notice notice--error" role="alert">
-              <p>The simulated reply could not be loaded. Your message was kept.</p>
-              <button type="button" className="button-secondary" onClick={handleRetry}>
+          {failedMessages.map((message) => (
+            <div key={message.id} className="notice notice--error" role="alert">
+              <p className="message__text">
+                The simulated reply could not be loaded. Your message was kept:
+                {' '}“{message.text.length > 80 ? `${message.text.slice(0, 80)}…` : message.text}”
+              </p>
+              <button
+                type="button"
+                className="button-secondary"
+                disabled={isReplying}
+                aria-label={failedMessages.length === 1 ? 'Retry reply' : `Retry reply to: ${message.text}`}
+                onClick={() => handleRetry(message)}
+              >
                 Retry reply
               </button>
             </div>
-          )}
+          ))}
         </div>
       </div>
 

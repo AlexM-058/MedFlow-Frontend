@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { THEME_PREFERENCES, type ThemePreference } from './themeContract';
 import { useTheme } from './themeContext';
 
@@ -9,6 +10,7 @@ const LABELS: Record<ThemePreference, string> = {
 
 export function ThemeSelector() {
   const { preference, setPreference } = useTheme();
+  const groupName = useId();
 
   return (
     <fieldset className="theme-selector">
@@ -17,7 +19,7 @@ export function ThemeSelector() {
         <label key={option} className="theme-selector__option">
           <input
             type="radio"
-            name="theme-preference"
+            name={`theme-preference-${groupName}`}
             value={option}
             checked={preference === option}
             onChange={() => setPreference(option)}

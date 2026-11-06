@@ -40,6 +40,18 @@ textarea {
   color: inherit;
 }
 
+select {
+  font: inherit;
+}
+
+button,
+a,
+input,
+textarea,
+select {
+  touch-action: manipulation;
+}
+
 img {
   display: block;
   max-width: 100%;

@@ -44,18 +44,23 @@ export function Composer({ onSend, isSending, disabled = false }: ComposerProps)
             className="composer__input"
             rows={1}
             maxLength={2000}
-            placeholder="Write a message…"
+            placeholder="Type your message..."
             value={text}
             disabled={disabled}
             aria-describedby={hintId}
             onChange={(event) => setText(event.target.value)}
             onKeyDown={handleKeyDown}
           />
-          <button type="submit" className="composer__send" disabled={!canSend}>
+          <button
+            type="submit"
+            className="composer__send"
+            disabled={!canSend}
+            aria-label={isSending ? 'Waiting for simulated reply' : 'Send message'}
+          >
             <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" focusable="false">
               <path fill="currentColor" d="M3.4 20.4 21 12 3.4 3.6 3.4 10l12.6 2-12.6 2z" />
             </svg>
-            <span>Send</span>
+            <span className="composer__send-label">Send</span>
           </button>
         </div>
         <p id={hintId} className="composer__hint">

@@ -7,7 +7,7 @@ import type { ChatMessage } from './types';
  */
 export interface ChatService {
   loadConversation(): Promise<ChatMessage[]>;
-  /** Returns the assistant reply to the latest patient message in `history`. */
+  /** Replies to `text`; `history` includes the original message, including on retry. */
   sendMessage(text: string, history: readonly ChatMessage[]): Promise<ChatMessage>;
 }
 

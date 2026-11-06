@@ -6,7 +6,10 @@ export function AppHeader() {
     <header className="app-header">
       <div className="app-header__inner">
         <BrandMark />
-        <ThemeSelector />
+        <div className="app-header__actions">
+          <a className="app-header__workspace-link" href="#/doctor">Doctor demo</a>
+          <ThemeSelector />
+        </div>
       </div>
     </header>
   );

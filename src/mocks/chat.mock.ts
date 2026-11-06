@@ -11,7 +11,7 @@ const SEED: ChatMessage[] = [
   {
     id: 'seed-1',
     sender: 'ai',
-    text: 'Lorem ipsum dolor sit amet. How can I help you prepare for your visit today?',
+    text: 'How can I help you prepare an update for your next appointment?',
     createdAt: '2026-11-06T09:00:00.000Z',
     simulated: true,
   },
@@ -24,7 +24,7 @@ const SEED: ChatMessage[] = [
   {
     id: 'seed-3',
     sender: 'ai',
-    text: 'Consectetur adipiscing elit. Please describe the update in your own words.',
+    text: 'You can describe the update in your own words and list the questions you would like to discuss.',
     createdAt: '2026-11-06T09:00:45.000Z',
     simulated: true,
   },
@@ -37,9 +37,9 @@ const SEED: ChatMessage[] = [
 ];
 
 const REPLIES = [
-  'Sed do eiusmod tempor incididunt. Thank you, your message was recorded for your care team.',
-  'Ut enim ad minim veniam. Is there anything else you would like your doctor to know?',
-  'Duis aute irure dolor. Your care team will review this conversation.',
+  'This is a local demo reply. Your update is visible here, but has not been sent or saved to a care team.',
+  'Is there another question you would like to prepare for your appointment? This demo does not provide medical advice.',
+  'You can continue drafting your update here. This conversation will be cleared when the page is reloaded.',
 ];
 
 const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
