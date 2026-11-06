@@ -8,6 +8,7 @@ export function AppHeader() {
         <BrandMark />
         <div className="app-header__actions">
           <a className="app-header__workspace-link" href="#/patient">Sign in</a>
+          <a className="app-header__workspace-link" href="#/demo/scan">Scan document</a>
           <a className="app-header__workspace-link" href="#/demo/doctor">Doctor demo</a>
           <ThemeSelector />
         </div>

@@ -7,6 +7,7 @@ import { readAppRoute, subscribeToRoute, navigate } from './auth/navigation';
 import { AccountEntryPage, AccountLayout, AccountSessionControls, AuthBoundary, DoctorInvitationPage } from './auth/AuthPages';
 import { PatientConnectPage, PatientAccountPage } from './features/connections';
 import { ChatPage } from './features/chat/ChatPage';
+import { DocumentScannerPage } from './features/document-scanner';
 import { PatientSuggestionPanel } from './features/patient-suggestions';
 import { ThemeProvider } from './theme/ThemeProvider';
 
@@ -66,6 +67,7 @@ function Routes() {
   if (route === '/home' || route === '/') return <AccountLayout><AccountEntryPage /></AccountLayout>;
   if (route === '/demo/patient') return <PatientWorkspace />;
   if (route === '/demo/doctor') return DoctorApp ? <DoctorApp onExit={() => navigate('/demo/patient')} /> : <AccountLayout><p role="status">The doctor demo is not available yet.</p></AccountLayout>;
+  if (route === '/demo/scan') return <DocumentScannerPage />;
   if (route === '/auth/callback') return <AccountLayout><p role="status">Completing Google sign-in…</p></AccountLayout>;
   const connect = /^\/connect\/([^/]+)$/.exec(route);
   const invitation = /^\/doctor\/invite\/([^/]+)$/.exec(route);
