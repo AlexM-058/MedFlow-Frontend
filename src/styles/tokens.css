@@ -1,0 +1,84 @@
+/*
+ * MedFlow design tokens. Three independent groups:
+ *   1. Neutral palette  - per theme, never changed by a client brand.
+ *   2. Brand            - defaults here, overridden at runtime from brand.config.ts.
+ *   3. Status           - per theme, never derived from the brand.
+ * Components use only the semantic names below, never raw hex values.
+ */
+
+/* 1. Neutral palette - Light (default) */
+:root {
+  --color-bg: #f6f8fb;
+  --color-surface: #ffffff;
+  --color-surface-subtle: #f1f5f9;
+  --color-border-decorative: #e2e8f0;
+  --color-text: #172033;
+  /* Small secondary text: only on --color-surface (white) in Light. */
+  --color-text-secondary: #64748b;
+  --color-border-control: #64748b;
+  --color-focus-ring: #172033;
+}
+
+/* 1. Neutral palette - Dark */
+:root[data-theme='dark'] {
+  --color-bg: #0f172a;
+  --color-surface: #172033;
+  --color-surface-subtle: #1e293b;
+  --color-border-decorative: #334155;
+  --color-text: #f1f5f9;
+  --color-text-secondary: #a7b4c8;
+  --color-border-control: #8293aa;
+  --color-focus-ring: #f1f5f9;
+}
+
+/* 2. Brand - defaults; applyBrand() writes the configured values inline. */
+:root {
+  --brand-primary: #90ad9b;
+  /* Text and icons on the primary color, identical in both themes. */
+  --brand-on-primary: #172033;
+}
+
+/* 3. Status - Light */
+:root {
+  --status-info-bg: #e6eefa;
+  --status-info-border: #8aa8d6;
+  --status-error-bg: #fdecec;
+  --status-error-border: #b42318;
+  --status-on-tint: var(--color-text);
+}
+
+/* 3. Status - Dark */
+:root[data-theme='dark'] {
+  --status-info-bg: #1c2f4d;
+  --status-info-border: #4f6f9f;
+  --status-error-bg: #44202a;
+  --status-error-border: #f97066;
+}
+
+/* Typography, spacing, shape */
+:root {
+  --font-sans: 'Quicksand', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
+  --font-size-sm: 0.8125rem;
+  --font-size-md: 1rem;
+  --line-height: 1.5;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.875rem;
+  --radius-pill: 999px;
+
+  --column-max: 44rem;
+  --gutter: var(--space-4);
+}
+
+@media (min-width: 640px) {
+  :root {
+    --gutter: var(--space-6);
+  }
+}

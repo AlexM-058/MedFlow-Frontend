@@ -1,0 +1,290 @@
+/* Layout: header + scrollable conversation + composer, filling the viewport. */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  min-width: 0;
+}
+
+/* Header */
+.app-header {
+  flex: none;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border-decorative);
+}
+
+.app-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  max-width: calc(var(--column-max) + 2 * var(--gutter));
+  margin: 0 auto;
+  padding: var(--space-2) var(--gutter);
+  min-height: 3.5rem;
+}
+
+.brand-mark {
+  display: flex;
+  align-items: center;
+  flex: none;
+}
+
+.brand-mark__logo {
+  display: none;
+  height: 2.25rem;
+  width: auto;
+}
+
+.brand-mark__symbol {
+  height: 2.25rem;
+  width: 2.25rem;
+}
+
+@media (min-width: 640px) {
+  .brand-mark__logo {
+    display: block;
+  }
+  .brand-mark__symbol {
+    display: none;
+  }
+}
+
+/* Theme selector: segmented radio group */
+.theme-selector {
+  display: inline-flex;
+  margin: 0;
+  padding: 2px;
+  min-width: 0;
+  border: 1px solid var(--color-border-control);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+}
+
+.theme-selector__option {
+  position: relative;
+  display: flex;
+}
+
+.theme-selector__label {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text);
+  cursor: pointer;
+  user-select: none;
+}
+
+.theme-selector__input:checked + .theme-selector__label {
+  background: var(--color-text);
+  color: var(--color-surface);
+}
+
+.theme-selector__input:focus-visible + .theme-selector__label {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (max-width: 359px) {
+  .theme-selector__label {
+    padding: var(--space-1) var(--space-2);
+  }
+}
+
+/* Conversation */
+.chat {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.chat__scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.chat__column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: calc(var(--column-max) + 2 * var(--gutter));
+  margin: 0 auto;
+  padding: var(--space-4) var(--gutter) var(--space-6);
+}
+
+.chat__status {
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+}
+
+.message-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.message--patient {
+  align-items: flex-end;
+}
+
+/* Sits on the tinted page background, so it uses primary text. */
+.message__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.message__tag {
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border-decorative);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-subtle);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.message__text,
+.message__bubble {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+/* AI: plain text on the neutral background. */
+.message__text {
+  color: var(--color-text);
+}
+
+/* Patient: right-aligned sage bubble with dark text in both themes. */
+.message__bubble {
+  max-width: min(85%, 32rem);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md) var(--radius-md) var(--radius-sm) var(--radius-md);
+  background: var(--brand-primary);
+  color: var(--brand-on-primary);
+}
+
+/* Notices (status colors, independent of brand) */
+.notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--status-on-tint);
+}
+
+.notice--info {
+  background: var(--status-info-bg);
+  border-color: var(--status-info-border);
+}
+
+.notice--error {
+  background: var(--status-error-bg);
+  border-color: var(--status-error-border);
+}
+
+.button-secondary {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-control);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Composer */
+.composer {
+  flex: none;
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border-decorative);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.composer__column {
+  max-width: calc(var(--column-max) + 2 * var(--gutter));
+  margin: 0 auto;
+  padding: var(--space-3) var(--gutter) var(--space-2);
+}
+
+.composer__row {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+
+.composer__input {
+  flex: 1;
+  min-width: 0;
+  min-height: 2.75rem;
+  max-height: 9rem;
+  field-sizing: content;
+  resize: none;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-control);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  line-height: var(--line-height);
+}
+
+.composer__input::placeholder {
+  color: var(--color-text-secondary);
+  opacity: 1;
+}
+
+.composer__send {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 2.75rem;
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--brand-primary);
+  color: var(--brand-on-primary);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.composer__send:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* Small secondary text on the white composer surface. */
+.composer__hint {
+  margin-top: var(--space-1);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 359px) {
+  .composer__send {
+    padding: 0 var(--space-3);
+  }
+}

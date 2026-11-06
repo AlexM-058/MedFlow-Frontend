@@ -34,3 +34,6 @@ __pycache__/
 *.keystore
 keystore.properties
 key.properties
+
+# Local Figma reference screenshots
+/figma-references/
