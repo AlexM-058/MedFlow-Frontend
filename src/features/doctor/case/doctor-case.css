@@ -99,7 +99,7 @@
   background: var(--color-surface);
   color: var(--status-on-tint);
   font-size: var(--font-size-sm);
-  font-weight: 600;
+  font-weight: 500;
   width: fit-content;
   max-width: 100%;
 }
@@ -251,7 +251,7 @@
 }
 
 .care-case-fields dt {
-  font-weight: 600;
+  font-weight: 500;
   font-size: var(--font-size-sm);
 }
 
@@ -278,7 +278,7 @@
   align-items: center;
   min-height: 2.75rem;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .care-case-note {
@@ -299,7 +299,7 @@
 }
 
 .care-case-label {
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .care-case-textarea {

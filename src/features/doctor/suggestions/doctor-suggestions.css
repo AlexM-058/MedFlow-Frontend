@@ -42,7 +42,7 @@
 
 .doctor-suggestion-count--over {
   color: var(--doctor-error-text);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /* ---------- Photo ---------- */
@@ -80,7 +80,7 @@
 }
 
 .doctor-suggestion-preview__name {
-  font-weight: 700;
+  font-weight: 600;
   font-size: 0.875rem;
   min-width: 0;
   overflow-wrap: anywhere;

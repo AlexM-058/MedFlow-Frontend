@@ -4,7 +4,9 @@ import type { AccountProfile } from '../../../auth/contracts';
 import { ConnectionQrPanel } from './ConnectionQrPanel';
 import { ConnectionRequestsPanel } from './ConnectionRequestsPanel';
 import { useConnectionRequests } from './useConnectionRequests';
+import { PatientBacklogPanel } from '../workspace/PatientBacklogPanel';
 import '../doctor.css';
+import '../workspace/doctor-workspace.css';
 import './doctor-account.css';
 import { brand } from '../../../brand/brand.config';
 
@@ -14,30 +16,13 @@ export interface DoctorAccountWorkspaceProps {
   onExit: () => void;
 }
 
-type Section = 'requests' | 'qr' | 'patients' | 'messages' | 'documents';
+type Section = 'requests' | 'qr' | 'patients';
 
 const SECTIONS: { id: Section; label: string }[] = [
-  { id: 'requests', label: 'Connection requests' },
-  { id: 'qr', label: 'Connection QR' },
-  { id: 'patients', label: 'Patients' },
-  { id: 'messages', label: 'Messages' },
-  { id: 'documents', label: 'Documents' },
+  { id: 'requests', label: 'Cereri de conectare' },
+  { id: 'qr', label: 'Cod QR de conectare' },
+  { id: 'patients', label: 'Pacienți' },
 ];
-
-const UNAVAILABLE: Record<'patients' | 'messages' | 'documents', { title: string; text: string }> = {
-  patients: {
-    title: 'Patients',
-    text: 'Your patient list will appear here once the patient backlog service is connected. Accepted connection requests are recorded by the server, but this page does not display patient records yet.',
-  },
-  messages: {
-    title: 'Messages',
-    text: 'Secure messaging with patients is not connected yet. No messages are shown or stored here.',
-  },
-  documents: {
-    title: 'Documents',
-    text: 'Document sharing is not connected yet. No documents are shown or uploaded here.',
-  },
-};
 
 /**
  * Real doctor workspace backed by the account API. Never falls back to demo
@@ -65,7 +50,7 @@ export function DoctorAccountWorkspace({ profile, onExit }: DoctorAccountWorkspa
     try {
       await signOut();
     } catch (error) {
-      setSignOutError(error instanceof Error ? error.message : 'Could not sign out. Please try again.');
+      setSignOutError(error instanceof Error ? error.message : 'Deconectarea nu a reușit. Vă rugăm să încercați din nou.');
       setSigningOut(false);
     }
   }
@@ -74,19 +59,19 @@ export function DoctorAccountWorkspace({ profile, onExit }: DoctorAccountWorkspa
     <div className="doctor-app doctor-account">
       <header className="doctor-account-header">
         <div className="doctor-account-identity">
-          <p className="doctor-eyebrow">Doctor workspace</p>
+          <p className="doctor-eyebrow">Spațiul de lucru al medicului</p>
           <h1 ref={headingRef} tabIndex={-1} className="doctor-account-identity__name">
             {profile.fullName}
           </h1>
           <p className="doctor-account-identity__email">{profile.email}</p>
-          <p className="doctor-account-verified">Doctor role verified by {brand.productName}</p>
+          <p className="doctor-account-verified">Rol de medic verificat de {brand.productName}</p>
         </div>
         <div className="doctor-account-actions doctor-account-header__actions">
           <button type="button" className="doctor-button doctor-button--secondary" onClick={onExit}>
-            Patient area
+            Zona pentru pacienți
           </button>
           <button type="button" className="doctor-button doctor-button--secondary" onClick={() => void handleSignOut()} disabled={signingOut} aria-busy={signingOut}>
-            {signingOut ? 'Signing out…' : 'Sign out'}
+            {signingOut ? 'Se deconectează…' : 'Deconectare'}
           </button>
         </div>
         {signOutError && (
@@ -98,7 +83,7 @@ export function DoctorAccountWorkspace({ profile, onExit }: DoctorAccountWorkspa
 
       <nav className="doctor-account-nav" aria-labelledby={`${id}-nav`}>
         <h2 id={`${id}-nav`} className="doctor-sr-only">
-          Workspace sections
+          Secțiunile spațiului de lucru
         </h2>
         <ul className="doctor-account-nav__list">
           {SECTIONS.map((item) => (
@@ -113,7 +98,7 @@ export function DoctorAccountWorkspace({ profile, onExit }: DoctorAccountWorkspa
                 {item.id === 'requests' && pendingCount > 0 && (
                   <span className="doctor-account-count">
                     {pendingCount}
-                    <span className="doctor-sr-only"> pending</span>
+                    <span className="doctor-sr-only"> în așteptare</span>
                   </span>
                 )}
               </button>
@@ -132,16 +117,7 @@ export function DoctorAccountWorkspace({ profile, onExit }: DoctorAccountWorkspa
           />
         )}
         {section === 'qr' && <ConnectionQrPanel token={token} />}
-        {(section === 'patients' || section === 'messages' || section === 'documents') && (
-          <section className="doctor-account-panel" aria-labelledby={`${id}-${section}`}>
-            <h2 id={`${id}-${section}`} className="doctor-account-panel__title">
-              {UNAVAILABLE[section].title}
-            </h2>
-            <p className="doctor-notice doctor-notice--info">
-              <strong>Not available yet.</strong> {UNAVAILABLE[section].text}
-            </p>
-          </section>
-        )}
+        {section === 'patients' && <PatientBacklogPanel />}
       </div>
     </div>
   );

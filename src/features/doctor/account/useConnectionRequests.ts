@@ -37,7 +37,7 @@ export function useConnectionRequests(token: string | null) {
   const refresh = useCallback(async () => {
     readController.current?.abort();
     if (!token) {
-      setState((s) => ({ ...s, phase: 'error', error: 'Your session is not available. Please sign in again.' }));
+      setState((s) => ({ ...s, phase: 'error', error: 'Sesiunea dumneavoastră nu este disponibilă. Vă rugăm să vă autentificați din nou.' }));
       return;
     }
     const controller = new AbortController();
@@ -49,7 +49,7 @@ export function useConnectionRequests(token: string | null) {
       setState({ phase: 'ready', requests, error: null, refreshing: false, updatedAt: new Date() });
     } catch (error) {
       if (isAbort(error) || controller.signal.aborted) return;
-      const text = error instanceof AccountApiError ? error.message : 'Connection requests could not be loaded.';
+      const text = error instanceof AccountApiError ? error.message : 'Cererile de conectare nu au putut fi încărcate.';
       setState((s) => ({ ...s, phase: s.phase === 'ready' ? 'ready' : 'error', error: text, refreshing: false }));
     } finally {
       if (readController.current === controller) readController.current = null;
@@ -82,18 +82,18 @@ export function useConnectionRequests(token: string | null) {
       try {
         const updated = await accountApi.updateConnection(token, request.id, action);
         setState((s) => ({ ...s, requests: applyServerRequest(s.requests, updated) }));
-        const done = updated.status === 'accepted' ? 'accepted' : updated.status === 'rejected' ? 'rejected' : updated.status;
-        setMutations((m) => ({ ...m, [request.id]: { pending: null, error: null, notice: `Request from ${updated.patient.fullName} ${done}.` } }));
+        const done = updated.status === 'accepted' ? 'a fost acceptată' : updated.status === 'rejected' ? 'a fost respinsă' : 'a fost actualizată';
+        setMutations((m) => ({ ...m, [request.id]: { pending: null, error: null, notice: `Cererea de la ${updated.patient.fullName} ${done}.` } }));
       } catch (error) {
         const status = error instanceof AccountApiError ? error.status : 0;
         const handling = failureHandling(status);
-        const text = error instanceof AccountApiError ? error.message : 'The request could not be updated. Please try again.';
+        const text = error instanceof AccountApiError ? error.message : 'Cererea nu a putut fi actualizată. Vă rugăm să încercați din nou.';
         setMutations((m) => ({
           ...m,
           [request.id]: {
             pending: null,
             error: handling === 'refresh' ? null : text,
-            notice: handling === 'refresh' ? 'This request was already processed. The list was refreshed with its current status.' : null,
+            notice: handling === 'refresh' ? 'Această cerere a fost deja procesată. Lista a fost actualizată cu starea curentă.' : null,
           },
         }));
         if (handling === 'refresh') void refresh();

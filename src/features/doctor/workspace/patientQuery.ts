@@ -17,17 +17,17 @@ export interface PatientQuery {
 export const DEFAULT_QUERY: PatientQuery = { search: '', status: 'all', sort: 'recent' };
 
 export const STATUS_LABELS: Record<PatientStatus, string> = {
-  'needs-review': 'Needs review',
-  'follow-up-due': 'Follow-up due',
-  'up-to-date': 'Up to date',
+  'needs-review': 'Necesită verificare',
+  'follow-up-due': 'Control de urmărire scadent',
+  'up-to-date': 'La zi',
 };
 
 export const STATUS_ORDER: readonly PatientStatus[] = ['needs-review', 'follow-up-due', 'up-to-date'];
 
 export const SORT_LABELS: Record<PatientSort, string> = {
-  recent: 'Most recent activity',
-  oldest: 'Oldest activity',
-  'follow-up': 'Next follow-up',
+  recent: 'Cea mai recentă activitate',
+  oldest: 'Cea mai veche activitate',
+  'follow-up': 'Următorul control de urmărire',
 };
 
 export interface StatusCounts {

@@ -71,7 +71,7 @@
 
 .doctor-eyebrow {
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--doctor-accent-text);
@@ -88,7 +88,7 @@
   border: 1px solid transparent;
   border-radius: var(--radius-pill);
   font: inherit;
-  font-weight: 700;
+  font-weight: 600;
   font-size: 0.9375rem;
   line-height: 1.2;
   text-align: center;
@@ -103,7 +103,7 @@
 }
 
 .doctor-button--primary:hover:not(:disabled) {
-  border-color: var(--brand-on-primary);
+  border-color: var(--brand-primary-strong);
 }
 
 .doctor-button--secondary {
@@ -150,7 +150,7 @@
 
 .doctor-link {
   color: var(--color-text);
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 0.2em;
 }
@@ -165,7 +165,7 @@
 
 .doctor-label {
   font-size: 0.875rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-text);
 }
 
@@ -205,7 +205,7 @@ textarea.doctor-input {
   display: flex;
   gap: var(--space-1);
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--doctor-error-text);
 }
 
@@ -221,7 +221,7 @@ textarea.doctor-input {
   background: var(--doctor-error-text);
   color: var(--color-surface);
   font-size: 0.75em;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 /* ---------- Status badge ---------- */
@@ -231,7 +231,7 @@ textarea.doctor-input {
   padding: 0.125rem var(--space-2);
   border-radius: var(--radius-sm);
   font-size: 0.8125rem;
-  font-weight: 700;
+  font-weight: 600;
   white-space: nowrap;
 }
 
@@ -286,7 +286,7 @@ textarea.doctor-input {
   border: 1px solid var(--color-border-control);
   border-radius: var(--radius-pill);
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-text);
   white-space: nowrap;
 }

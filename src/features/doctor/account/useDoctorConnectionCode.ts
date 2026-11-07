@@ -23,7 +23,7 @@ export function useDoctorConnectionCode(token: string | null) {
   const load = useCallback(async () => {
     const id = ++generation.current;
     if (!token) {
-      setState({ phase: 'error', message: 'Your session is not available. Please sign in again.' });
+      setState({ phase: 'error', message: 'Sesiunea dumneavoastră nu este disponibilă. Vă rugăm să vă autentificați din nou.' });
       return;
     }
     setState({ phase: 'loading' });
@@ -34,7 +34,7 @@ export function useDoctorConnectionCode(token: string | null) {
       setState(check.ok ? { phase: 'ready', code, url: check.url } : { phase: 'invalid', message: check.reason });
     } catch (error) {
       if (id !== generation.current) return;
-      setState({ phase: 'error', message: message(error, 'Your connection QR could not be loaded. Please try again.') });
+      setState({ phase: 'error', message: message(error, 'Codul dumneavoastră QR de conectare nu a putut fi încărcat. Vă rugăm să încercați din nou.') });
     }
   }, [token]);
 
@@ -58,7 +58,7 @@ export function useDoctorConnectionCode(token: string | null) {
       generation.current += 1;
       setState(check.ok ? { phase: 'ready', code, url: check.url } : { phase: 'invalid', message: check.reason });
     } catch (error) {
-      throw new Error(message(error, 'The QR code could not be regenerated. Your current QR still works.'), { cause: error });
+      throw new Error(message(error, 'Codul QR nu a putut fi regenerat. Codul QR actual încă funcționează.'), { cause: error });
     } finally {
       rotatingRef.current = false;
       setRotating(false);

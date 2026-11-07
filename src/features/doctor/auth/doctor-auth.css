@@ -43,7 +43,7 @@
 
 .doctor-auth-exit {
   margin-inline-start: calc(-1 * var(--space-2));
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .doctor-auth-panel {
@@ -67,7 +67,7 @@
 }
 
 .doctor-auth-mobile-brand .brand-mark__symbol {
-  width: 3rem;
+  width: auto;
   height: 3rem;
 }
 
@@ -87,7 +87,7 @@
   color: var(--color-text);
   font: inherit;
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
 }
 
@@ -99,7 +99,7 @@
   border-color: var(--brand-primary);
   background: var(--brand-primary);
   color: var(--brand-on-primary);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /* ---------- Headings ---------- */
@@ -112,7 +112,7 @@
 .doctor-auth-title {
   font-size: clamp(1.625rem, 1.2rem + 1.8vw, 2rem);
   line-height: 1.25;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .doctor-auth-title:focus {
@@ -183,7 +183,7 @@
   color: var(--color-text);
   font: inherit;
   font-size: 0.875rem;
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 0.2em;
   cursor: pointer;
@@ -228,7 +228,7 @@
   background: transparent;
   color: var(--color-text);
   font: inherit;
-  font-weight: 700;
+  font-weight: 600;
   text-align: start;
   text-decoration: underline;
   text-underline-offset: 0.2em;
@@ -292,7 +292,7 @@
 }
 
 .doctor-auth-dropzone__title {
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /* Inside the white dropzone the regular secondary color has enough contrast. */
@@ -321,7 +321,7 @@
 }
 
 .doctor-auth-file__name {
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .doctor-auth-file__size {
@@ -348,7 +348,7 @@
 
 .doctor-auth-summary dt {
   font-size: 0.8125rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-text-secondary);
 }
 
@@ -396,7 +396,7 @@
 
   .doctor-auth-aside__headline {
     font-size: clamp(1.75rem, 1rem + 1.6vw, 2.5rem);
-    font-weight: 700;
+    font-weight: 600;
     line-height: 1.25;
     max-width: 16ch;
   }

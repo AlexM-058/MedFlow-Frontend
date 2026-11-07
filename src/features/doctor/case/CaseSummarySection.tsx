@@ -8,6 +8,7 @@ import {
   summaryOriginLabel,
   type CaseLookup,
   type Coverage,
+  type SummaryFlag,
 } from './caseLogic';
 import type { Resource } from './useResource';
 
@@ -19,35 +20,37 @@ interface Props {
   onGoTo: (targetId: string) => void;
 }
 
+const FLAG_LABEL: Record<SummaryFlag, string> = { Negated: 'Negat', Uncertain: 'Incert' };
+
 /** Derived summary with sources, flags and code-computed coverage. Originals stay visible elsewhere. */
 export function CaseSummarySection({ summary, onRetry, lookup, coverage, onGoTo }: Props) {
   return (
     <section className="care-case-card" aria-labelledby="care-case-summary-title">
       <h3 id="care-case-summary-title" className="care-case-card__title">
-        Summary (derived — check the sources)
+        Rezumat (derivat — verificați sursele)
       </h3>
 
-      {summary.status === 'loading' && <p role="status">Loading summary…</p>}
+      {summary.status === 'loading' && <p role="status">Se încarcă rezumatul…</p>}
 
       {summary.status === 'error' && (
         <div className="care-case-alert care-case-alert--error" role="alert">
-          <p>The summary could not be loaded: {summary.message}</p>
-          <p>The original conversation below is complete without it.</p>
+          <p>Rezumatul nu a putut fi încărcat: {summary.message}</p>
+          <p>Conversația originală de mai jos este completă și fără el.</p>
           <button type="button" className="ui-button ui-button--secondary" onClick={onRetry}>
-            Try again
+            Încercați din nou
           </button>
         </div>
       )}
 
       {summary.status === 'ready' && summary.data === null && (
-        <p className="care-case-hint">No summary for this case yet. Read the original conversation.</p>
+        <p className="care-case-hint">Nu există încă un rezumat pentru acest caz. Citiți conversația originală.</p>
       )}
 
       {summary.status === 'ready' && summary.data !== null && (
         <>
           <p className="care-case-hint">
             <span className="care-case-tag care-case-tag--origin">{summaryOriginLabel(summary.data.generatedBy)}</span>{' '}
-            Version {summary.data.version}, {formatDateTime(summary.data.createdAt)}. It never replaces the originals.
+            Versiunea {summary.data.version}, {formatDateTime(summary.data.createdAt)}. Nu înlocuiește niciodată originalele.
           </p>
           <ul className="care-case-summary">
             {buildSummaryRows(summary.data, lookup).map((row) => (
@@ -57,15 +60,15 @@ export function CaseSummarySection({ summary, onRetry, lookup, coverage, onGoTo 
                   <p className="care-case-summary__flags">
                     {row.flags.map((flag) => (
                       <span key={flag} className={`care-case-tag care-case-tag--${flag.toLowerCase()}`}>
-                        {flag}
+                        {FLAG_LABEL[flag]}
                       </span>
                     ))}
                   </p>
                 )}
                 {row.unsourced ? (
-                  <p className="care-case-tag care-case-tag--unsourced">No source — verify</p>
+                  <p className="care-case-tag care-case-tag--unsourced">Fără sursă — verificați</p>
                 ) : (
-                  <div className="care-case-summary__sources" role="group" aria-label="Sources">
+                  <div className="care-case-summary__sources" role="group" aria-label="Surse">
                     {row.links.map((link, index) =>
                       link.targetId ? (
                         <button
@@ -93,24 +96,24 @@ export function CaseSummarySection({ summary, onRetry, lookup, coverage, onGoTo 
       {coverage && (
         <div className="care-case-coverage">
           <p className="care-case-coverage__count">
-            <strong>{coverageLabel(coverage)}</strong> by the summary (computed from its sources, not claimed by a model).
+            <strong>{coverageLabel(coverage)}</strong> de rezumat (calculat din surse, nu afirmat de un model).
           </p>
           {coverage.uncited.length > 0 && (
             <section className="care-case-alert care-case-alert--warning" aria-labelledby="care-case-uncited-title">
               <h4 id="care-case-uncited-title" className="care-case-subtitle">
-                Not included in the summary — read the original
+                Neincluse în rezumat — citiți originalul
               </h4>
               <ul className="care-case-uncited">
                 {coverage.uncited.map((message) => (
                   <li key={message.id} className="care-case-uncited__item">
-                    <p className="care-case-meta">Patient, {formatTime(message.createdAt)}</p>
+                    <p className="care-case-meta">Pacient, {formatTime(message.createdAt)}</p>
                     <p className="care-case-verbatim">{message.text}</p>
                     <button
                       type="button"
                       className="ui-button ui-button--secondary care-case-source"
                       onClick={() => onGoTo(messageAnchorId(message.id))}
                     >
-                      Show in conversation
+                      Arată în conversație
                     </button>
                   </li>
                 ))}

@@ -14,29 +14,29 @@ export type ConnectionUrlCheck = { ok: true; url: string } | { ok: false; reason
 export function checkConnectionUrl(connectionCode: ConnectionCode): ConnectionUrlCheck {
   const { code, url } = connectionCode;
   if (!/^[A-Za-z0-9_-]{16,256}$/.test(code)) {
-    return { ok: false, reason: 'The connection code from the server has an unexpected format.' };
+    return { ok: false, reason: 'Codul de conectare primit de la server are un format neașteptat.' };
   }
   let parsed: URL;
   try {
     parsed = new URL(url);
   } catch {
-    return { ok: false, reason: 'The connection link from the server is not a valid address.' };
+    return { ok: false, reason: 'Linkul de conectare primit de la server nu este o adresă validă.' };
   }
   const secure = parsed.protocol === 'https:' || (parsed.protocol === 'http:' && LOOPBACK_HOSTS.has(parsed.hostname));
-  if (!secure) return { ok: false, reason: 'The connection link must use HTTPS.' };
-  if (parsed.username || parsed.password) return { ok: false, reason: 'The connection link must not contain credentials.' };
-  if (parsed.search) return { ok: false, reason: 'The connection link must not contain extra parameters.' };
+  if (!secure) return { ok: false, reason: 'Linkul de conectare trebuie să folosească HTTPS.' };
+  if (parsed.username || parsed.password) return { ok: false, reason: 'Linkul de conectare nu trebuie să conțină credențiale.' };
+  if (parsed.search) return { ok: false, reason: 'Linkul de conectare nu trebuie să conțină parametri suplimentari.' };
   if (parsed.hash !== `#/connect/${code}`) {
-    return { ok: false, reason: 'The connection link does not match the connection code.' };
+    return { ok: false, reason: 'Linkul de conectare nu corespunde codului de conectare.' };
   }
   return { ok: true, url: parsed.href };
 }
 
 export const STATUS_LABEL: Record<ConnectionStatus, string> = {
-  pending: 'Pending',
-  accepted: 'Accepted',
-  rejected: 'Rejected',
-  cancelled: 'Cancelled by patient',
+  pending: 'În așteptare',
+  accepted: 'Acceptată',
+  rejected: 'Respinsă',
+  cancelled: 'Anulată de pacient',
 };
 
 /** Pending first (oldest waiting first), then history (newest first). Ties by id. */

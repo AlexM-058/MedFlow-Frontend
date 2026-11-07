@@ -7,8 +7,8 @@ import './doctor-auth.css';
 import { brand } from '../../../brand/brand.config';
 
 const MODES: ReadonlyArray<{ mode: AuthMode; label: string }> = [
-  { mode: 'login', label: 'Log in' },
-  { mode: 'register', label: 'Register' },
+  { mode: 'login', label: 'Autentificare' },
+  { mode: 'register', label: 'Înregistrare' },
 ];
 
 /**
@@ -34,42 +34,42 @@ export function DoctorAuth({ mode, onModeChange, onDemoLogin, onExit }: DoctorAu
 
   return (
     <div className="doctor-auth">
-      <aside className="doctor-auth-aside" aria-label={`About ${brand.productName} for doctors`}>
+      <aside className="doctor-auth-aside" aria-label={`Despre ${brand.productName} pentru medici`}>
         <BrandMark />
         <div className="doctor-auth-aside__body">
-          <p className="doctor-eyebrow">Care, connected.</p>
-          <p className="doctor-auth-aside__headline">The care doesn't end when the appointment does.</p>
-          <p className="doctor-auth-aside__text">A shared space for your patients, follow-ups and everyday care.</p>
+          <p className="doctor-eyebrow">Îngrijire conectată.</p>
+          <p className="doctor-auth-aside__headline">Îngrijirea nu se oprește când se termină consultația.</p>
+          <p className="doctor-auth-aside__text">Un spațiu comun pentru pacienții dumneavoastră, controalele de urmărire și îngrijirea de zi cu zi.</p>
         </div>
-        <p className="doctor-eyebrow">{brand.productName} for doctors</p>
+        <p className="doctor-eyebrow">{brand.productName} pentru medici</p>
       </aside>
 
       <main className="doctor-auth-main">
         <div className="doctor-auth-topbar">
           <button type="button" className="doctor-button doctor-button--ghost doctor-auth-exit" onClick={onExit}>
-            <span aria-hidden="true">←</span> Patient demo
+            <span aria-hidden="true">←</span> Demo pacient
           </button>
-          <span className="doctor-demo-tag" title="No real authentication">
-            Demo · no real sign-in
+          <span className="doctor-demo-tag" title="Fără autentificare reală">
+            Demo · fără autentificare reală
           </span>
         </div>
 
         <div className="doctor-auth-panel">
           <div className="doctor-auth-mobile-brand">
             <BrandMark />
-            <p className="doctor-eyebrow">{brand.productName} for doctors</p>
+            <p className="doctor-eyebrow">{brand.productName} pentru medici</p>
           </div>
 
           <p className="doctor-notice doctor-notice--info doctor-auth-invite-note">
-            <strong>Synthetic demo.</strong> Real {brand.productName} doctor accounts are invitation only: the {brand.productName} team
-            sends you an invitation link, then you sign in with the invited Google account. The registration and
-            password fields on this page are part of the demo and create no account.{' '}
+            <strong>Demo cu date sintetice.</strong> Conturile reale de medic {brand.productName} se acordă doar pe bază de invitație: echipa {brand.productName}
+            vă trimite un link de invitație, apoi vă autentificați cu contul Google invitat. Câmpurile de înregistrare și
+            parolă din această pagină fac parte din demonstrație și nu creează niciun cont.{' '}
             <a className="doctor-link" href="#/doctor">
-              Go to real doctor sign-in
+              Mergeți la autentificarea reală de medic
             </a>
           </p>
 
-          <div className="doctor-auth-toggle" role="group" aria-label="Choose log in or registration">
+          <div className="doctor-auth-toggle" role="group" aria-label="Alegeți autentificarea sau înregistrarea">
             {MODES.map((item) => (
               <button
                 key={item.mode}

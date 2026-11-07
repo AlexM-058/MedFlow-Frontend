@@ -12,7 +12,7 @@ interface Settled<T> {
 }
 
 function errorMessage(error: unknown): string {
-  return error instanceof Error && error.message ? error.message : 'The request failed.';
+  return error instanceof Error && error.message ? error.message : 'Solicitarea a eșuat.';
 }
 
 /**

@@ -139,45 +139,45 @@ export function RegisterForm({ headingId, onLogin }: RegisterFormProps) {
     return (
       <div className="doctor-auth-pending">
         <div className="doctor-auth-heading">
-          <p className="doctor-eyebrow">Demo · Pending verification</p>
+          <p className="doctor-eyebrow">Demo · Verificare în așteptare</p>
           <h1 id={headingId} ref={pendingHeadingRef} className="doctor-auth-title" tabIndex={-1}>
-            Verification pending
+            Verificare în așteptare
           </h1>
           <p className="doctor-auth-subtitle">
-            In a connected version, your document would be reviewed before your doctor account is activated.
+            Într-o versiune conectată, documentul dumneavoastră ar fi verificat înainte de activarea contului de medic.
           </p>
         </div>
 
         <div className="doctor-notice doctor-notice--success" role="status">
-          <strong>Demo only:</strong> nothing was uploaded or sent. Your account is not created or approved, and your
-          password was not stored.
+          <strong>Doar demonstrație:</strong> nimic nu a fost încărcat sau trimis. Contul dumneavoastră nu a fost creat sau aprobat, iar
+          parola nu a fost stocată.
         </div>
 
         <dl className="doctor-auth-summary">
           <div>
-            <dt>Full name</dt>
+            <dt>Nume complet</dt>
             <dd>{pending.fullName}</dd>
           </div>
           <div>
-            <dt>Work email</dt>
+            <dt>E-mail de serviciu</dt>
             <dd>{pending.email}</dd>
           </div>
           <div>
-            <dt>Specialty</dt>
+            <dt>Specialitate</dt>
             <dd>{pending.specialty}</dd>
           </div>
           <div>
-            <dt>Clinic / hospital</dt>
+            <dt>Clinică / spital</dt>
             <dd>{pending.institution}</dd>
           </div>
           <div>
-            <dt>Credential document</dt>
-            <dd>{pending.fileName} (not uploaded)</dd>
+            <dt>Document de atestare</dt>
+            <dd>{pending.fileName} (neîncărcat)</dd>
           </div>
         </dl>
 
         <button type="button" className="doctor-button doctor-button--primary doctor-button--block" onClick={onLogin}>
-          Back to log in
+          Înapoi la autentificare
         </button>
       </div>
     );
@@ -196,19 +196,19 @@ export function RegisterForm({ headingId, onLogin }: RegisterFormProps) {
     <>
       <div className="doctor-auth-heading">
         <h1 id={headingId} className="doctor-auth-title" tabIndex={-1}>
-          Create your doctor account
+          Creați-vă contul de medic
         </h1>
-        <p className="doctor-auth-subtitle">Your details and credentials, all in one place.</p>
+        <p className="doctor-auth-subtitle">Datele și atestările dumneavoastră, într-un singur loc.</p>
       </div>
 
       <form className="doctor-auth-form" noValidate onSubmit={handleSubmit} aria-labelledby={headingId}>
         <div className="doctor-auth-grid">
           <TextField
             id={`${id}-name`}
-            label="Full name"
+            label="Nume complet"
             name="name"
             autoComplete="name"
-            placeholder="Dr. First name Last name"
+            placeholder="Dr. Prenume Nume"
             value={values.fullName}
             onChange={update('fullName')}
             error={errors.fullName}
@@ -216,12 +216,12 @@ export function RegisterForm({ headingId, onLogin }: RegisterFormProps) {
           />
           <TextField
             id={`${id}-email`}
-            label="Work email"
+            label="E-mail de serviciu"
             type="email"
             name="email"
             autoComplete="email"
             inputMode="email"
-            placeholder="doctor@clinic.com"
+            placeholder="medic@clinica.ro"
             value={values.email}
             onChange={update('email')}
             error={errors.email}
@@ -229,7 +229,7 @@ export function RegisterForm({ headingId, onLogin }: RegisterFormProps) {
           />
           <TextField
             id={`${id}-phone`}
-            label="Phone number"
+            label="Număr de telefon"
             type="tel"
             name="phone"
             autoComplete="tel"
@@ -240,7 +240,7 @@ export function RegisterForm({ headingId, onLogin }: RegisterFormProps) {
             error={errors.phone}
             required
           />
-          <FieldShell id={`${id}-specialty`} label="Specialty" error={errors.specialty}>
+          <FieldShell id={`${id}-specialty`} label="Specialitate" error={errors.specialty}>
             <select
               id={`${id}-specialty`}
               name="specialty"
@@ -251,7 +251,7 @@ export function RegisterForm({ headingId, onLogin }: RegisterFormProps) {
               aria-describedby={errors.specialty ? `${id}-specialty-error` : undefined}
               required
             >
-              <option value="">Select your specialty</option>
+              <option value="">Selectați specialitatea</option>
               {SPECIALTY_OPTIONS.map((option) => (
                 <option key={option} value={option}>
                   {option}
@@ -261,10 +261,10 @@ export function RegisterForm({ headingId, onLogin }: RegisterFormProps) {
           </FieldShell>
           <TextField
             id={`${id}-license`}
-            label="Medical license number"
+            label="Număr de înregistrare profesională"
             name="license-number"
             autoComplete="off"
-            placeholder="Enter registration number"
+            placeholder="Introduceți numărul de înregistrare"
             value={values.licenseNumber}
             onChange={update('licenseNumber')}
             error={errors.licenseNumber}
@@ -272,10 +272,10 @@ export function RegisterForm({ headingId, onLogin }: RegisterFormProps) {
           />
           <TextField
             id={`${id}-institution`}
-            label="Clinic / hospital"
+            label="Clinică / spital"
             name="organization"
             autoComplete="organization"
-            placeholder="Enter institution"
+            placeholder="Introduceți instituția"
             value={values.institution}
             onChange={update('institution')}
             error={errors.institution}
@@ -283,10 +283,10 @@ export function RegisterForm({ headingId, onLogin }: RegisterFormProps) {
           />
           <PasswordField
             id={`${id}-password`}
-            label="Password"
+            label="Parolă"
             name="new-password"
             autoComplete="new-password"
-            placeholder="Create a password"
+            placeholder="Creați o parolă"
             hint={`At least ${PASSWORD_MIN_LENGTH} characters.`}
             value={values.password}
             onChange={update('password')}
@@ -295,10 +295,10 @@ export function RegisterForm({ headingId, onLogin }: RegisterFormProps) {
           />
           <PasswordField
             id={`${id}-confirm`}
-            label="Confirm password"
+            label="Confirmați parola"
             name="confirm-password"
             autoComplete="new-password"
-            placeholder="Re-enter password"
+            placeholder="Introduceți din nou parola"
             value={values.confirmPassword}
             onChange={update('confirmPassword')}
             error={errors.confirmPassword}
@@ -308,7 +308,7 @@ export function RegisterForm({ headingId, onLogin }: RegisterFormProps) {
 
         <div className="doctor-auth-file-group" role="group" aria-labelledby={fileHeadingId}>
           <p id={fileHeadingId} className="doctor-label">
-            Proof of medical credentials
+            Dovada calității de medic
           </p>
           <div
             className={`doctor-auth-dropzone${errors.credentialFile ? ' doctor-auth-dropzone--invalid' : ''}`}
@@ -324,9 +324,9 @@ export function RegisterForm({ headingId, onLogin }: RegisterFormProps) {
               />
             </svg>
             <div className="doctor-auth-dropzone__text">
-              <p className="doctor-auth-dropzone__title">Attach your medical license or certificate</p>
+              <p className="doctor-auth-dropzone__title">Atașați dreptul de liberă practică sau certificatul</p>
               <p id={fileHintId} className="doctor-hint">
-                {CREDENTIAL_FILE_RULE.label} · Up to 10 MB
+                {CREDENTIAL_FILE_RULE.label} · Maximum 10 MB
               </p>
             </div>
             <input
@@ -344,19 +344,19 @@ export function RegisterForm({ headingId, onLogin }: RegisterFormProps) {
               onClick={() => fileInputRef.current?.click()}
               aria-describedby={fileDescribedBy}
             >
-              {credentialFile ? 'Replace file' : 'Browse files'}
+              {credentialFile ? 'Înlocuiți fișierul' : 'Alegeți fișiere'}
             </button>
           </div>
 
           {credentialFile && (
             <div className="doctor-auth-file" id={fileStatusId}>
               <p className="doctor-auth-file__meta">
-                <span className="doctor-sr-only">Selected file: </span>
+                <span className="doctor-sr-only">Fișier selectat: </span>
                 <span className="doctor-auth-file__name">{credentialFile.name}</span>{' '}
                 <span className="doctor-auth-file__size">{formatFileSize(credentialFile.size)}</span>
               </p>
               <button type="button" className="doctor-button doctor-button--ghost" onClick={removeFile}>
-                Remove<span className="doctor-sr-only"> {credentialFile.name}</span>
+                Eliminați<span className="doctor-sr-only"> {credentialFile.name}</span>
               </button>
             </div>
           )}
@@ -367,20 +367,20 @@ export function RegisterForm({ headingId, onLogin }: RegisterFormProps) {
             </p>
           )}
           <p id={reviewHintId} className="doctor-hint">
-            Your document will be reviewed before your doctor account is activated. In this demo it stays on your
-            device and is never uploaded.
+            Documentul dumneavoastră va fi verificat înainte de activarea contului de medic. În această demonstrație rămâne pe
+            dispozitivul dumneavoastră și nu este încărcat niciodată.
           </p>
         </div>
 
         <button type="submit" className="doctor-button doctor-button--primary doctor-button--block">
-          Submit for verification
+          Trimiteți pentru verificare
         </button>
       </form>
 
       <p className="doctor-auth-switch">
-        Already registered?{' '}
+        Aveți deja cont?{' '}
         <button type="button" className="doctor-auth-text-button" onClick={onLogin}>
-          Log in to check your verification status
+          Autentificați-vă pentru a verifica starea verificării
         </button>
       </p>
     </>

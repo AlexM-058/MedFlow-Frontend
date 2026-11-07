@@ -88,7 +88,7 @@ export function PasswordField({ id, label, hint, error, inputRef, ...inputProps 
           aria-controls={id}
           onClick={() => setVisible((value) => !value)}
         >
-          Show<span className="doctor-sr-only"> password</span>
+          Afișați<span className="doctor-sr-only"> parola</span>
         </button>
       </div>
     </FieldShell>

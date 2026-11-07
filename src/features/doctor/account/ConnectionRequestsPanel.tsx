@@ -4,7 +4,7 @@ import { STATUS_LABEL, splitRequests } from './connectionLogic';
 import type { MutationState, RequestsState } from './useConnectionRequests';
 import type { ConnectionAction } from './connectionLogic';
 
-const dateTime = new Intl.DateTimeFormat('en-GB', {
+const dateTime = new Intl.DateTimeFormat('ro-RO', {
   day: '2-digit',
   month: 'short',
   year: 'numeric',
@@ -12,11 +12,11 @@ const dateTime = new Intl.DateTimeFormat('en-GB', {
   minute: '2-digit',
   hourCycle: 'h23',
 });
-const timeOnly = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' });
+const timeOnly = new Intl.DateTimeFormat('ro-RO', { hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' });
 
 function formatDate(iso: string): string {
   const time = Date.parse(iso);
-  return Number.isNaN(time) ? 'Unknown date' : dateTime.format(time);
+  return Number.isNaN(time) ? 'Dată necunoscută' : dateTime.format(time);
 }
 
 interface Props {
@@ -34,7 +34,7 @@ function RequestItem({ request, mutation, onAct }: { request: ConnectionRequest;
       <div className="doctor-account-request__main">
         <p className="doctor-account-request__name">{request.patient.fullName}</p>
         <p className="doctor-account-request__meta">
-          Requested <time dateTime={request.createdAt}>{formatDate(request.createdAt)}</time>
+          Solicitată <time dateTime={request.createdAt}>{formatDate(request.createdAt)}</time>
         </p>
       </div>
       <span className={`doctor-account-badge doctor-account-badge--${request.status}`}>{STATUS_LABEL[request.status]}</span>
@@ -47,8 +47,8 @@ function RequestItem({ request, mutation, onAct }: { request: ConnectionRequest;
             disabled={busy !== null}
             aria-busy={busy === 'accept'}
           >
-            {busy === 'accept' ? 'Accepting…' : 'Accept'}
-            <span className="doctor-sr-only"> request from {request.patient.fullName}</span>
+            {busy === 'accept' ? 'Se acceptă…' : 'Acceptați'}
+            <span className="doctor-sr-only"> cererea de la {request.patient.fullName}</span>
           </button>
           <button
             type="button"
@@ -57,14 +57,14 @@ function RequestItem({ request, mutation, onAct }: { request: ConnectionRequest;
             disabled={busy !== null}
             aria-busy={busy === 'reject'}
           >
-            {busy === 'reject' ? 'Rejecting…' : 'Reject'}
-            <span className="doctor-sr-only"> request from {request.patient.fullName}</span>
+            {busy === 'reject' ? 'Se respinge…' : 'Respingeți'}
+            <span className="doctor-sr-only"> cererea de la {request.patient.fullName}</span>
           </button>
         </div>
       )}
       {mutation?.error && (
         <p className="doctor-notice doctor-notice--error doctor-account-request__message" role="alert">
-          {mutation.error} The request is unchanged; you can try again.
+          {mutation.error} Cererea nu a fost modificată; puteți încerca din nou.
         </p>
       )}
       {mutation?.notice && (
@@ -85,24 +85,24 @@ export function ConnectionRequestsPanel({ state, mutations, onRefresh, onAct }: 
       <div className="doctor-account-panel__header doctor-account-panel__header--row">
         <div>
           <h2 id={titleId} className="doctor-account-panel__title">
-            Connection requests
+            Cereri de conectare
           </h2>
           <p className="doctor-account-panel__intro">
-            Requests sent by patients who used your QR or link. Nothing is accepted automatically.
+            Cereri trimise de pacienții care au folosit codul QR sau linkul dumneavoastră. Nimic nu este acceptat automat.
           </p>
         </div>
         <button type="button" className="doctor-button doctor-button--secondary" onClick={onRefresh} disabled={state.refreshing}>
-          {state.refreshing ? 'Refreshing…' : 'Refresh'}
+          {state.refreshing ? 'Se actualizează…' : 'Actualizați'}
         </button>
       </div>
 
       {state.updatedAt && (
-        <p className="doctor-hint">Last updated {timeOnly.format(state.updatedAt)}. Updates every 30 seconds while this page is open.</p>
+        <p className="doctor-hint">Ultima actualizare: {timeOnly.format(state.updatedAt)}. Lista se actualizează la fiecare 30 de secunde cât timp această pagină este deschisă.</p>
       )}
 
       {state.phase === 'loading' && (
         <p className="doctor-account-status-line" role="status">
-          Loading connection requests…
+          Se încarcă cererile de conectare…
         </p>
       )}
 
@@ -110,11 +110,11 @@ export function ConnectionRequestsPanel({ state, mutations, onRefresh, onAct }: 
         <div className="doctor-notice doctor-notice--error doctor-account-stack" role="alert">
           <p>
             {state.error}
-            {state.phase === 'ready' ? ' Showing the last loaded list.' : ''}
+            {state.phase === 'ready' ? ' Este afișată ultima listă încărcată.' : ''}
           </p>
           <div className="doctor-account-actions">
             <button type="button" className="doctor-button doctor-button--secondary" onClick={onRefresh}>
-              Try again
+              Încercați din nou
             </button>
           </div>
         </div>
@@ -122,9 +122,9 @@ export function ConnectionRequestsPanel({ state, mutations, onRefresh, onAct }: 
 
       {state.phase === 'ready' && (
         <>
-          <h3 className="doctor-account-subtitle">Pending ({pending.length})</h3>
+          <h3 className="doctor-account-subtitle">În așteptare ({pending.length})</h3>
           {pending.length === 0 ? (
-            <p className="doctor-account-empty">No pending requests.</p>
+            <p className="doctor-account-empty">Nu există cereri în așteptare.</p>
           ) : (
             <ul className="doctor-account-requests">
               {pending.map((request) => (
@@ -133,9 +133,9 @@ export function ConnectionRequestsPanel({ state, mutations, onRefresh, onAct }: 
             </ul>
           )}
 
-          <h3 className="doctor-account-subtitle">History ({history.length})</h3>
+          <h3 className="doctor-account-subtitle">Istoric ({history.length})</h3>
           {history.length === 0 ? (
-            <p className="doctor-account-empty">No processed requests yet.</p>
+            <p className="doctor-account-empty">Nu există încă cereri procesate.</p>
           ) : (
             <ul className="doctor-account-requests">
               {history.map((request) => (

@@ -6,21 +6,21 @@ export function NotConnectedPanel({ area }: { area: 'messages' | 'documents' }) 
   const copy =
     area === 'messages'
       ? {
-          what: 'Secure messages with your patients will appear here.',
+          what: 'Mesajele securizate cu pacienții dumneavoastră vor apărea aici.',
           later:
-            'Messaging needs the backend conversation service and case assignment. No messages are stored or shown in this demo.',
+            'Mesageria necesită serviciul de conversații din backend și atribuirea cazurilor. În această demonstrație nu sunt stocate sau afișate mesaje.',
         }
       : {
-          what: 'Documents shared by your patients will appear here.',
+          what: 'Documentele transmise de pacienții dumneavoastră vor apărea aici.',
           later:
-            'Document storage needs the backend and consent rules. No files are stored, uploaded or shown in this demo.',
+            'Stocarea documentelor necesită backend-ul și regulile de consimțământ. În această demonstrație nu sunt stocate, încărcate sau afișate fișiere.',
         };
 
   return (
     <div className="doctor-workspace-panel">
       <div className="doctor-notice doctor-notice--info">
         <p>
-          <strong>Not connected in this demo.</strong> {copy.what}
+          <strong>Neconectat în această demonstrație.</strong> {copy.what}
         </p>
       </div>
       <p className="doctor-workspace-panel__text">{copy.later}</p>
@@ -33,27 +33,27 @@ export function SettingsPanel({ doctor }: { doctor: DoctorProfile }) {
     <div className="doctor-workspace-panel">
       <section className="doctor-workspace-panel__card" aria-labelledby="doctor-workspace-theme">
         <h2 id="doctor-workspace-theme" className="doctor-workspace-panel__heading">
-          Theme
+          Temă
         </h2>
-        <p className="doctor-hint">Applies to this device only.</p>
+        <p className="doctor-hint">Se aplică doar acestui dispozitiv.</p>
         <ThemeSelector />
       </section>
 
       <section className="doctor-workspace-panel__card" aria-labelledby="doctor-workspace-profile">
         <h2 id="doctor-workspace-profile" className="doctor-workspace-panel__heading">
-          Profile <span className="doctor-demo-tag">Demo data</span>
+          Profil <span className="doctor-demo-tag">Date demo</span>
         </h2>
         <dl className="doctor-workspace-details">
           <div>
-            <dt>Name</dt>
+            <dt>Nume</dt>
             <dd>{doctor.fullName}</dd>
           </div>
           <div>
-            <dt>Specialty</dt>
+            <dt>Specialitate</dt>
             <dd>{doctor.specialty}</dd>
           </div>
           <div>
-            <dt>Work email</dt>
+            <dt>E-mail de serviciu</dt>
             <dd>{doctor.email}</dd>
           </div>
         </dl>
@@ -61,8 +61,8 @@ export function SettingsPanel({ doctor }: { doctor: DoctorProfile }) {
 
       <div className="doctor-notice doctor-notice--info">
         <p>
-          <strong>Not connected in this demo.</strong> Profile, notification and security settings
-          will be managed by the backend. Nothing on this page is saved to a server.
+          <strong>Neconectat în această demonstrație.</strong> Setările de profil, notificări și securitate
+          vor fi gestionate de backend. Nimic din această pagină nu este salvat pe un server.
         </p>
       </div>
     </div>

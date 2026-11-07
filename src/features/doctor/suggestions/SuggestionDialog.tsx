@@ -168,15 +168,15 @@ function SuggestionDialogSession({ patient, onClose }: SessionProps) {
 
   const description = (
     <>
-      Patient: {patient.name} <span className="doctor-suggestion-id">· ID {patient.id}</span>
+      Pacient: {patient.name} <span className="doctor-suggestion-id">· ID {patient.id}</span>
     </>
   );
 
   const statusText =
     phase === 'sending'
-      ? `Sending suggestion to ${patient.name} (demo)…`
+      ? `Se trimite sugestia către ${patient.name} (demonstrativ)…`
       : phase === 'success'
-        ? `Demo only: this suggestion was not sent to ${patient.name} and was not saved.`
+        ? `Doar demonstrativ: sugestia nu a fost trimisă către ${patient.name} și nu a fost salvată.`
         : '';
 
   const formId = `${ids.message}-form`;
@@ -184,12 +184,12 @@ function SuggestionDialogSession({ patient, onClose }: SessionProps) {
   const footer =
     phase === 'success' ? (
       <button type="button" className="doctor-button doctor-button--primary" onClick={onClose}>
-        Close
+        Închide
       </button>
     ) : (
       <>
         <button type="button" className="doctor-button doctor-button--secondary" onClick={onClose} disabled={sending}>
-          Cancel
+          Anulează
         </button>
         <button
           ref={sendButtonRef}
@@ -199,7 +199,7 @@ function SuggestionDialogSession({ patient, onClose }: SessionProps) {
           aria-busy={sending ? 'true' : undefined}
           aria-disabled={sending ? 'true' : undefined}
         >
-          {sending ? 'Sending…' : phase === 'error' ? 'Try sending again' : 'Send suggestion'}
+          {sending ? 'Se trimite…' : phase === 'error' ? 'Încercați din nou trimiterea' : 'Trimite sugestia'}
         </button>
       </>
     );
@@ -207,7 +207,7 @@ function SuggestionDialogSession({ patient, onClose }: SessionProps) {
   return (
     <DoctorDialog
       open
-      title="Give suggestions"
+      title="Oferiți sugestii"
       description={description}
       onClose={onClose}
       preventClose={sending}
@@ -222,25 +222,25 @@ function SuggestionDialogSession({ patient, onClose }: SessionProps) {
 
         <div className="doctor-notice doctor-notice--info doctor-suggestion-demo">
           <span className="doctor-demo-tag">Demo</span>
-          <span>Demo only — nothing is sent to the patient.</span>
+          <span>Doar demonstrativ — nimic nu este trimis pacientului.</span>
         </div>
 
         {phase === 'success' ? (
           <div ref={successRef} tabIndex={-1} className="doctor-notice doctor-notice--success doctor-suggestion-result">
-            <h3 className="doctor-suggestion-result__title">Suggestion not sent (demo)</h3>
+            <h3 className="doctor-suggestion-result__title">Sugestie netrimisă (demonstrativ)</h3>
             <p>
-              Demo only: this suggestion was not sent to {patient.name} and was not saved. The message and any
-              photo were discarded from this screen.
+              Doar demonstrativ: sugestia nu a fost trimisă către {patient.name} și nu a fost salvată. Mesajul și
+              eventuala fotografie au fost eliminate de pe acest ecran.
             </p>
           </div>
         ) : (
           <form id={formId} className="doctor-suggestion-form" noValidate onSubmit={handleSubmit}>
             <div className="doctor-field">
               <label className="doctor-label" htmlFor={ids.message}>
-                Message to {patient.name} <span className="doctor-suggestion-required">(required)</span>
+                Mesaj către {patient.name} <span className="doctor-suggestion-required">(obligatoriu)</span>
               </label>
               <p id={ids.messageHint} className="doctor-hint">
-                Write the suggestion yourself. {brand.productName} does not generate medical advice.
+                Redactați sugestia dumneavoastră. {brand.productName} nu generează sfaturi medicale.
               </p>
               <textarea
                 ref={messageRef}
@@ -276,11 +276,11 @@ function SuggestionDialogSession({ patient, onClose }: SessionProps) {
 
             <div className="doctor-field doctor-suggestion-photo">
               <span className="doctor-label">
-                Photo <span className="doctor-suggestion-required">(optional)</span>
+                Fotografie <span className="doctor-suggestion-required">(opțional)</span>
               </span>
               <p id={ids.photoHint} className="doctor-hint">
-                {SUGGESTION_PHOTO_RULE.label}, up to {formatFileSize(SUGGESTION_PHOTO_RULE.maxBytes)}. Kept on this
-                device only.
+                {SUGGESTION_PHOTO_RULE.label}, maximum {formatFileSize(SUGGESTION_PHOTO_RULE.maxBytes)}. Rămâne doar pe
+                acest dispozitiv.
               </p>
 
               {photo && (
@@ -288,7 +288,7 @@ function SuggestionDialogSession({ patient, onClose }: SessionProps) {
                   <img
                     className="doctor-suggestion-preview__image"
                     src={photo.url}
-                    alt={`Selected photo preview: ${photo.file.name}`}
+                    alt={`Previzualizare fotografie selectată: ${photo.file.name}`}
                   />
                   <figcaption className="doctor-suggestion-preview__meta">
                     <span className="doctor-suggestion-preview__name">{photo.file.name}</span>
@@ -314,7 +314,7 @@ function SuggestionDialogSession({ patient, onClose }: SessionProps) {
                   className="doctor-button doctor-button--secondary doctor-suggestion-file-label"
                   aria-disabled={sending ? 'true' : undefined}
                 >
-                  {photo ? 'Replace photo' : 'Add photo'}
+                  {photo ? 'Înlocuiți fotografia' : 'Adăugați fotografie'}
                 </label>
                 {photo && (
                   <button
@@ -323,7 +323,7 @@ function SuggestionDialogSession({ patient, onClose }: SessionProps) {
                     onClick={handleRemovePhoto}
                     disabled={sending}
                   >
-                    Remove photo
+                    Eliminați fotografia
                     <span className="doctor-sr-only"> {photo.file.name}</span>
                   </button>
                 )}
@@ -345,14 +345,14 @@ function SuggestionDialogSession({ patient, onClose }: SessionProps) {
                 disabled={sending}
               />
               <label htmlFor={ids.simulate}>
-                Simulate a send error <span className="doctor-demo-tag">Demo</span>
+                Simulați o eroare de trimitere <span className="doctor-demo-tag">Demo</span>
               </label>
             </div>
 
             {phase === 'error' && (
               <div role="alert" className="doctor-notice doctor-notice--error">
-                The suggestion could not be sent (simulated error). Your message and photo are kept — try sending
-                again.
+                Sugestia nu a putut fi trimisă (eroare simulată). Mesajul și fotografia dumneavoastră au fost
+                păstrate — încercați din nou trimiterea.
               </div>
             )}
           </form>

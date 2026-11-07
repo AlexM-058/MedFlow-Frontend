@@ -35,14 +35,14 @@ export function CaseFeedbackForm({
     return (
       <section className="care-case-card" aria-labelledby="care-case-feedback-title">
         <h3 id="care-case-feedback-title" className="care-case-card__title">
-          Your response
+          Răspunsul dumneavoastră
         </h3>
         <p className="care-case-alert care-case-alert--success" role="status">
-          Sent to {patientName} on {formatDateTime(sent.createdAt)}.
+          Trimis către {patientName} la {formatDateTime(sent.createdAt)}.
         </p>
         <p className="care-case-meta">
           {sent.doctor.fullName}
-          {sent.basedOnVariant !== null && `, started from decision-support variant ${sent.basedOnVariant + 1} and edited by you`}
+          {sent.basedOnVariant !== null && `, pornit de la varianta de suport decizional ${sent.basedOnVariant + 1} și editat de dumneavoastră`}
         </p>
         <blockquote className="care-case-sent care-case-verbatim">{sent.text}</blockquote>
       </section>
@@ -59,15 +59,15 @@ export function CaseFeedbackForm({
   return (
     <section className="care-case-card" aria-labelledby="care-case-feedback-title">
       <h3 id="care-case-feedback-title" className="care-case-card__title">
-        Your response to {patientName}
+        Răspunsul dumneavoastră către {patientName}
       </h3>
       <form className="care-case-form" onSubmit={submit} noValidate>
         <label htmlFor={fieldId} className="care-case-label">
-          Response (required)
+          Răspuns (obligatoriu)
         </label>
         {basedOnVariant !== null && (
           <p className="care-case-hint">
-            Prefilled from decision-support variant {basedOnVariant + 1}. Edit it; it is sent as your own words.
+            Completat inițial din varianta de suport decizional {basedOnVariant + 1}. Editați-l; se trimite ca propriile dumneavoastră cuvinte.
           </p>
         )}
         <textarea
@@ -89,7 +89,7 @@ export function CaseFeedbackForm({
         </p>
         {showError && (
           <p id={errorId} className="care-case-alert care-case-alert--error" role="alert">
-            {error} Your text is kept.
+            {error} Textul dumneavoastră a fost păstrat.
           </p>
         )}
         <div className="care-case-actions">
@@ -99,7 +99,7 @@ export function CaseFeedbackForm({
             disabled={sending}
             aria-busy={sending || undefined}
           >
-            {sending ? 'Sending…' : 'Send as my response'}
+            {sending ? 'Se trimite…' : 'Trimite ca răspunsul meu'}
           </button>
         </div>
       </form>

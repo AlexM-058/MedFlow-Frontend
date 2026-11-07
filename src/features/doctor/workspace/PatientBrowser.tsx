@@ -69,14 +69,14 @@ export function PatientBrowser({
   };
 
   const headingText =
-    dataState === 'data' ? `All patients (${results.length})` : 'All patients';
+    dataState === 'data' ? `Toți pacienții (${results.length})` : 'Toți pacienții';
 
   return (
     <section className="doctor-workspace-browser" aria-labelledby={`${id}-heading`}>
-      <div className="doctor-workspace-toolbar" role="search" aria-label="Patients">
+      <div className="doctor-workspace-toolbar" role="search" aria-label="Pacienți">
         <div className="doctor-field doctor-workspace-toolbar__search">
           <label className="doctor-label" htmlFor={`${id}-search`}>
-            Search
+            Căutare
           </label>
           <input
             ref={searchRef}
@@ -85,14 +85,14 @@ export function PatientBrowser({
             type="search"
             autoComplete="off"
             spellCheck={false}
-            placeholder="Search by patient name or ID"
+            placeholder="Căutați după numele sau ID-ul pacientului"
             value={query.search}
             onChange={(event) => onQueryChange({ ...query, search: event.target.value })}
           />
         </div>
         <div className="doctor-field">
           <label className="doctor-label" htmlFor={`${id}-status`}>
-            Status
+            Stare
           </label>
           <select
             id={`${id}-status`}
@@ -102,7 +102,7 @@ export function PatientBrowser({
               onQueryChange({ ...query, status: event.target.value as StatusFilter })
             }
           >
-            <option value="all">All statuses</option>
+            <option value="all">Toate stările</option>
             {STATUS_ORDER.map((status) => (
               <option key={status} value={status}>
                 {STATUS_LABELS[status]}
@@ -112,7 +112,7 @@ export function PatientBrowser({
         </div>
         <div className="doctor-field">
           <label className="doctor-label" htmlFor={`${id}-sort`}>
-            Sort by
+            Sortare după
           </label>
           <select
             id={`${id}-sort`}
@@ -142,7 +142,7 @@ export function PatientBrowser({
 
       {dataState === 'loading' && (
         <div className="doctor-workspace-loading" role="status">
-          <p>Loading patients…</p>
+          <p>Se încarcă pacienții…</p>
           <ul className="doctor-workspace-skeleton" aria-hidden="true">
             {[0, 1, 2, 3].map((row) => (
               <li key={row} className="doctor-workspace-skeleton__row" />
@@ -154,25 +154,25 @@ export function PatientBrowser({
       {dataState === 'error' && (
         <div className="doctor-notice doctor-notice--error doctor-workspace-state" role="alert">
           <p>
-            <strong>Patients could not be loaded.</strong> This is a demo error preview; no request
-            was made.
+            <strong>Pacienții nu au putut fi încărcați.</strong> Aceasta este o previzualizare demo a unei erori; nu a fost
+            făcută nicio cerere.
           </p>
           <button type="button" className="doctor-button doctor-button--secondary" onClick={retry}>
-            Try again
+            Încercați din nou
           </button>
         </div>
       )}
 
       {dataState === 'data' && results.length === 0 && (
         <div className="doctor-workspace-empty">
-          <p className="doctor-workspace-empty__title">No patients match your filters.</p>
-          <p className="doctor-hint">Try another name or ID, or show all statuses.</p>
+          <p className="doctor-workspace-empty__title">Niciun pacient nu corespunde filtrelor.</p>
+          <p className="doctor-hint">Încercați alt nume sau alt ID ori afișați toate stările.</p>
           <button
             type="button"
             className="doctor-button doctor-button--secondary"
             onClick={clearFilters}
           >
-            Clear filters
+            Ștergeți filtrele
           </button>
         </div>
       )}
@@ -183,34 +183,43 @@ export function PatientBrowser({
             <div className="doctor-workspace-table-wrap">
               <table className="doctor-workspace-table">
                 <caption className="doctor-sr-only">
-                  {`${headingText}, sorted by ${SORT_LABELS[query.sort].toLowerCase()}`}
+                  {`${headingText}, sortat după ${SORT_LABELS[query.sort].toLowerCase()}`}
                 </caption>
                 <thead>
                   <tr>
-                    <th scope="col">Patient</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Last contact</th>
-                    <th scope="col">Next follow-up</th>
-                    <th scope="col">Actions</th>
+                    <th scope="col">Pacient</th>
+                    <th scope="col">Stare</th>
+                    <th scope="col">Ultimul contact</th>
+                    <th scope="col">Următorul control</th>
+                    <th scope="col">Acțiuni</th>
                   </tr>
                 </thead>
                 <tbody>
                   {results.map((patient) => (
                     <tr key={patient.id}>
                       <th scope="row">
-                        <span className="doctor-workspace-patient-name">{patient.name}</span>
-                        <span className="doctor-workspace-patient-id">{patient.id}</span>
+                        <div className="doctor-workspace-patient-cell">
+                          <span className="doctor-workspace-patient-name">{patient.name}</span>
+                          <div className="doctor-workspace-patient-id-row">
+                            <span className="doctor-workspace-patient-id">{patient.id}</span>
+                            {patient.aiSummary && (
+                              <span className="doctor-ai-pill" title="Sumar AI recepționat">
+                                Sumar AI
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       </th>
                       <td>
                         <StatusBadge status={patient.status} />
                       </td>
                       <td>
-                        <time dateTime={patient.lastContactAt}>
+                        <time dateTime={patient.lastContactAt} className="doctor-workspace-time">
                           {formatLastContact(patient.lastContactAt, now)}
                         </time>
                       </td>
                       <td>
-                        <time dateTime={patient.nextFollowUpOn}>
+                        <time dateTime={patient.nextFollowUpOn} className="doctor-workspace-time">
                           {formatFollowUp(patient.nextFollowUpOn, now)}
                         </time>
                       </td>
@@ -218,18 +227,19 @@ export function PatientBrowser({
                         <div className="doctor-workspace-row-actions">
                           <button
                             type="button"
-                            className="doctor-button doctor-button--ghost doctor-workspace-row-action"
+                            className={`doctor-workspace-row-action ${patient.aiSummary ? 'doctor-workspace-row-action--primary' : 'doctor-workspace-row-action--subtle'}`}
                             onClick={() => onView(patient)}
                           >
-                            View patient<span className="doctor-sr-only">: {patient.name}</span>
+                            {patient.aiSummary ? 'Vezi sumar AI' : 'Vizualizați pacientul'}
+                            <span className="doctor-sr-only">: {patient.name}</span>
                           </button>
                           <button
                             type="button"
-                            className="doctor-button doctor-button--ghost doctor-workspace-row-action"
+                            className="doctor-workspace-row-action doctor-workspace-row-action--subtle"
                             onClick={() => onSuggest(patient)}
                           >
-                            Give suggestions
-                            <span className="doctor-sr-only"> to {patient.name}</span>
+                            Sugestii
+                            <span className="doctor-sr-only"> pentru {patient.name}</span>
                           </button>
                         </div>
                       </td>
@@ -248,43 +258,52 @@ export function PatientBrowser({
           >
             {results.map((patient) => (
               <li key={patient.id} className="doctor-workspace-card">
-                <ItemHeading className="doctor-workspace-card__name">{patient.name}</ItemHeading>
-                <p className="doctor-workspace-patient-id">{patient.id}</p>
-                <p>
-                  <StatusBadge status={patient.status} />
-                </p>
-                <dl className="doctor-workspace-card__facts">
-                  <div>
-                    <dt>Last contact:</dt>
-                    <dd>
+                <div className="doctor-workspace-card__main">
+                  <div className="doctor-workspace-card__title-row">
+                    <ItemHeading className="doctor-workspace-card__name">
+                      {patient.name}
+                    </ItemHeading>
+                    <span className="doctor-workspace-patient-id">{patient.id}</span>
+                    {patient.aiSummary && (
+                      <span className="doctor-ai-pill" title="Sumar AI recepționat">
+                        Sumar AI
+                      </span>
+                    )}
+                  </div>
+                  <div className="doctor-workspace-card__facts">
+                    <span>
+                      Ultimul contact:{' '}
                       <time dateTime={patient.lastContactAt}>
                         {formatLastContact(patient.lastContactAt, now)}
                       </time>
-                    </dd>
-                  </div>
-                  <div>
-                    <dt>Next follow-up:</dt>
-                    <dd>
+                    </span>
+                    <span aria-hidden="true" className="doctor-workspace-dot">·</span>
+                    <span>
+                      Follow-up:{' '}
                       <time dateTime={patient.nextFollowUpOn}>
                         {formatFollowUp(patient.nextFollowUpOn, now)}
                       </time>
-                    </dd>
+                    </span>
                   </div>
-                </dl>
+                </div>
+                <div className="doctor-workspace-card__status">
+                  <StatusBadge status={patient.status} />
+                </div>
                 <div className="doctor-workspace-card__actions">
                   <button
                     type="button"
-                    className="doctor-button doctor-button--primary"
+                    className={`doctor-workspace-row-action ${patient.aiSummary ? 'doctor-workspace-row-action--primary' : 'doctor-workspace-row-action--subtle'}`}
                     onClick={() => onView(patient)}
                   >
-                    View patient<span className="doctor-sr-only">: {patient.name}</span>
+                    {patient.aiSummary ? 'Vezi sumar AI' : 'Vizualizați pacientul'}
+                    <span className="doctor-sr-only">: {patient.name}</span>
                   </button>
                   <button
                     type="button"
-                    className="doctor-button doctor-button--secondary"
+                    className="doctor-workspace-row-action doctor-workspace-row-action--subtle"
                     onClick={() => onSuggest(patient)}
                   >
-                    Give suggestions<span className="doctor-sr-only"> to {patient.name}</span>
+                    Sugestii<span className="doctor-sr-only"> pentru {patient.name}</span>
                   </button>
                 </div>
               </li>
@@ -298,10 +317,10 @@ export function PatientBrowser({
           {dataState !== 'data'
             ? ''
             : !filtered && results.length === total
-              ? `Showing all ${total} patients`
-              : `Showing ${results.length} of ${total} patients`}
+              ? `Se afișează toți cei ${total} pacienți`
+              : `Se afișează ${results.length} din ${total} pacienți`}
         </p>
-        <p className="doctor-workspace-sample">Sample patient data</p>
+        <p className="doctor-workspace-sample">Date de probă ale pacienților</p>
       </div>
     </section>
   );

@@ -27,11 +27,11 @@ export function ConnectionQrPanel({ token }: { token: string | null }) {
     setStatus(null);
     try {
       await navigator.clipboard.writeText(url);
-      setStatus('Connection link copied.');
+      setStatus('Linkul de conectare a fost copiat.');
     } catch {
       linkRef.current?.focus();
       linkRef.current?.select();
-      setStatus('Copying is blocked in this browser. The link is selected; copy it with your keyboard.');
+      setStatus('Copierea este blocată în acest browser. Linkul este selectat; copiați-l de la tastatură.');
     }
   }
 
@@ -43,7 +43,7 @@ export function ConnectionQrPanel({ token }: { token: string | null }) {
     link.download = `${brandSlug}-connection-qr.svg`;
     link.click();
     window.setTimeout(() => URL.revokeObjectURL(blobUrl), 0);
-    setStatus('QR code downloaded.');
+    setStatus('Codul QR a fost descărcat.');
   }
 
   async function confirmRotate() {
@@ -51,9 +51,9 @@ export function ConnectionQrPanel({ token }: { token: string | null }) {
     try {
       await rotate();
       setConfirmOpen(false);
-      setStatus('A new QR code was generated. The previous QR no longer works. Existing patients and pending requests are unchanged.');
+      setStatus('A fost generat un nou cod QR. Codul QR anterior nu mai funcționează. Pacienții existenți și cererile în așteptare nu sunt afectați.');
     } catch (error) {
-      setRotateError(error instanceof Error ? error.message : 'The QR code could not be regenerated.');
+      setRotateError(error instanceof Error ? error.message : 'Codul QR nu a putut fi regenerat.');
     }
   }
 
@@ -61,29 +61,29 @@ export function ConnectionQrPanel({ token }: { token: string | null }) {
     <section className="doctor-account-panel" aria-labelledby={`${linkId}-title`}>
       <div className="doctor-account-panel__header">
         <h2 id={`${linkId}-title`} className="doctor-account-panel__title">
-          Your connection QR
+          Codul dumneavoastră QR de conectare
         </h2>
         <p className="doctor-account-panel__intro">
-          Patients scan this code or open the link to send you a connection request. You decide whether to accept
-          it. The code identifies you only; it contains no patient data and does not sign anyone in.
+          Pacienții scanează acest cod sau deschid linkul pentru a vă trimite o cerere de conectare. Dumneavoastră decideți dacă o acceptați.
+          Codul vă identifică doar pe dumneavoastră; nu conține date ale pacienților și nu autentifică pe nimeni.
         </p>
       </div>
 
       {state.phase === 'loading' && (
         <p className="doctor-account-status-line" role="status">
-          Loading your connection QR…
+          Se încarcă codul dumneavoastră QR de conectare…
         </p>
       )}
 
       {(state.phase === 'error' || state.phase === 'invalid') && (
         <div className="doctor-notice doctor-notice--error doctor-account-stack" role="alert">
           <p>
-            <strong>{state.phase === 'invalid' ? 'This connection link cannot be shown.' : 'Connection QR unavailable.'}</strong>{' '}
+            <strong>{state.phase === 'invalid' ? 'Acest link de conectare nu poate fi afișat.' : 'Codul QR de conectare nu este disponibil.'}</strong>{' '}
             {state.message}
           </p>
           <div className="doctor-account-actions">
             <button type="button" className="doctor-button doctor-button--secondary" onClick={() => void reload()}>
-              Try again
+              Încercați din nou
             </button>
           </div>
         </div>
@@ -96,24 +96,24 @@ export function ConnectionQrPanel({ token }: { token: string | null }) {
               <img
                 className="doctor-account-qr__image"
                 src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`}
-                alt={`QR code linking to your ${brand.productName} connection page`}
+                alt={`Cod QR către pagina dumneavoastră de conectare ${brand.productName}`}
               />
             ) : (
-              <div className="doctor-account-qr__pending" role="img" aria-describedby={qrNoteId} aria-label="QR image unavailable">
+              <div className="doctor-account-qr__pending" role="img" aria-describedby={qrNoteId} aria-label="Imaginea QR nu este disponibilă">
                 <span aria-hidden="true">QR</span>
               </div>
             )}
             <figcaption id={qrNoteId} className="doctor-account-qr__caption">
               {svg
-                ? 'Scan with a phone camera.'
-                : 'This connection link could not be encoded as a QR image. Try regenerating it, or share the link below.'}
+                ? 'Scanați cu camera telefonului.'
+                : 'Acest link de conectare nu a putut fi codificat ca imagine QR. Încercați să îl regenerați sau transmiteți linkul de mai jos.'}
             </figcaption>
           </figure>
 
           <div className="doctor-account-stack">
             <div className="doctor-field">
               <label className="doctor-label" htmlFor={linkId}>
-                Connection link
+                Link de conectare
               </label>
               <input
                 ref={linkRef}
@@ -126,7 +126,7 @@ export function ConnectionQrPanel({ token }: { token: string | null }) {
             </div>
             <div className="doctor-account-actions">
               <button type="button" className="doctor-button doctor-button--primary" onClick={() => void copyLink()}>
-                Copy link
+                Copiați linkul
               </button>
               <button
                 type="button"
@@ -135,7 +135,7 @@ export function ConnectionQrPanel({ token }: { token: string | null }) {
                 disabled={!svg}
                 aria-describedby={svg ? undefined : qrNoteId}
               >
-                Download QR
+                Descărcați codul QR
               </button>
               <button
                 type="button"
@@ -145,7 +145,7 @@ export function ConnectionQrPanel({ token }: { token: string | null }) {
                   setConfirmOpen(true);
                 }}
               >
-                Regenerate QR
+                Regenerați codul QR
               </button>
             </div>
           </div>
@@ -158,15 +158,15 @@ export function ConnectionQrPanel({ token }: { token: string | null }) {
 
       <DoctorDialog
         open={confirmOpen}
-        title="Regenerate your QR code?"
-        description="The current QR code and link will stop working immediately."
+        title="Regenerați codul dumneavoastră QR?"
+        description="Codul QR și linkul actuale vor înceta să funcționeze imediat."
         onClose={() => setConfirmOpen(false)}
         preventClose={rotating}
         initialFocusRef={cancelRef}
         footer={
           <>
             <button ref={cancelRef} type="button" className="doctor-button doctor-button--secondary" onClick={() => setConfirmOpen(false)} disabled={rotating}>
-              Keep current QR
+              Păstrați codul QR actual
             </button>
             <button
               type="button"
@@ -175,15 +175,15 @@ export function ConnectionQrPanel({ token }: { token: string | null }) {
               aria-busy={rotating}
               disabled={rotating}
             >
-              {rotating ? 'Regenerating…' : 'Regenerate QR'}
+              {rotating ? 'Se regenerează…' : 'Regenerați codul QR'}
             </button>
           </>
         }
       >
         <div className="doctor-account-stack">
           <p>
-            Printed or shared copies of the old QR will no longer open your connection page. Patients already connected
-            to you and requests that are already pending are not affected.
+            Copiile tipărite sau transmise ale vechiului cod QR nu vor mai deschide pagina dumneavoastră de conectare. Pacienții deja conectați
+            și cererile aflate deja în așteptare nu sunt afectați.
           </p>
           {rotateError && (
             <p className="doctor-notice doctor-notice--error" role="alert">

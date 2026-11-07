@@ -8,43 +8,31 @@ import { SuggestionDialog } from '../suggestions';
 import { PatientBrowser, type DemoDataState } from './PatientBrowser';
 import { PatientDetailsDialog } from './PatientDetailsDialog';
 import { countByStatus, DEFAULT_QUERY, STATUS_LABELS, type PatientQuery } from './patientQuery';
-import { NotConnectedPanel, SettingsPanel } from './WorkspacePanels';
+import { SettingsPanel } from './WorkspacePanels';
 import './doctor-workspace.css';
 import { brand } from '../../../brand/brand.config';
 
-type Section = 'backlog' | 'messages' | 'documents' | 'settings';
+type Section = 'backlog' | 'settings';
 
 const SECTIONS: readonly { id: Section; label: string; title: string; subtitle: string }[] = [
   {
     id: 'backlog',
-    label: 'Patient backlog',
-    title: 'Patient backlog',
-    subtitle: 'Your patients and follow-ups, in one place.',
-  },
-  {
-    id: 'messages',
-    label: 'Messages',
-    title: 'Messages',
-    subtitle: 'Conversations with your patients.',
-  },
-  {
-    id: 'documents',
-    label: 'Documents',
-    title: 'Documents',
-    subtitle: 'Files shared with you by your patients.',
+    label: 'Lista de pacienți',
+    title: 'Lista de pacienți',
+    subtitle: 'Pacienții și controalele de urmărire, într-un singur loc.',
   },
   {
     id: 'settings',
-    label: 'Settings',
-    title: 'Settings',
-    subtitle: 'Appearance and account preferences.',
+    label: 'Setări',
+    title: 'Setări',
+    subtitle: 'Aspect și preferințele contului.',
   },
 ];
 
 const DATA_STATES: readonly { id: DemoDataState; label: string }[] = [
-  { id: 'data', label: 'Data' },
-  { id: 'loading', label: 'Loading' },
-  { id: 'error', label: 'Error' },
+  { id: 'data', label: 'Date' },
+  { id: 'loading', label: 'Se încarcă' },
+  { id: 'error', label: 'Eroare' },
 ];
 
 /**
@@ -77,7 +65,7 @@ export function DoctorWorkspace({ doctor, onLogout, onExit }: DoctorWorkspacePro
   const suggest = (patient: DoctorPatient) => setSuggestFor({ id: patient.id, name: patient.name });
 
   const stats = [
-    { key: 'all', label: 'All patients', value: counts.all },
+    { key: 'all', label: 'Toți pacienții', value: counts.all },
     { key: 'needs-review', label: STATUS_LABELS['needs-review'], value: counts['needs-review'] },
     { key: 'follow-up-due', label: STATUS_LABELS['follow-up-due'], value: counts['follow-up-due'] },
     { key: 'up-to-date', label: STATUS_LABELS['up-to-date'], value: counts['up-to-date'] },
@@ -97,13 +85,13 @@ export function DoctorWorkspace({ doctor, onLogout, onExit }: DoctorWorkspacePro
   return (
     <div className="doctor-workspace">
       <a className="doctor-workspace-skip doctor-button doctor-button--secondary" href={`#${id}-main`}>
-        Skip to main content
+        Treceți la conținutul principal
       </a>
 
       <div className="doctor-workspace-sidebar">
         <div className="doctor-workspace-brand">
           <BrandMark />
-          <p className="doctor-eyebrow">Doctor workspace</p>
+          <p className="doctor-eyebrow">Spațiul de lucru al medicului</p>
         </div>
 
         <div className="doctor-workspace-identity">
@@ -113,7 +101,7 @@ export function DoctorWorkspace({ doctor, onLogout, onExit }: DoctorWorkspacePro
 
         <nav className="doctor-workspace-nav" aria-labelledby={`${id}-nav`}>
           <h2 id={`${id}-nav`} className="doctor-workspace-nav__heading">
-            Workspace
+            Spațiu de lucru
           </h2>
           <ul className="doctor-workspace-nav__list">
             {SECTIONS.map((item) => (
@@ -137,14 +125,14 @@ export function DoctorWorkspace({ doctor, onLogout, onExit }: DoctorWorkspacePro
             className="doctor-button doctor-button--ghost doctor-workspace-account__action"
             onClick={onLogout}
           >
-            Log out
+            Deconectare
           </button>
           <button
             type="button"
             className="doctor-button doctor-button--ghost doctor-workspace-account__action"
             onClick={onExit}
           >
-            Patient demo
+            Demo pacient
           </button>
         </div>
       </div>
@@ -163,7 +151,7 @@ export function DoctorWorkspace({ doctor, onLogout, onExit }: DoctorWorkspacePro
               className="doctor-button doctor-button--primary doctor-workspace-add"
               onClick={() => setAddOpen(true)}
             >
-              <span aria-hidden="true">+</span> Add patient
+              <span aria-hidden="true">+</span> Adăugați pacient
             </button>
           )}
         </header>
@@ -172,7 +160,7 @@ export function DoctorWorkspace({ doctor, onLogout, onExit }: DoctorWorkspacePro
           <>
             <section aria-labelledby={`${id}-overview`}>
               <h2 id={`${id}-overview`} className="doctor-sr-only">
-                Overview
+                Prezentare generală
               </h2>
               <dl className="doctor-workspace-stats">
                 {stats.map((stat) => (
@@ -184,7 +172,7 @@ export function DoctorWorkspace({ doctor, onLogout, onExit }: DoctorWorkspacePro
                       ) : (
                         <>
                           <span aria-hidden="true">–</span>
-                          <span className="doctor-sr-only">Not available</span>
+                          <span className="doctor-sr-only">Indisponibil</span>
                         </>
                       )}
                     </dd>
@@ -199,7 +187,7 @@ export function DoctorWorkspace({ doctor, onLogout, onExit }: DoctorWorkspacePro
               aria-haspopup="dialog"
               onClick={() => setPatientsPanelOpen(true)}
             >
-              View patients
+              Vizualizați pacienții
             </button>
 
             <div className="doctor-workspace-inline-list">
@@ -207,9 +195,9 @@ export function DoctorWorkspace({ doctor, onLogout, onExit }: DoctorWorkspacePro
             </div>
 
             <details className="doctor-workspace-demo">
-              <summary className="doctor-workspace-demo__summary">Demo controls</summary>
+              <summary className="doctor-workspace-demo__summary">Comenzi demo</summary>
               <fieldset className="doctor-workspace-demo__fieldset">
-                <legend className="doctor-label">Preview patient list state</legend>
+                <legend className="doctor-label">Previzualizați starea listei de pacienți</legend>
                 <div className="doctor-workspace-demo__options">
                   {DATA_STATES.map((option) => (
                     <label key={option.id} className="doctor-workspace-demo__option">
@@ -225,22 +213,19 @@ export function DoctorWorkspace({ doctor, onLogout, onExit }: DoctorWorkspacePro
                   ))}
                 </div>
                 <p className="doctor-hint">
-                  Local preview only. No data is fetched from a server.
+                  Doar previzualizare locală. Nu se preiau date de pe un server.
                 </p>
               </fieldset>
             </details>
           </>
         )}
 
-        {(section === 'messages' || section === 'documents') && (
-          <NotConnectedPanel area={section} />
-        )}
         {section === 'settings' && <SettingsPanel doctor={doctor} />}
       </main>
 
       <DoctorDialog
         open={patientsPanelOpen}
-        title="Patients"
+        title="Pacienți"
         onClose={() => setPatientsPanelOpen(false)}
         initialFocusRef={panelHeadingRef}
         wide
@@ -268,19 +253,19 @@ export function DoctorWorkspace({ doctor, onLogout, onExit }: DoctorWorkspacePro
 
       <DoctorDialog
         open={addOpen}
-        title="Add patient"
-        description="Not connected in this demo."
+        title="Adăugați pacient"
+        description="Neconectat în această demonstrație."
         onClose={() => setAddOpen(false)}
       >
         <div className="doctor-workspace-panel">
           <p>
-            In the full product you will invite a patient with a QR code or an invitation link.
-            The patient joins {brand.productName} and their case is assigned to you once the backend supports
-            case assignment.
+            În produsul complet veți invita un pacient cu un cod QR sau un link de invitație.
+            Pacientul se alătură {brand.productName}, iar cazul său vă este atribuit odată ce backend-ul va susține
+            atribuirea cazurilor.
           </p>
           <div className="doctor-notice doctor-notice--info">
             <p>
-              No invitation is created and no patient is added to your list in this demo.
+              În această demonstrație nu este creată nicio invitație și niciun pacient nu este adăugat în lista dumneavoastră.
             </p>
           </div>
         </div>

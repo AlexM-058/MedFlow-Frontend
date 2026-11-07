@@ -49,20 +49,20 @@ export function LoginForm({ headingId, onDemoLogin, onRegister }: LoginFormProps
     <>
       <div className="doctor-auth-heading">
         <h1 id={headingId} className="doctor-auth-title" tabIndex={-1}>
-          Welcome back, doctor
+          Bine ați revenit
         </h1>
-        <p className="doctor-auth-subtitle">Log in to continue caring for your patients.</p>
+        <p className="doctor-auth-subtitle">Autentificați-vă pentru a continua îngrijirea pacienților dumneavoastră.</p>
       </div>
 
       <form className="doctor-auth-form" noValidate onSubmit={handleSubmit} aria-labelledby={headingId}>
         <TextField
           id={fieldIds.email}
-          label="Work email"
+          label="E-mail de serviciu"
           type="email"
           name="email"
           autoComplete="email"
           inputMode="email"
-          placeholder="doctor@clinic.com"
+          placeholder="medic@clinica.ro"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
           error={errors.email}
@@ -70,10 +70,10 @@ export function LoginForm({ headingId, onDemoLogin, onRegister }: LoginFormProps
         />
         <PasswordField
           id={fieldIds.password}
-          label="Password"
+          label="Parolă"
           name="password"
           autoComplete="current-password"
-          placeholder="Enter your password"
+          placeholder="Introduceți parola"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           error={errors.password}
@@ -87,33 +87,33 @@ export function LoginForm({ headingId, onDemoLogin, onRegister }: LoginFormProps
               checked={rememberMe}
               onChange={(event) => setRememberMe(event.target.checked)}
             />
-            <span>Remember me</span>
+            <span>Ține-mă minte</span>
           </label>
           <button type="button" className="doctor-auth-text-button" onClick={() => setResetOpen(true)}>
-            Forgot password?
+            Ați uitat parola?
           </button>
         </div>
 
         <button type="submit" className="doctor-button doctor-button--primary doctor-button--block">
-          Log in
+          Autentificare
         </button>
 
         <p className="doctor-auth-demo-note">
-          <span className="doctor-demo-tag">Demo</span> No real authentication: any valid email and password opens
-          a sample workspace with synthetic patients.
+          <span className="doctor-demo-tag">Demo</span> Fără autentificare reală: orice e-mail și orice parolă valide deschid
+          un spațiu de lucru de probă cu pacienți sintetici.
         </p>
       </form>
 
       <p className="doctor-auth-switch">
-        New to {brand.productName}?{' '}
+        Sunteți nou în {brand.productName}?{' '}
         <button type="button" className="doctor-auth-text-button" onClick={onRegister}>
-          Create a doctor account
+          Creați un cont de medic
         </button>
       </p>
 
       <DoctorDialog
         open={resetOpen}
-        title="Password reset is not connected"
+        title="Resetarea parolei nu este conectată"
         onClose={() => setResetOpen(false)}
         footer={
           <button
@@ -126,8 +126,8 @@ export function LoginForm({ headingId, onDemoLogin, onRegister }: LoginFormProps
         }
       >
         <p>
-          This is a demo. Password reset is not connected yet, so no email is sent and no account is changed. In the
-          demo, any valid email and password opens the sample workspace.
+          Aceasta este o demonstrație. Resetarea parolei nu este încă conectată, deci nu se trimite niciun e-mail și niciun cont nu este modificat. În
+          demonstrație, orice e-mail și orice parolă valide deschid spațiul de lucru de probă.
         </p>
       </DoctorDialog>
     </>

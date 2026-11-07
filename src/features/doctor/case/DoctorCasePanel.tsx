@@ -56,7 +56,7 @@ export function DoctorCasePanel({ adapter, refreshKey = 0 }: { adapter: CareCase
   function startFromVariant(variants: DecisionVariants, index: number) {
     const prefill = prefillFromVariant(variants, index);
     if (!prefill) return;
-    if (draft.trim().length > 0 && draft !== prefill.text && !window.confirm('Replace your current draft with this variant?')) {
+    if (draft.trim().length > 0 && draft !== prefill.text && !window.confirm('Înlocuiți ciorna curentă cu această variantă?')) {
       return;
     }
     setDraft(prefill.text);
@@ -82,7 +82,7 @@ export function DoctorCasePanel({ adapter, refreshKey = 0 }: { adapter: CareCase
       setDraft('');
       setBasedOnVariant(null);
     } catch (error) {
-      setSendError(`Your response was not sent: ${errorMessage(error)}`);
+      setSendError(`Răspunsul dumneavoastră nu a fost trimis: ${errorMessage(error)}`);
     } finally {
       sendingRef.current = false;
       setSending(false);
@@ -92,7 +92,7 @@ export function DoctorCasePanel({ adapter, refreshKey = 0 }: { adapter: CareCase
   if (careCase.status === 'loading') {
     return (
       <section className="care-case" aria-busy="true">
-        <p className="care-case-card" role="status">Loading the case…</p>
+        <p className="care-case-card" role="status">Se încarcă cazul…</p>
       </section>
     );
   }
@@ -102,11 +102,11 @@ export function DoctorCasePanel({ adapter, refreshKey = 0 }: { adapter: CareCase
       <section className="care-case">
         <div className="care-case-card">
           <div className="care-case-alert care-case-alert--error" role="alert">
-            <p>The case could not be loaded: {careCase.message}</p>
+            <p>Cazul nu a putut fi încărcat: {careCase.message}</p>
           </div>
           <div className="care-case-actions">
             <button type="button" className="ui-button ui-button--secondary" onClick={retryCase}>
-              Try again
+              Încercați din nou
             </button>
             <DataSourceBadge source={adapter.source} />
           </div>
@@ -132,7 +132,7 @@ export function DoctorCasePanel({ adapter, refreshKey = 0 }: { adapter: CareCase
             <span className={`care-case-tag care-case-tag--${existingFeedback ? 'answered' : data.status}`}>
               {caseStatusLabel(data.status, existingFeedback !== null)}
             </span>{' '}
-            {data.submittedAt ? `Submitted ${formatDateTime(data.submittedAt)}` : 'Not submitted yet'}
+            {data.submittedAt ? `Trimis ${formatDateTime(data.submittedAt)}` : 'Netrimis încă'}
           </p>
         </div>
         <DataSourceBadge source={adapter.source} />
@@ -157,15 +157,15 @@ export function DoctorCasePanel({ adapter, refreshKey = 0 }: { adapter: CareCase
           )}
 
           {feedback.status === 'loading' && sentFeedback === null && (
-            <p className="care-case-card" role="status">Loading your response…</p>
+            <p className="care-case-card" role="status">Se încarcă răspunsul dumneavoastră…</p>
           )}
           {feedback.status === 'error' && sentFeedback === null && (
             <div className="care-case-card">
               <div className="care-case-alert care-case-alert--error" role="alert">
-                <p>Your previous response could not be checked: {feedback.message}</p>
+                <p>Răspunsul dumneavoastră anterior nu a putut fi verificat: {feedback.message}</p>
               </div>
               <button type="button" className="ui-button ui-button--secondary" onClick={retryFeedback}>
-                Try again
+                Încercați din nou
               </button>
             </div>
           )}

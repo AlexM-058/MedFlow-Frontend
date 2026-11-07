@@ -15,12 +15,12 @@ interface Props {
   highlightedId: string | null;
 }
 
-const NOT_EXTRACTED = 'Not extracted (unreadable or missing)';
+const NOT_EXTRACTED = 'Neextras (ilizibil sau lipsă)';
 
 function speaker(message: IntakeMessage, patientName: string): string {
-  if (message.role === 'patient') return `${patientName} (patient)`;
-  if (message.role === 'assistant') return `${brand.assistantName} (assistant, AI)`;
-  return 'System notice (safety rule)';
+  if (message.role === 'patient') return `${patientName} (pacient)`;
+  if (message.role === 'assistant') return `${brand.assistantName} (asistent, AI)`;
+  return 'Notificare de sistem (regulă de siguranță)';
 }
 
 function highlightClass(base: string, id: string, highlightedId: string | null): string {
@@ -35,10 +35,10 @@ export function CaseOriginals({ careCase, highlightedId }: Props) {
     <>
       <section className="care-case-card" aria-labelledby="care-case-conversation-title">
         <h3 id="care-case-conversation-title" className="care-case-card__title">
-          Original conversation
+          Conversația originală
         </h3>
         {careCase.messages.length === 0 ? (
-          <p className="care-case-hint">No messages in this case.</p>
+          <p className="care-case-hint">Niciun mesaj în acest caz.</p>
         ) : (
           <ol className="care-case-conversation">
             {careCase.messages.map((message) => {
@@ -63,10 +63,10 @@ export function CaseOriginals({ careCase, highlightedId }: Props) {
 
       <section className="care-case-card" aria-labelledby="care-case-documents-title">
         <h3 id="care-case-documents-title" className="care-case-card__title">
-          Documents
+          Documente
         </h3>
         {careCase.documents.length === 0 ? (
-          <p className="care-case-hint">No documents in this case.</p>
+          <p className="care-case-hint">Niciun document în acest caz.</p>
         ) : (
           careCase.documents.map((document) => {
             const anchor = documentAnchorId(document.id);
@@ -83,17 +83,17 @@ export function CaseOriginals({ careCase, highlightedId }: Props) {
                   Document: {documentTypeLabel(document.documentType)}
                 </h4>
                 <p className="care-case-meta">
-                  {document.fileName}, extracted {formatDateTime(document.extractedAt)}
+                  {document.fileName}, extras la {formatDateTime(document.extractedAt)}
                 </p>
                 {document.medications.map((medication, index) => (
                   <dl key={index} className="care-case-fields">
-                    <dt>Medication</dt>
+                    <dt>Medicament</dt>
                     <dd>{medication.name ?? NOT_EXTRACTED}</dd>
-                    <dt>Dose</dt>
+                    <dt>Doză</dt>
                     <dd>{medication.dose ?? NOT_EXTRACTED}</dd>
-                    <dt>Frequency (as written)</dt>
+                    <dt>Frecvență (conform textului)</dt>
                     <dd>{medication.frequency ?? NOT_EXTRACTED}</dd>
-                    <dt>Duration</dt>
+                    <dt>Durată</dt>
                     <dd>{medication.duration ?? NOT_EXTRACTED}</dd>
                   </dl>
                 ))}
@@ -101,7 +101,7 @@ export function CaseOriginals({ careCase, highlightedId }: Props) {
                   <dl className="care-case-fields">
                     {document.dates.map((date, index) => (
                       <div key={index} className="care-case-fields__row">
-                        <dt>{date.label ?? 'Date'}</dt>
+                        <dt>{date.label ?? 'Dată'}</dt>
                         <dd>{date.value ?? NOT_EXTRACTED}</dd>
                       </div>
                     ))}
@@ -110,7 +110,7 @@ export function CaseOriginals({ careCase, highlightedId }: Props) {
                 {document.warnings.length > 0 && (
                   <div className="care-case-alert care-case-alert--warning">
                     <p>
-                      <strong>Extraction warnings</strong>
+                      <strong>Avertismente de extragere</strong>
                     </p>
                     <ul>
                       {document.warnings.map((warning, index) => (
@@ -121,7 +121,7 @@ export function CaseOriginals({ careCase, highlightedId }: Props) {
                 )}
                 {quotes.length > 0 && (
                   <details className="care-case-details">
-                    <summary>Source text per field</summary>
+                    <summary>Textul-sursă pentru fiecare câmp</summary>
                     <dl className="care-case-fields">
                       {quotes.map(([path, quote]) => (
                         <div key={path} className="care-case-fields__row">
@@ -140,10 +140,10 @@ export function CaseOriginals({ careCase, highlightedId }: Props) {
 
       <section className="care-case-card" aria-labelledby="care-case-context-title">
         <h3 id="care-case-context-title" className="care-case-card__title">
-          Patient context
+          Contextul pacientului
         </h3>
         {careCase.context.length === 0 ? (
-          <p className="care-case-hint">No context items recorded.</p>
+          <p className="care-case-hint">Nu există elemente de context înregistrate.</p>
         ) : (
           <ul className="care-case-list">
             {careCase.context.map((item) => (
@@ -155,7 +155,7 @@ export function CaseOriginals({ careCase, highlightedId }: Props) {
                   <span className={`care-case-tag care-case-tag--${item.confirmation.status}`}>
                     {confirmationLabel(item.confirmation.status, item.confirmation.by, item.confirmation.at)}
                   </span>{' '}
-                  Source: {sourceLink(item.source, lookup).label}
+                  Sursă: {sourceLink(item.source, lookup).label}
                 </p>
                 {item.note && <p className="care-case-note">{item.note}</p>}
               </li>
@@ -163,9 +163,9 @@ export function CaseOriginals({ careCase, highlightedId }: Props) {
           </ul>
         )}
 
-        <h4 className="care-case-subtitle">Confirmed medications</h4>
+        <h4 className="care-case-subtitle">Medicamente confirmate</h4>
         {careCase.medications.length === 0 ? (
-          <p className="care-case-hint">No confirmed medications.</p>
+          <p className="care-case-hint">Niciun medicament confirmat.</p>
         ) : (
           <ul className="care-case-list">
             {careCase.medications.map((medication) => (
@@ -174,11 +174,11 @@ export function CaseOriginals({ careCase, highlightedId }: Props) {
                   <strong>{medication.name}</strong> {medication.doseText}
                 </p>
                 <dl className="care-case-fields">
-                  <dt>Instruction (verbatim)</dt>
+                  <dt>Instrucțiune (textual)</dt>
                   <dd className="care-case-verbatim">{medication.instructionOriginal}</dd>
-                  <dt>Duration</dt>
-                  <dd>{medication.durationText ?? 'No duration on the prescription'}</dd>
-                  <dt>Confirmed by the patient</dt>
+                  <dt>Durată</dt>
+                  <dd>{medication.durationText ?? 'Nicio durată pe rețetă'}</dd>
+                  <dt>Confirmat de pacient</dt>
                   <dd>{formatDateTime(medication.confirmedAt)}</dd>
                 </dl>
               </li>
