@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { useAuth } from '../../auth/authContext';
 import type { AccountProfile } from '../../auth/contracts';
-import { caseApi, type CaseDecision, type CaseMessageRecord } from '../../lib/caseApi';
+import { formatDateTime, statusLabel } from '../patient-context/contextLogic';
+import { caseApi, type CaseDecision, type CaseMessageRecord, type LocalCaseSummary } from '../../lib/caseApi';
 import './cases.css';
 
 function errorText(error: unknown) { return error instanceof Error ? error.message : 'Datele nu au putut fi încărcate.'; }
@@ -98,7 +99,8 @@ export function CaseConversation({ caseId, token, profile, drafts, changeDraft }
   const [revision, setRevision] = useState(0);
   const draft = drafts.message;
   const feedbackDraft = drafts.feedback;
-  const [sending, setSending] = useState<'message' | 'feedback' | null>(null);
+  const [sending, setSending] = useState<'message' | 'feedback' | 'question' | 'summary' | null>(null);
+  const [summary, setSummary] = useState<LocalCaseSummary | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [offset, setOffset] = useState(0);
@@ -106,12 +108,35 @@ export function CaseConversation({ caseId, token, profile, drafts, changeDraft }
   const alive = useRef(true);
   useEffect(() => { alive.current = true; return () => { alive.current = false; }; }, []);
   const load = useCallback(async (signal: AbortSignal) => {
-    const [messages, decision] = await Promise.all([
+    const [messages, decision, context] = await Promise.all([
       caseApi.listMessages(token, caseId, offset, signal), caseApi.getDecision(token, caseId, signal),
+      profile.role === 'doctor' ? caseApi.loadCaseContext(token, caseId, signal) : Promise.resolve([]),
     ]);
-    return { messages, decision };
-  }, [token, caseId, offset]);
+    return { messages, decision, context };
+  }, [token, caseId, offset, profile.role]);
   const result = useLoad(load, revision);
+
+  async function askLocalQuestion() {
+    if (pending.current) return;
+    pending.current = true; setSending('question'); setError(null); setNotice(null);
+    try {
+      const answer = await caseApi.askLocalQuestion(token, caseId);
+      if (!alive.current) return;
+      setNotice(answer.notice ?? 'Întrebarea agentului local a fost salvată.');
+      setRevision((value) => value + 1);
+    } catch (reason) { if (alive.current) setError(`${errorText(reason)} Mesajele deja salvate nu se pierd.`); }
+    finally { pending.current = false; if (alive.current) setSending(null); }
+  }
+
+  async function summarize() {
+    if (pending.current) return;
+    pending.current = true; setSending('summary'); setError(null); setNotice(null);
+    try {
+      const generated = await caseApi.summarizeLocally(token, caseId);
+      if (alive.current) setSummary(generated);
+    } catch (reason) { if (alive.current) setError(errorText(reason)); }
+    finally { pending.current = false; if (alive.current) setSending(null); }
+  }
 
   async function send(kind: 'message' | 'feedback', event: FormEvent) {
     event.preventDefault();
@@ -146,6 +171,17 @@ export function CaseConversation({ caseId, token, profile, drafts, changeDraft }
             <button type="button" className="ui-button ui-button--secondary" disabled={result.data?.messages.length !== 100} onClick={() => setOffset((value) => value + 100)}>Mesajele următoare</button>
           </div>
           <Feedback decision={result.data?.decision ?? null} />
+          {profile.role === 'doctor' && <section className="case-inbox__feedback">
+            <h4>Context declarat de pacient</h4>
+            <p>Confirmarea de către pacient nu este verificare medicală.</p>
+            {result.data?.context.length === 0 ? <p>Nu există informații declarate în această secțiune.</p> : <ul>{result.data?.context.map((item) => <li key={item.id}>
+              <strong>{item.kind === 'allergy' ? 'Alergie' : item.kind === 'condition' ? 'Afecțiune' : 'Medicament declarat'}</strong>: {item.text}
+              <p>{statusLabel(item.confirmation.status)} · Declarat de pacient
+                {item.source.kind === 'patient-input' && ` la ${formatDateTime(item.source.at)}`}
+                {item.confirmation.at && ` · ${item.confirmation.status === 'confirmed' ? 'Confirmat' : 'Marcat necunoscut'} de pacient la ${formatDateTime(item.confirmation.at)}`}
+              </p>
+            </li>)}</ul>}
+          </section>}
         </>
       )}
       <form className="case-inbox__form" onSubmit={(event) => void send('message', event)}>
@@ -153,11 +189,30 @@ export function CaseConversation({ caseId, token, profile, drafts, changeDraft }
         <textarea id={messageFieldId} value={draft} onChange={(event) => changeDraft('message', event.target.value)} maxLength={5000} required readOnly={!!sending} />
         <button className="ui-button ui-button--primary" disabled={!!sending || !draft.trim() || !result || !!result.error}>{sending === 'message' ? 'Se salvează…' : 'Trimiteți mesajul'}</button>
       </form>
+      {profile.role === 'patient' && <div>
+        <button type="button" className="ui-button ui-button--secondary" disabled={!!sending || !result || !!result.error}
+          onClick={() => void askLocalQuestion()}>{sending === 'question' ? 'Se așteaptă agentul local…' : 'Cereți o întrebare de clarificare (AI local)'}</button>
+        <p>Salvați mai întâi mesajul. AI-ul local colectează informații pentru medic; nu diagnostichează și nu prescrie.</p>
+      </div>}
       {profile.role === 'doctor' && <form className="case-inbox__form" onSubmit={(event) => void send('feedback', event)}>
         <label htmlFor={feedbackFieldId}>Feedback-ul dumneavoastră pentru pacient</label>
         <textarea id={feedbackFieldId} value={feedbackDraft} onChange={(event) => changeDraft('feedback', event.target.value)} maxLength={10000} required readOnly={!!sending} />
         <button className="ui-button ui-button--primary" disabled={!!sending || !feedbackDraft.trim() || !result || !!result.error}>{sending === 'feedback' ? 'Se salvează…' : 'Trimiteți feedback-ul ca medic'}</button>
       </form>}
+      {profile.role === 'doctor' && <section className="case-inbox__feedback" aria-label="Rezumat local cu surse">
+        <h4>Organizarea mesajelor pentru medic</h4>
+        <button type="button" className="ui-button ui-button--secondary" disabled={!!sending || !result || !!result.error}
+          onClick={() => void summarize()}>{sending === 'summary' ? 'Se generează local…' : 'Generați rezumatul cu citate (AI local)'}</button>
+        {summary && <>
+          <p>Generat de AI local din mesajele pacientului. Verificați citatele și originalele; nu reprezintă un diagnostic. Fotografie a conversației la momentul generării.</p>
+          <ul>{summary.items.map((item, index) => <li key={`${item.messageId}-${index}`}>
+            <blockquote>{item.text}</blockquote>
+            <details><summary>Mesajul sursă</summary><p>{summary.originals.find((original) => original.id === item.messageId)?.text}</p></details>
+          </li>)}</ul>
+          <p>{summary.uncoveredMessageIds.length} mesaje fără citat în această organizare. Citatele nu garantează păstrarea tuturor detaliilor.</p>
+          <details><summary>Toate mesajele originale folosite</summary>{summary.originals.map((original) => <p key={original.id}>{original.text}</p>)}</details>
+        </>}
+      </section>}
       {error && <p role="alert">{error}</p>}{notice && <p role="status">{notice}</p>}
     </section>
   );

@@ -60,7 +60,12 @@ export function PatientContextPanel({ adapter }: { adapter: PatientContextAdapte
 
   async function apply(operation: Promise<ContextItem>) {
     const from = adapter;
-    const item = await operation;
+    let item: ContextItem;
+    try { item = await operation; }
+    catch (error) {
+      if (error instanceof Error && 'status' in error && error.status === 409) setAttempt((value) => value + 1);
+      throw error;
+    }
     setView((prev) =>
       prev && prev.adapter === from && prev.status === 'ready' ? { ...prev, items: upsertItem(prev.items, item) } : prev,
     );

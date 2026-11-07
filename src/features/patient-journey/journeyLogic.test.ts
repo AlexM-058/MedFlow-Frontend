@@ -6,11 +6,10 @@ const assert = {
   },
 };
 
-assert.equal(journeyStage({ doctorCount: 0, confirmedMedicationCount: 0 }), 'connect');
-// A confirmed prescription alone never opens the chat: there must be a doctor to receive it.
-assert.equal(journeyStage({ doctorCount: 0, confirmedMedicationCount: 2 }), 'connect');
-assert.equal(journeyStage({ doctorCount: 1, confirmedMedicationCount: 0 }), 'prescription');
-assert.equal(journeyStage({ doctorCount: 1, confirmedMedicationCount: 1 }), 'chat');
+assert.equal(journeyStage({ doctorCount: 0 }), 'connect');
+// As soon as a doctor is connected the chat opens, with no prescription step in between.
+assert.equal(journeyStage({ doctorCount: 1 }), 'chat');
+assert.equal(journeyStage({ doctorCount: 3 }), 'chat');
 
 const code = 'synthetic_doctor_code_1234';
 assert.equal(extractConnectCode(code), code);

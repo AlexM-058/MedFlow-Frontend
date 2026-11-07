@@ -5,6 +5,29 @@
 // from the HTTP status (English), and the server text is kept only for diagnostics.
 // Transport rules mirror accountApi.ts.
 import { supportContact } from '../brand/brandAsset';
+import type { ContextItem, ContextKind } from '../features/care-scenario/contracts';
+
+function contextRecord(value: unknown): ContextItem {
+  const data = record(value);
+  const source = record(data.source);
+  const confirmation = record(data.confirmation);
+  if (!['allergy', 'condition', 'medication'].includes(String(data.kind)) || source.kind !== 'patient-input'
+    || !['unconfirmed', 'confirmed', 'unknown'].includes(String(confirmation.status))
+    || (confirmation.by !== undefined && confirmation.by !== 'patient')) throw invalid();
+  return {
+    id: string(data.id), kind: data.kind as ContextKind, text: string(data.text),
+    source: { kind: 'patient-input', at: string(source.at) },
+    confirmation: { status: confirmation.status as ContextItem['confirmation']['status'],
+      ...(confirmation.by === 'patient' ? { by: 'patient' as const } : {}),
+      ...(confirmation.at !== undefined ? { at: string(confirmation.at) } : {}),
+    },
+  };
+}
+function contextItems(payload: unknown): ContextItem[] {
+  const data = record(payload);
+  if (!Array.isArray(data.items)) throw invalid();
+  return data.items.map(contextRecord);
+}
 
 export type CaseDocumentType = 'prescription' | 'lab_result' | 'medical_letter' | 'other';
 
@@ -39,6 +62,12 @@ export interface CaseDecision {
   doctorId: string;
   text: string;
   createdAt: string;
+}
+
+export interface LocalCaseSummary {
+  items: { messageId: string; text: string }[];
+  originals: { id: string; text: string }[];
+  uncoveredMessageIds: string[];
 }
 
 function decisionRecord(value: unknown): CaseDecision {
@@ -294,6 +323,36 @@ async function request(path: string, options: RequestOptions): Promise<unknown> 
 const caseUrl = (caseId: string) => `/cases/${encodeURIComponent(caseId)}`;
 
 export const caseApi = {
+  async summarizeLocally(token: string, caseId: string): Promise<LocalCaseSummary> {
+    const payload = record(await request(`${caseUrl(caseId)}/summary`, { method: 'POST', token, operation: 'case', json: {}, timeoutMs: 110000 }));
+    const data = record(payload.summary);
+    if (!Array.isArray(data.items) || !Array.isArray(data.originals) || !Array.isArray(data.uncoveredMessageIds)) throw invalid();
+    const originals = data.originals.map((entry) => { const item = record(entry); return { id: string(item.id), text: string(item.text) }; });
+    const items = data.items.map((entry) => {
+      const item = record(entry); const messageId = string(item.messageId); const text = string(item.text);
+      if (!originals.some((original) => original.id === messageId && original.text.includes(text))) throw invalid();
+      return { messageId, text };
+    });
+    return { items, originals, uncoveredMessageIds: data.uncoveredMessageIds.map(string) };
+  },
+  async askLocalQuestion(token: string, caseId: string): Promise<{ message: CaseMessageRecord | null; notice: string | null }> {
+    const data = record(await request(`${caseUrl(caseId)}/intake-question`, { method: 'POST', token, operation: 'case', json: {}, timeoutMs: 110000 }));
+    return { message: data.message === null ? null : messageRecord(data.message), notice: typeof data.notice === 'string' ? data.notice : null };
+  },
+  async loadContext(token: string, signal?: AbortSignal): Promise<ContextItem[]> {
+    return contextItems(await request('/patient/context', { method: 'GET', token, operation: 'case', signal }));
+  },
+  async loadCaseContext(token: string, caseId: string, signal?: AbortSignal): Promise<ContextItem[]> {
+    return contextItems(await request(`${caseUrl(caseId)}/context`, { method: 'GET', token, operation: 'case', signal }));
+  },
+  async addContext(token: string, kind: ContextKind, text: string): Promise<ContextItem> {
+    const data = record(await request('/patient/context/items', { method: 'POST', token, operation: 'case', json: { kind, text } }));
+    return contextRecord(data.item);
+  },
+  async updateContext(token: string, id: string, action: 'confirm' | 'unknown'): Promise<ContextItem> {
+    const data = record(await request(`/patient/context/items/${encodeURIComponent(id)}/${action}`, { method: 'POST', token, operation: 'case', json: {} }));
+    return contextRecord(data.item);
+  },
   async listCases(token: string, offset = 0, signal?: AbortSignal): Promise<CaseRecord[]> {
     const data = record(await request(`/cases?limit=50&offset=${offset}`, { method: 'GET', token, operation: 'case', signal }));
     if (!Array.isArray(data.cases)) throw invalid();
