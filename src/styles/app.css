@@ -33,13 +33,13 @@
 
 .brand-mark__logo {
   display: none;
-  height: 2.25rem;
+  height: 3rem;
   width: auto;
 }
 
 .brand-mark__symbol {
   height: 2.25rem;
-  width: 2.25rem;
+  width: auto;
 }
 
 @media (min-width: 640px) {
@@ -51,15 +51,52 @@
   }
 }
 
-/* Theme selector: segmented radio group */
+/* Theme preferences stay behind a compact disclosure in the header. */
 .theme-selector {
-  display: inline-flex;
+  position: relative;
+  flex: none;
+}
+
+.theme-selector__trigger {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  list-style: none;
+}
+.theme-selector__trigger::-webkit-details-marker { display: none; }
+.theme-selector__trigger:hover,
+.theme-selector[open] > .theme-selector__trigger {
+  color: var(--color-text);
+  background: var(--color-surface-subtle);
+}
+.theme-selector__trigger:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.theme-selector__panel {
+  position: absolute;
+  z-index: 100;
+  inset-inline-end: 0;
+  top: calc(100% + var(--space-2));
+  width: min(13rem, calc(100vw - 2 * var(--gutter)));
   margin: 0;
-  padding: 2px;
+  padding: var(--space-2);
   min-width: 0;
-  border: 1px solid var(--color-border-control);
-  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border-decorative);
+  border-radius: var(--radius-md);
   background: var(--color-surface);
+}
+.theme-selector__heading {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
 }
 
 .theme-selector__option {
@@ -72,18 +109,21 @@
   align-items: center;
   min-height: 2.75rem;
   padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-pill);
+  width: 100%;
+  border-radius: var(--radius-sm);
   font-size: var(--font-size-sm);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--color-text);
   cursor: pointer;
   user-select: none;
 }
 
 .theme-selector__input:checked + .theme-selector__label {
-  background: var(--color-text);
-  color: var(--color-surface);
+  background: var(--color-surface-subtle);
+  color: var(--color-text);
 }
+.theme-selector__input:checked + .theme-selector__label::after { content: '✓'; margin-inline-start: auto; }
+.theme-selector__label:hover { background: var(--color-surface-subtle); }
 
 .theme-selector__input:focus-visible + .theme-selector__label {
   outline: 2px solid var(--color-focus-ring);
@@ -153,7 +193,7 @@
   align-items: center;
   gap: var(--space-2);
   font-size: var(--font-size-sm);
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-text);
 }
 
@@ -162,7 +202,7 @@
   border: 1px solid var(--color-border-decorative);
   border-radius: var(--radius-pill);
   background: var(--color-surface-subtle);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--color-text);
 }
 
@@ -181,7 +221,7 @@
 .message__bubble {
   max-width: min(85%, 32rem);
   padding: var(--space-2) var(--space-4);
-  border-radius: 1.5rem;
+  border-radius: var(--radius-md);
   background: var(--brand-primary);
   color: var(--brand-on-primary);
 }
@@ -220,7 +260,7 @@
   background: var(--color-surface);
   color: var(--color-text);
   font-size: var(--font-size-sm);
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
 }
 
@@ -277,7 +317,7 @@
   resize: none;
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--color-border-control);
-  border-radius: 1.5rem;
+  border-radius: var(--radius-md);
   background: var(--color-surface);
   color: var(--color-text);
   line-height: var(--line-height);
@@ -301,13 +341,13 @@
   border-radius: var(--radius-pill);
   background: var(--brand-primary);
   color: var(--brand-on-primary);
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 
 /* Round send button: own size/shape, shared primary states (src/styles/buttons.css). */
 .composer__send:hover:not(:disabled) {
-  border-color: var(--brand-on-primary);
+  border-color: var(--brand-primary-strong);
 }
 
 .composer__send:focus-visible {
@@ -380,7 +420,7 @@
 .chat__eyebrow,
 .workspace-pending__eyebrow {
   font-size: 0.6875rem;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.12em;
 }
 
@@ -399,12 +439,12 @@
 }
 
 .chat__suggestion-button[aria-expanded='true']:hover:not(:disabled) {
-  border-color: var(--brand-on-primary);
+  border-color: var(--brand-primary-strong);
 }
 
 .chat__demo-tag {
   font-size: 0.6875rem;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .chat__day {

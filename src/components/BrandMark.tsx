@@ -12,14 +12,14 @@ export function BrandMark() {
         className="brand-mark__logo"
         src={brandAsset(brand.logo[resolvedTheme])}
         alt={brand.productName}
-        width={168}
-        height={40}
+        width={79}
+        height={48}
       />
       <img
         className="brand-mark__symbol"
         src={brandAsset(brand.symbol)}
         alt={brand.productName}
-        width={36}
+        width={44}
         height={36}
       />
     </div>

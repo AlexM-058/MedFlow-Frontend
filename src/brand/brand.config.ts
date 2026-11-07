@@ -5,9 +5,8 @@
 // resolve them with brandAsset() from ./brandAsset.ts.
 //
 // Placeholders currently in use (replace with the client's artwork):
-//   public/brand/medflow-logo-placeholder-light.svg  -> full logo for Light theme
-//   public/brand/medflow-logo-placeholder-dark.svg   -> full logo for Dark theme
-//   public/brand/medflow-symbol-placeholder.svg      -> symbol / favicon (original: Medflow_No_Logo.svg)
+//   public/brand/medflow-logo.png    -> full logo (symbol + wordmark), transparent, both themes
+//   public/brand/medflow-symbol.png  -> symbol only, used below 640 px and as favicon
 
 export interface BrandConfig {
   /** Shown in titles, texts and alt attributes. */
@@ -36,14 +35,15 @@ export const brand: BrandConfig = {
   productName: 'MedFlow',
   assistantName: 'Asistentul MedFlow',
   logo: {
-    light: 'brand/medflow-logo-placeholder-light.svg',
-    dark: 'brand/medflow-logo-placeholder-dark.svg',
+    light: 'brand/medflow-logo.png',
+    dark: 'brand/medflow-logo.png',
   },
-  symbol: 'brand/medflow-symbol-placeholder.svg',
-  favicon: 'brand/medflow-symbol-placeholder.svg',
+  symbol: 'brand/medflow-symbol.png',
+  favicon: 'brand/medflow-symbol.png',
   colors: {
-    primary: '#90AD9B',
-    onPrimary: '#172033',
+    // Deep teal taken from the logo's heart/hand; white text on it is 5.3:1.
+    primary: '#2C7679',
+    onPrimary: '#FFFFFF',
   },
   // Synthetic placeholder: set the client's real support address before release.
   support: { email: 'support@medflow.example' },
