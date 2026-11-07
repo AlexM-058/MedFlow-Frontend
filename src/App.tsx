@@ -1,11 +1,11 @@
-import { useState, useSyncExternalStore, type ComponentType, type MouseEvent } from 'react';
+import { useEffect, useState, useSyncExternalStore, type ComponentType, type MouseEvent } from 'react';
 import { AppHeader } from './components/AppHeader';
 import { brand } from './brand/brand.config';
 import { AuthProvider } from './auth/AuthProvider';
 import { useAuth } from './auth/authContext';
 import type { AccountProfile } from './auth/contracts';
 import { readAppRoute, subscribeToRoute, navigate } from './auth/navigation';
-import { AccountEntryPage, AccountLayout, AccountSessionControls, AuthBoundary, DoctorInvitationPage } from './auth/AuthPages';
+import { AccountLayout, AccountSessionControls, AuthBoundary, DoctorInvitationPage } from './auth/AuthPages';
 import { PatientConnectPage, PatientAccountPage } from './features/connections';
 import { AdminPage } from './features/admin';
 import { ChatPage } from './features/chat/ChatPage';
@@ -65,9 +65,15 @@ function SignedInControls() {
   return session ? <AccountSessionControls /> : null;
 }
 
+/** There is no shared landing page: the root and the old /home go to the patient sign-in. */
+function RedirectToPatient() {
+  useEffect(() => { window.location.replace('#/patient'); }, []);
+  return null;
+}
+
 function Routes() {
-  const route = useSyncExternalStore(subscribeToRoute, readAppRoute, () => '/home');
-  if (route === '/home' || route === '/') return <AccountLayout><AccountEntryPage /></AccountLayout>;
+  const route = useSyncExternalStore(subscribeToRoute, readAppRoute, () => '/patient');
+  if (route === '/home' || route === '/') return <RedirectToPatient />;
   if (route === '/demo/patient') return <PatientWorkspace />;
   if (route === '/demo/doctor') return DoctorApp ? <DoctorApp onExit={() => navigate('/demo/patient')} /> : <AccountLayout><p role="status">Demo-ul pentru medic nu este disponibil încă.</p></AccountLayout>;
   if (route === '/demo/scan') return <DocumentScannerPage />;
@@ -75,8 +81,9 @@ function Routes() {
   if (route === '/auth/callback') return <AccountLayout><p role="status">Se finalizează autentificarea cu Google…</p></AccountLayout>;
   const connect = /^\/connect\/([^/]+)$/.exec(route);
   const invitation = /^\/doctor\/invite\/([^/]+)$/.exec(route);
+  const portal = route === '/doctor' || invitation ? 'doctor' : 'patient';
   return (
-    <AccountLayout>
+    <AccountLayout portal={portal}>
       {connect ? <><PatientConnectPage key={connect[1]} code={connect[1]} /><SignedInControls /></> : invitation ? <DoctorInvitationPage key={invitation[1]} token={invitation[1]} /> : route === '/doctor' ? (
         <AuthBoundary destination="/doctor" doctor><VerifiedDoctor /></AuthBoundary>
       ) : route === '/admin' ? (

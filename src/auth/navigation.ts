@@ -42,7 +42,7 @@ export function navigate(destination: string): void {
 
 export function readAppRoute(): string {
   if (window.location.pathname === callbackPath(import.meta.env.BASE_URL)) return '/auth/callback';
-  return window.location.hash.slice(1) || '/home';
+  return window.location.hash.slice(1) || '/patient';
 }
 
 export function subscribeToRoute(callback: () => void): () => void {

@@ -12,49 +12,22 @@ function externalLinkProps(url: string) {
   return /^[a-z][a-z0-9+.-]*:/i.test(url) || url.startsWith('//') ? { rel: 'noopener noreferrer' } : {};
 }
 
-export function AccountLayout({ children }: { children: ReactNode }) {
+export type Portal = 'patient' | 'doctor';
+
+/** Each portal has its own entry page; the logo returns to that portal's sign-in, never to a shared page. */
+export function AccountLayout({ children, portal = 'patient' }: { children: ReactNode; portal?: Portal }) {
   return (
-    <div className="account-shell">
+    <div className="account-shell" data-portal={portal}>
       <header className="account-shell__header">
-        <a href="#/home" aria-label={`${brand.productName} – pagina principală`}><BrandMark /></a>
+        <a href={`#/${portal}`} aria-label={`${brand.productName} – ${portal === 'doctor' ? 'portalul medicilor' : 'portalul pacienților'}`}><BrandMark /></a>
         <ThemeSelector />
       </header>
       <main className="account-shell__main">{children}</main>
       <footer className="account-shell__footer">
-        <a href="#/demo/patient">Explorați demo-ul pentru pacient</a>
-        <a href="#/demo/doctor">Explorați demo-ul pentru medic</a>
-        <a href="#/demo/care">Explorați scenariul de îngrijire (demo)</a>
         {brand.legal.privacyUrl && <a href={brand.legal.privacyUrl} {...externalLinkProps(brand.legal.privacyUrl)}>Confidențialitate</a>}
         {brand.legal.termsUrl && <a href={brand.legal.termsUrl} {...externalLinkProps(brand.legal.termsUrl)}>Termeni și condiții</a>}
       </footer>
     </div>
-  );
-}
-
-export function AccountEntryPage() {
-  return (
-    <section className="account-entry" aria-labelledby="account-entry-title">
-      <div className="account-entry__intro">
-        <p className="account-eyebrow">CARE, CONNECTED.</p>
-        <h1 id="account-entry-title">Îngrijirea nu se oprește când se termină consultația.</h1>
-        <p>Un spațiu comun pentru pacienți, medici și îngrijirea de zi cu zi. Alegeți zona dumneavoastră pentru a continua.</p>
-      </div>
-      <div className="account-entry__choices">
-        <section className="account-card" aria-labelledby="patient-entry-title">
-          <p className="account-eyebrow">PENTRU PACIENȚI</p>
-          <h2 id="patient-entry-title">Îngrijirea dumneavoastră, într-un singur loc</h2>
-          <p>Autentificați-vă cu Google, scanați codul QR al medicului și trimiteți o cerere de conectare la echipa dumneavoastră de îngrijire.</p>
-          <a className="ui-button ui-button--primary" href="#/patient">Autentificare pacient</a>
-        </section>
-        <section className="account-card" aria-labelledby="doctor-entry-title">
-          <p className="account-eyebrow">PENTRU MEDICI</p>
-          <h2 id="doctor-entry-title">Îngrijire dincolo de consultație</h2>
-          <p>Folosiți contul Google invitat pentru a accesa spațiul de lucru și a gestiona cererile de conectare ale pacienților.</p>
-          <a className="ui-button ui-button--secondary" href="#/doctor">Autentificare medic</a>
-          <p className="account-small">Accesul medicilor se face doar pe bază de invitație.</p>
-        </section>
-      </div>
-    </section>
   );
 }
 
@@ -75,17 +48,16 @@ export function GoogleSignIn({ destination = '/patient', doctor = false }: { des
 
   return (
     <section className="account-card" aria-labelledby="sign-in-heading">
-      <p className="account-eyebrow">{`${brand.productName.toUpperCase()} FOR ${doctor ? 'DOCTORS' : 'PATIENTS'}`}</p>
+      <p className="account-eyebrow">{`${brand.productName.toUpperCase()} ${doctor ? 'PENTRU MEDICI' : 'PENTRU PACIENȚI'}`}</p>
       <h1 id="sign-in-heading">{doctor ? 'Autentificare medic' : 'Autentificare pacient'}</h1>
       <p>{doctor ? `Folosiți contul Google asociat invitației dumneavoastră ${brand.productName}. Accesul medicilor este acordat de echipa ${brand.productName}.` : 'Autentificați-vă cu Google pentru a vă conecta cu medicul dumneavoastră. Puteți vedea profilul medicului înainte de a trimite o cerere de conectare.'}</p>
       {(failure || error) && <p className="account-error" role="alert">{failure || error}</p>}
-      {status === 'unconfigured' && <p className="account-notice" role="status">Autentificarea cu Google nu este configurată în acest mediu. Puteți explora demo-urile separate de mai jos.</p>}
+      {status === 'unconfigured' && <p className="account-notice" role="status">Autentificarea cu Google nu este configurată în acest mediu. Încercați din nou mai târziu.</p>}
       <button className="ui-button ui-button--primary" type="button" onClick={() => void start()} disabled={pending || status === 'unconfigured'} aria-busy={pending || undefined}>
         <span className="account-google-mark" aria-hidden="true">G</span>
         {pending ? 'Se deschide Google…' : 'Continuă cu Google'}
       </button>
       <p className="account-small">Vă solicităm numele și adresa de email pentru a vă identifica contul. Nu solicităm acces la mesajele dumneavoastră Gmail.</p>
-      {doctor ? <a href="#/patient">Sunt pacient</a> : <a href="#/doctor">Am o invitație de medic</a>}
     </section>
   );
 }
