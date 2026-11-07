@@ -12,6 +12,7 @@ import {
   type EndMode,
   type ScheduleError,
 } from './scheduleLogic';
+import { coherenceWarnings } from './coherence';
 
 export type ScheduleRequest = Omit<MedicationSchedule, 'id' | 'status' | 'confirmedAt'>;
 
@@ -87,6 +88,14 @@ export function ScheduleForm({
   const result = validateScheduleForm(medication, { times: rows.map((row) => row.value), startDate, endMode, endDate });
   const errors = attempted && !result.ok ? result.errors : [];
   const suggestedEnd = duration && isValidDate(startDate) ? computeEndDate(startDate, duration.days) : null;
+  // Informative only: the patient's choice is never changed or blocked.
+  const enteredTimes = rows.filter((row) => row.value.trim() !== '').length;
+  const coherence = coherenceWarnings({
+    frequencyText: medication.instructionOriginal,
+    durationText: medication.durationText,
+    quantity: null,
+    chosenTimes: enteredTimes > 0 ? enteredTimes : null,
+  });
 
   const submit = async () => {
     if (savingRef.current) return;
@@ -178,6 +187,11 @@ export function ScheduleForm({
             {timesError}
           </p>
         )}
+        {coherence.map((warning) => (
+          <p key={warning.code} className="med-schedule-note med-schedule-note--warning" role="status">
+            {warning.message}
+          </p>
+        ))}
       </fieldset>
 
       <div className="med-schedule-field">
