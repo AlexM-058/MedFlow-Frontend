@@ -27,3 +27,9 @@
 .qr-scanner__viewport { position: relative; width: min(100%, 26rem); aspect-ratio: 1 / 1; overflow: hidden; border: 1px solid var(--color-border-control); border-radius: var(--radius-md); background: var(--color-surface-subtle); }
 .qr-scanner__video { width: 100%; height: 100%; object-fit: cover; }
 .qr-scanner__frame { position: absolute; inset: 14%; border: 3px solid var(--brand-primary); border-radius: var(--radius-sm); pointer-events: none; }
+
+/* Step 1: one large action; the paste-a-code form stays closed until asked for. */
+.journey__big-button { width: 100%; min-height: 4rem; font-size: 1.25rem; }
+.journey__alt { display: grid; gap: var(--space-3); }
+.journey__alt > summary { cursor: pointer; padding: var(--space-3) 0; font-size: 1.125rem; text-decoration: underline; }
+.journey__alt[open] > summary { margin-bottom: var(--space-2); }
