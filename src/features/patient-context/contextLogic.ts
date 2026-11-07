@@ -20,13 +20,13 @@ export interface ContextGroup {
 }
 
 export const CONTEXT_GROUPS: readonly ContextGroup[] = [
-  { kind: 'allergy', title: 'Allergies', addLabel: 'Add an allergy', emptyText: 'No allergies recorded yet.' },
-  { kind: 'condition', title: 'Conditions', addLabel: 'Add a condition', emptyText: 'No conditions recorded yet.' },
+  { kind: 'allergy', title: 'Alergii', addLabel: 'Adăugați o alergie', emptyText: 'Nu a fost înregistrată nicio alergie.' },
+  { kind: 'condition', title: 'Afecțiuni', addLabel: 'Adăugați o afecțiune', emptyText: 'Nu a fost înregistrată nicio afecțiune.' },
   {
     kind: 'medication',
-    title: 'Current medication',
-    addLabel: 'Add a medication you take',
-    emptyText: 'No current medication recorded yet.',
+    title: 'Medicație curentă',
+    addLabel: 'Adăugați un medicament pe care îl luați',
+    emptyText: 'Nu a fost înregistrată nicio medicație curentă.',
   },
 ];
 
@@ -38,10 +38,10 @@ export function groupItems(items: readonly ContextItem[]): Record<ContextKind, C
 }
 
 const STATUS_LABELS: Record<ConfirmationStatus, string> = {
-  confirmed: 'Confirmed',
-  unconfirmed: 'Not confirmed',
+  confirmed: 'Confirmat',
+  unconfirmed: 'Neconfirmat',
   // Never blank and never "No": the patient does not know.
-  unknown: 'Unknown',
+  unknown: 'Necunoscut',
   conflict: 'Conflict',
 };
 
@@ -49,7 +49,7 @@ export function statusLabel(status: ConfirmationStatus): string {
   return STATUS_LABELS[status];
 }
 
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const MONTHS = ['ian', 'feb', 'mar', 'apr', 'mai', 'iun', 'iul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 const pad = (value: number) => String(value).padStart(2, '0');
 
 /** "06 Nov 2026 14:02" in the device's local time; an unparseable value is shown as given. */
@@ -71,22 +71,22 @@ export interface SourceDescription {
 export function describeSource(source: Source): SourceDescription {
   switch (source.kind) {
     case 'patient-input':
-      return { label: `You entered this · ${formatDateTime(source.at)}` };
+      return { label: `Introdus de dumneavoastră · ${formatDateTime(source.at)}` };
     case 'message':
-      return { label: 'From your message in the chat', quote: source.quote };
+      return { label: 'Din mesajul dumneavoastră din conversație', quote: source.quote };
     case 'document': {
-      const page = source.page !== undefined ? `, page ${source.page}` : '';
+      const page = source.page !== undefined ? `, pagina ${source.page}` : '';
       return {
-        label: `From document ${source.documentId}${page}`,
+        label: `Din documentul ${source.documentId}${page}`,
         ...(source.quote ? { quote: source.quote } : {}),
       };
     }
     case 'doctor':
-      return { label: `From your doctor · ${formatDateTime(source.at)}` };
+      return { label: `De la medicul dumneavoastră · ${formatDateTime(source.at)}` };
   }
 }
 
-const who = (by: Confirmation['by']) => (by === 'doctor' ? 'your doctor' : by === 'patient' ? 'you' : null);
+const who = (by: Confirmation['by']) => (by === 'doctor' ? 'medicul dumneavoastră' : by === 'patient' ? 'dumneavoastră' : null);
 
 /** Who confirmed (or marked unknown) and when. Never invents a person or a time. */
 export function describeConfirmation(confirmation: Confirmation): string {
@@ -94,13 +94,13 @@ export function describeConfirmation(confirmation: Confirmation): string {
   const when = confirmation.at ? ` · ${formatDateTime(confirmation.at)}` : '';
   switch (confirmation.status) {
     case 'confirmed':
-      return `Confirmed${person ? ` by ${person}` : ''}${when}`;
+      return `Confirmat${person ? ` de ${person}` : ''}${when}`;
     case 'unknown':
-      return `Marked as unknown${person ? ` by ${person}` : ''}${when}`;
+      return `Marcat ca necunoscut${person ? ` de ${person}` : ''}${when}`;
     case 'unconfirmed':
-      return 'Not confirmed yet';
+      return 'Încă neconfirmat';
     case 'conflict':
-      return 'Needs your doctor: this does not match other information.';
+      return 'Necesită medicul dumneavoastră: nu corespunde altor informații.';
   }
 }
 
@@ -118,9 +118,9 @@ export type TextValidation = { ok: true; text: string } | { ok: false; error: st
 
 export function validateItemText(raw: string): TextValidation {
   const text = raw.trim();
-  if (text.length === 0) return { ok: false, error: 'Enter a value before adding it.' };
+  if (text.length === 0) return { ok: false, error: 'Introduceți o valoare înainte de a o adăuga.' };
   if (text.length > MAX_ITEM_LENGTH) {
-    return { ok: false, error: `Use at most ${MAX_ITEM_LENGTH} characters (now ${text.length}).` };
+    return { ok: false, error: `Folosiți cel mult ${MAX_ITEM_LENGTH} de caractere (acum ${text.length}).` };
   }
   return { ok: true, text };
 }

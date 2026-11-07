@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useId, useState } from 'react';
 import type { ConfirmedMedication, MedicationSchedule, ScheduleAdapter } from '../care-scenario/contracts';
 import { DataSourceBadge } from '../care-scenario/DataSourceBadge';
-import { ScheduleCard } from './ScheduleCard';
+import { ScheduleCard, formatDoseDay } from './ScheduleCard';
 import { NotSchedulableCard, ScheduleForm, type ScheduleRequest } from './ScheduleForm';
-import { classifyRegimen, deviceTimeZone, effectiveStatus, formatDoseDay, nextDose, PERMISSION_MESSAGES } from './scheduleLogic';
+import { classifyRegimen, deviceTimeZone, effectiveStatus, nextDose, PERMISSION_MESSAGES } from './scheduleLogic';
 import { useReminders } from './useReminders';
 import './medication-schedule.css';
 
@@ -45,7 +45,7 @@ export function MedicationSchedulePanel({
       },
       (error: unknown) => {
         if (!controller.signal.aborted) {
-          setResult({ adapter, token, schedules: null, error: errorMessage(error, 'The schedules could not be loaded.') });
+          setResult({ adapter, token, schedules: null, error: errorMessage(error, 'Programele nu au putut fi încărcate.') });
         }
       },
     );
@@ -92,26 +92,26 @@ export function MedicationSchedulePanel({
   return (
     <section className="med-schedule" aria-labelledby={`${id}-title`}>
       <header className="med-schedule-header">
-        <h2 id={`${id}-title`}>Medication schedule</h2>
+        <h2 id={`${id}-title`}>Program de medicație</h2>
         <DataSourceBadge source={adapter.source} />
       </header>
 
       <p className="med-schedule-note med-schedule-note--info">
-        Reminders work only while this page is open. Background and lock-screen notifications are not available in this
-        demo.
+        Mementourile funcționează numai cât timp această pagină este deschisă. Notificările în fundal și pe ecranul de
+        blocare nu sunt disponibile în această demonstrație.
       </p>
 
       {!current && (
         <p role="status" className="med-schedule-status">
-          Loading your schedules…
+          Se încarcă programele dumneavoastră…
         </p>
       )}
 
       {current?.error && (
         <div className="med-schedule-note med-schedule-note--error" role="alert">
-          <p>Could not load your schedules: {current.error}</p>
+          <p>Programele dumneavoastră nu au putut fi încărcate: {current.error}</p>
           <button type="button" className="ui-button ui-button--secondary" onClick={() => setToken((value) => value + 1)}>
-            Try again
+            Încercați din nou
           </button>
         </div>
       )}
@@ -121,10 +121,10 @@ export function MedicationSchedulePanel({
           <p className="med-schedule-summary" aria-live="polite">
             {next ? (
               <>
-                Next dose: <strong>{next.medication}</strong> at <strong>{next.time}</strong>, {formatDoseDay(next, nowDate)}
+                Următoarea doză: <strong>{next.medication}</strong>, la ora <strong>{next.time}</strong>, {formatDoseDay(next, nowDate)}
               </>
             ) : (
-              'No upcoming doses scheduled.'
+              'Nu există doze viitoare programate.'
             )}
           </p>
 
@@ -138,11 +138,11 @@ export function MedicationSchedulePanel({
                 disabled={reminders.requesting}
                 aria-busy={reminders.requesting}
               >
-                {reminders.requesting ? 'Waiting for your answer…' : 'Turn on notifications'}
+                {reminders.requesting ? 'Se așteaptă răspunsul dumneavoastră…' : 'Activați notificările'}
               </button>
             )}
             {reminders.systemFailed && (
-              <p>This browser did not show the system notification. The in-page reminder is shown instead.</p>
+              <p>Acest browser nu a afișat notificarea de sistem. În locul ei este afișat mementoul din pagină.</p>
             )}
           </div>
 
@@ -150,14 +150,14 @@ export function MedicationSchedulePanel({
             {reminders.banners.map((dose) => (
               <div key={dose.key} className="med-schedule-banner">
                 <p>
-                  Reminder: <strong>{dose.medication}</strong>, scheduled for {dose.time}.
+                  Memento: <strong>{dose.medication}</strong>, programat la ora {dose.time}.
                 </p>
                 <div className="med-schedule-actions">
                   <button type="button" className="ui-button ui-button--primary" onClick={() => reminders.markTaken(dose.key)}>
-                    Mark as taken
+                    Marcați ca administrat
                   </button>
                   <button type="button" className="ui-button ui-button--secondary" onClick={() => reminders.dismiss(dose.key)}>
-                    Dismiss
+                    Închideți
                   </button>
                 </div>
               </div>
@@ -165,10 +165,10 @@ export function MedicationSchedulePanel({
           </div>
 
           {reminders.taken.length > 0 && (
-            <ul className="med-schedule-taken" aria-label="Marked as taken on this page">
+            <ul className="med-schedule-taken" aria-label="Marcate ca administrate pe această pagină">
               {reminders.taken.map(({ dose }) => (
                 <li key={dose.key}>
-                  Marked as taken: {dose.medication}, {dose.time} (kept on this page only)
+                  Marcat ca administrat: {dose.medication}, {dose.time} (păstrat numai pe această pagină)
                 </li>
               ))}
             </ul>
@@ -195,12 +195,12 @@ export function MedicationSchedulePanel({
           )}
 
           {medications.length === 0 && active.length === 0 && (
-            <p className="med-schedule-status">No confirmed medications yet. Confirm a prescription first.</p>
+            <p className="med-schedule-status">Nu există încă medicamente confirmate. Confirmați mai întâi o prescripție.</p>
           )}
 
           {ended.length > 0 && (
             <div className="med-schedule-list">
-              <h3 className="med-schedule-subtitle">Ended schedules</h3>
+              <h3 className="med-schedule-subtitle">Programe încheiate</h3>
               {ended.map((schedule) => (
                 <ScheduleCard key={schedule.id} schedule={schedule} now={nowDate} deviceZone={deviceZone} ended />
               ))}

@@ -110,27 +110,27 @@ export function describeMutationFailure(error: unknown, kind: MutationKind): Mut
     case 409:
       return {
         message: kind === 'request'
-          ? 'A request for this doctor was already processed. Its current status is shown here.'
-          : 'This request was already processed. Its current status is shown here.',
+          ? 'O cerere pentru acest medic a fost deja procesată. Starea ei curentă este afișată aici.'
+          : 'Această cerere a fost deja procesată. Starea ei curentă este afișată aici.',
         refresh: true,
         retry: false,
       };
     case 401:
-      return { message: 'Your session has expired. Please sign in again.', refresh: false, retry: false };
+      return { message: 'Sesiunea dumneavoastră a expirat. Vă rugăm să vă autentificați din nou.', refresh: false, retry: false };
     case 403:
-      return { message: serverMessage ?? 'This account is not allowed to perform that action.', refresh: false, retry: false };
+      return { message: serverMessage ?? 'Acest cont nu are permisiunea de a efectua această acțiune.', refresh: false, retry: false };
     case 404:
     case 410:
       return kind === 'request'
-        ? { message: 'This doctor link is no longer valid. Ask your doctor for their current QR code.', refresh: true, retry: false }
-        : { message: 'This request is no longer available. The list was refreshed.', refresh: true, retry: false };
+        ? { message: 'Acest link al medicului nu mai este valid. Solicitați medicului codul QR actual.', refresh: true, retry: false }
+        : { message: 'Această cerere nu mai este disponibilă. Lista a fost reîmprospătată.', refresh: true, retry: false };
     case 429:
-      return { message: 'Too many attempts. Please wait a moment before trying again.', refresh: false, retry: true };
+      return { message: 'Prea multe încercări. Vă rugăm să așteptați puțin înainte de a încerca din nou.', refresh: false, retry: true };
     default:
       return {
         message: kind === 'request'
-          ? 'Your connection request could not be confirmed. Check its status below before trying again.'
-          : 'The request could not be cancelled. Please try again.',
+          ? 'Cererea dumneavoastră de conectare nu a putut fi confirmată. Verificați starea ei mai jos înainte de a încerca din nou.'
+          : 'Cererea nu a putut fi anulată. Vă rugăm să încercați din nou.',
         refresh: true,
         retry: true,
       };

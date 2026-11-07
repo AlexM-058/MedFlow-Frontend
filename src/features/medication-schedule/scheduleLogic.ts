@@ -68,8 +68,8 @@ export function classifyRegimen(
 }
 
 export const REGIMEN_MESSAGES: Record<Exclude<RegimenKind, 'fixed'>, string> = {
-  'as-needed': 'As-needed medication is not scheduled automatically in this demo.',
-  variable: 'This regimen needs your doctor; it is not scheduled automatically.',
+  'as-needed': 'Medicația administrată la nevoie nu este programată automat în această demonstrație.',
+  variable: 'Acest regim necesită indicațiile medicului dumneavoastră; nu este programat automat.',
 };
 
 // ---------- Dates and times ----------
@@ -248,16 +248,16 @@ export function validateScheduleForm(
 
   const filled = input.times.map((value) => value.trim());
   if (filled.every((value) => value === '')) {
-    errors.push({ field: 'times', message: 'Choose at least one time. Times are never chosen for you.' });
+    errors.push({ field: 'times', message: 'Alegeți cel puțin o oră. Orele nu sunt alese niciodată în locul dumneavoastră.' });
   } else {
     const seen = new Set<string>();
     filled.forEach((value, index) => {
       if (value === '') {
-        errors.push({ field: 'times', index, message: 'Enter a time or remove this row.' });
+        errors.push({ field: 'times', index, message: 'Introduceți o oră sau eliminați acest rând.' });
       } else if (!isValidTime(value)) {
-        errors.push({ field: 'times', index, message: 'Use the 24-hour format HH:MM, for example 07:30.' });
+        errors.push({ field: 'times', index, message: 'Folosiți formatul de 24 de ore HH:MM, de exemplu 07:30.' });
       } else if (seen.has(value)) {
-        errors.push({ field: 'times', index, message: `${value} is already in the list.` });
+        errors.push({ field: 'times', index, message: `${value} se află deja în listă.` });
       } else {
         seen.add(value);
       }
@@ -266,14 +266,14 @@ export function validateScheduleForm(
 
   const startDate = input.startDate.trim();
   const startOk = isValidDate(startDate);
-  if (startDate === '') errors.push({ field: 'startDate', message: 'Choose the first day of the treatment.' });
-  else if (!startOk) errors.push({ field: 'startDate', message: 'Enter a valid start date.' });
+  if (startDate === '') errors.push({ field: 'startDate', message: 'Alegeți prima zi a tratamentului.' });
+  else if (!startOk) errors.push({ field: 'startDate', message: 'Introduceți o dată de început validă.' });
 
   let endDate: string | null = null;
   const duration = parseDuration(medication.durationText);
   if (duration) {
     if (input.endMode !== 'suggested') {
-      errors.push({ field: 'end', message: 'Confirm the end date computed from your prescription.' });
+      errors.push({ field: 'end', message: 'Confirmați data de încheiere calculată din prescripția dumneavoastră.' });
     } else if (startOk) {
       endDate = computeEndDate(startDate, duration.days);
     }
@@ -281,11 +281,11 @@ export function validateScheduleForm(
     endDate = null;
   } else if (input.endMode === 'date') {
     const end = input.endDate.trim();
-    if (!isValidDate(end)) errors.push({ field: 'end', message: 'Choose a valid end date.' });
-    else if (startOk && end < startDate) errors.push({ field: 'end', message: 'The end date cannot be before the start date.' });
+    if (!isValidDate(end)) errors.push({ field: 'end', message: 'Alegeți o dată de încheiere validă.' });
+    else if (startOk && end < startDate) errors.push({ field: 'end', message: 'Data de încheiere nu poate fi înaintea datei de început.' });
     else endDate = end;
   } else {
-    errors.push({ field: 'end', message: 'Choose an end date, or confirm that the prescription gives no end date.' });
+    errors.push({ field: 'end', message: 'Alegeți o dată de încheiere sau confirmați că prescripția nu indică una.' });
   }
 
   if (errors.length > 0) return { ok: false, errors };
@@ -472,7 +472,7 @@ export function formatDoseDay(dose: Pick<DoseOccurrence, 'date' | 'timezone' | '
 
 /** "Mon, 9 Nov 2026" for a "YYYY-MM-DD" calendar date. */
 export function formatDate(date: string): string {
-  return new Intl.DateTimeFormat('en-GB', {
+  return new Intl.DateTimeFormat('ro-RO', {
     timeZone: 'UTC',
     weekday: 'short',
     day: 'numeric',
@@ -499,11 +499,11 @@ export function mapNotificationPermission(env: {
 
 export const PERMISSION_MESSAGES: Record<ReminderPermission, string> = {
   unsupported:
-    'This browser cannot show system notifications here. In-page reminders still work while this page is open.',
-  default: 'System notifications are off. In-page reminders work while this page is open.',
+    'Acest browser nu poate afișa notificări de sistem aici. Mementourile din pagină funcționează cât timp pagina este deschisă.',
+  default: 'Notificările de sistem sunt dezactivate. Mementourile din pagină funcționează cât timp pagina este deschisă.',
   denied:
-    'Notifications are blocked for this site. To turn them on, open the site settings from the icon next to the address bar, allow notifications, then reload the page. In-page reminders still work while this page is open.',
-  granted: 'System notifications are on while this page is open. They never show the medication name.',
+    'Notificările sunt blocate pentru acest site. Pentru a le activa, deschideți setările site-ului din pictograma de lângă bara de adrese, permiteți notificările, apoi reîncărcați pagina. Mementourile din pagină funcționează cât timp pagina este deschisă.',
+  granted: 'Notificările de sistem sunt active cât timp pagina este deschisă. Ele nu afișează niciodată numele medicamentului.',
 };
 
 export function canShowSystemNotification(permission: ReminderPermission): boolean {

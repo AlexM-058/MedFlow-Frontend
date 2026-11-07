@@ -6,8 +6,8 @@ export function DataSourceBadge({ source }: { source: DataSourceKind }) {
   return source === 'live' ? (
     <span className="data-source-badge data-source-badge--live">Live</span>
   ) : (
-    <span className="data-source-badge data-source-badge--fixture" title="Synthetic demo data, not saved to the server">
-      Demo data
+    <span className="data-source-badge data-source-badge--fixture" title="Date demo sintetice, nesalvate pe server">
+      Date demo
     </span>
   );
 }

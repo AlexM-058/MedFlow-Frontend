@@ -19,7 +19,7 @@ export type DocumentScannerProps = {
 export function DocumentScanner({
   onConfirm,
   onCancel,
-  title = 'Scan medical document',
+  title = 'Scanare document medical',
 }: DocumentScannerProps) {
   const [phase, setPhase] = useState<ScannerPhase>('idle');
   const [draft, setDraft] = useState<ScannedDocument | null>(null);
@@ -54,7 +54,7 @@ export function DocumentScanner({
       setMethod(result.method);
       setPhase('preview');
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Could not capture document.';
+      const message = err instanceof Error ? err.message : 'Documentul nu a putut fi capturat.';
       setError(message);
       setPhase('error');
     }
@@ -84,11 +84,11 @@ export function DocumentScanner({
   return (
     <section className="doc-scanner" aria-labelledby="doc-scanner-title">
       <header className="doc-scanner__header">
-        <p className="doc-scanner__eyebrow">LOCAL ONLY</p>
+        <p className="doc-scanner__eyebrow">DOAR LOCAL</p>
         <h2 id="doc-scanner-title">{title}</h2>
         <p className="doc-scanner__hint">
-          Capture a printed prescription, lab result, or medical letter. Nothing is uploaded until you
-          confirm and a later case flow sends it to the backend.
+          Capturați o rețetă tipărită, un rezultat de laborator sau o scrisoare medicală. Nimic nu este încărcat până
+          nu confirmați, iar un flux ulterior al cazului îl trimite către backend.
         </p>
       </header>
 
@@ -104,52 +104,52 @@ export function DocumentScanner({
             <img
               className="doc-scanner__preview"
               src={draft.uri}
-              alt="Scanned medical document preview"
+              alt="Previzualizare document medical scanat"
             />
           ) : (
             <div className="doc-scanner__pdf-placeholder">
-              <p>PDF ready (preview not shown)</p>
+              <p>PDF pregătit (previzualizarea nu este afișată)</p>
               <p className="doc-scanner__meta">{draft.fileName}</p>
             </div>
           )}
           <dl className="doc-scanner__meta-list">
             <div>
-              <dt>File</dt>
+              <dt>Fișier</dt>
               <dd>{draft.fileName}</dd>
             </div>
             <div>
-              <dt>Type</dt>
+              <dt>Tip</dt>
               <dd>{draft.mimeType}</dd>
             </div>
             {typeof draft.sizeBytes === 'number' && (
               <div>
-                <dt>Size</dt>
+                <dt>Dimensiune</dt>
                 <dd>{Math.round(draft.sizeBytes / 1024)} KB</dd>
               </div>
             )}
             {method && (
               <div>
-                <dt>Capture</dt>
+                <dt>Captură</dt>
                 <dd>{describeCaptureMethod(method)}</dd>
               </div>
             )}
           </dl>
           <div className="doc-scanner__actions">
             <button type="button" className="ui-button ui-button--secondary" onClick={handleCancel}>
-              Cancel
+              Anulați
             </button>
             <button type="button" className="ui-button ui-button--secondary" onClick={handleRetake}>
-              Retake
+              Refaceți
             </button>
             <button type="button" className="ui-button ui-button--primary doc-scanner__primary" onClick={handleUse}>
-              Use Document
+              Folosiți documentul
             </button>
           </div>
         </div>
       ) : (
         <div className="doc-scanner__idle">
           <p className="doc-scanner__synthetic">
-            Use a synthetic printed document for testing (fake prescription / lab sheet).
+            Folosiți pentru testare un document tipărit sintetic (rețetă / fișă de laborator fictivă).
           </p>
           <div className="doc-scanner__actions">
             <button
@@ -159,7 +159,7 @@ export function DocumentScanner({
               aria-busy={phase === 'capturing' || undefined}
               onClick={() => void startCapture(false)}
             >
-              {phase === 'capturing' ? 'Opening camera…' : 'Scan document'}
+              {phase === 'capturing' ? 'Se deschide camera…' : 'Scanați documentul'}
             </button>
             <button
               type="button"
@@ -167,11 +167,11 @@ export function DocumentScanner({
               disabled={phase === 'capturing'}
               onClick={() => void startCapture(true)}
             >
-              Choose from gallery
+              Alegeți din galerie
             </button>
             {onCancel && (
               <button type="button" className="ui-button ui-button--secondary" onClick={handleCancel}>
-                Cancel
+                Anulați
               </button>
             )}
           </div>

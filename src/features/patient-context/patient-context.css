@@ -57,7 +57,7 @@
   gap: var(--space-2);
   min-width: 0;
 }
-.patient-context-item-text { flex: 1 1 12rem; min-width: 0; font-weight: 600; line-height: 1.4; }
+.patient-context-item-text { flex: 1 1 12rem; min-width: 0; font-weight: 500; line-height: 1.4; }
 
 .patient-context-chip {
   flex: 0 0 auto;
@@ -67,7 +67,7 @@
   background: var(--color-surface-subtle);
   color: var(--status-on-tint);
   font-size: var(--font-size-sm);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.5;
 }
 .patient-context-chip--confirmed { background: var(--status-success-bg); border-color: var(--status-success-border); }
@@ -98,13 +98,13 @@
   color: var(--status-on-tint);
 }
 .patient-context-note { white-space: pre-wrap; }
-.patient-context-conflict-action { font-weight: 700; }
+.patient-context-conflict-action { font-weight: 600; }
 
 .patient-context-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .patient-context .ui-button { justify-self: start; }
 
 .patient-context-add { display: grid; gap: var(--space-1); min-width: 0; }
-.patient-context-add-label { font-weight: 600; }
+.patient-context-add-label { font-weight: 500; }
 .patient-context-add-row { display: flex; flex-wrap: wrap; gap: var(--space-2); min-width: 0; }
 
 .patient-context-input {
@@ -121,7 +121,7 @@
 .patient-context-input:focus-visible { outline: 3px solid var(--color-focus-ring); outline-offset: 2px; }
 .patient-context-input[aria-invalid='true'] { border-color: var(--status-error-border); border-width: 2px; }
 
-.patient-context-field-error { color: var(--status-error-text); font-size: var(--font-size-sm); font-weight: 600; }
+.patient-context-field-error { color: var(--status-error-text); font-size: var(--font-size-sm); font-weight: 500; }
 
 @media (forced-colors: active) {
   .patient-context-chip { border-color: CanvasText; }

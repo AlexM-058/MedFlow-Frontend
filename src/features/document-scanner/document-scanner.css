@@ -17,7 +17,7 @@
 .doc-scanner__eyebrow {
   margin: 0;
   font-size: 0.6875rem;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.12em;
   color: var(--color-text);
 }
@@ -118,7 +118,7 @@
 /* Size tweaks only; colors and states (incl. disabled and aria-busy) come from .ui-button--primary. */
 .doc-scanner__primary {
   padding: var(--space-2) var(--space-4);
-  font-weight: 700;
+  font-weight: 600;
   font-size: var(--font-size-sm);
 }
 

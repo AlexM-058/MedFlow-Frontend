@@ -17,7 +17,7 @@ function getMobileSnapshot() {
 function formatDate(value: string) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return null;
-  return new Intl.DateTimeFormat('en-GB', {
+  return new Intl.DateTimeFormat('ro-RO', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
@@ -89,15 +89,15 @@ export function PatientSuggestionPanel({ suggestion, onClose }: PatientSuggestio
       data-suggestion-id={suggestion.id}
     >
       <div className="patient-suggestion-panel__header">
-        <span className="patient-suggestion-panel__eyebrow">Care team</span>
+        <span className="patient-suggestion-panel__eyebrow">Echipa medicală</span>
         <button
           ref={closeRef}
           className="ui-button ui-button--secondary patient-suggestion-panel__close"
           type="button"
           onClick={onClose}
-          aria-label="Close doctor suggestion"
+          aria-label="Închideți sugestia medicului"
         >
-          <span>Close</span>
+          <span>Închideți</span>
           <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none">
             <path d="m6 6 12 12M18 6 6 18" stroke="currentColor" strokeWidth="1.5" />
           </svg>
@@ -106,8 +106,8 @@ export function PatientSuggestionPanel({ suggestion, onClose }: PatientSuggestio
 
       <div className="patient-suggestion-panel__scroll">
         <article className="patient-suggestion-card">
-          <span className="patient-suggestion-card__eyebrow">Care team</span>
-          <h2 id={titleId} className="patient-suggestion-card__title">Doctor suggestion</h2>
+          <span className="patient-suggestion-card__eyebrow">Echipa medicală</span>
+          <h2 id={titleId} className="patient-suggestion-card__title">Sugestia medicului</h2>
           <p className="patient-suggestion-card__text">{suggestion.text}</p>
           <footer className="patient-suggestion-card__footer">
             <span>{suggestion.doctorName}</span>
@@ -116,8 +116,8 @@ export function PatientSuggestionPanel({ suggestion, onClose }: PatientSuggestio
         </article>
 
         <p id={demoId} className="patient-suggestion-panel__demo" role="note">
-          <strong>Demo suggestion.</strong> This is a fictional example, not a message received
-          from a doctor. No medical advice or treatment is provided.
+          <strong>Sugestie demo.</strong> Acesta este un exemplu fictiv, nu un mesaj primit
+          de la un medic. Nu se oferă sfaturi medicale sau tratament.
         </p>
       </div>
     </section>

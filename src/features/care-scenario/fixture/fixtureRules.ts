@@ -36,8 +36,8 @@ const RED_FLAG_PATTERNS: RegExp[] = [
 ];
 
 export const RED_FLAG_MESSAGE =
-  'Your message may describe an emergency. Call 112 now or go to the nearest emergency department. ' +
-  'This chat cannot help in an emergency. Your message has been saved for your doctor.';
+  'Mesajul dumneavoastră poate descrie o urgență. Sunați acum la 112 sau mergeți la cea mai apropiată unitate de primiri urgențe. ' +
+  'Acest chat nu poate ajuta într-o urgență. Mesajul dumneavoastră a fost salvat pentru medicul dumneavoastră.';
 
 export function matchesRedFlag(text: string): boolean {
   const normalized = normalizeText(text);

@@ -87,8 +87,8 @@ export function revokeScannedDocumentUri(document: ScannedDocument | null | unde
 export function describeCaptureMethod(method: ScanCaptureMethod): string {
   switch (method) {
     case 'camera-input':
-      return 'Device camera';
+      return 'Camera dispozitivului';
     case 'gallery-input':
-      return 'Device files / gallery';
+      return 'Fișierele dispozitivului / galerie';
   }
 }

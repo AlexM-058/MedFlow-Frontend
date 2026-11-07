@@ -6,7 +6,7 @@ import type { DoctorFeedback } from '../care-scenario/contracts.ts';
 
 const FEEDBACK_TIME_ZONE = 'Europe/Bucharest';
 
-const dateTimeFormat = new Intl.DateTimeFormat('en-GB', {
+const dateTimeFormat = new Intl.DateTimeFormat('ro-RO', {
   timeZone: FEEDBACK_TIME_ZONE,
   day: '2-digit',
   month: 'short',
@@ -43,7 +43,7 @@ export function buildPatientFeedbackView(feedback: DoctorFeedback | null): Patie
   };
 }
 
-/** "Dr. Demo said:" */
+/** "Dr. Demo a spus:" */
 export function attributionLabel(doctorName: string): string {
-  return `${doctorName} said:`;
+  return `${doctorName} a spus:`;
 }

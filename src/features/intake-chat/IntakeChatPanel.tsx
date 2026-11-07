@@ -132,35 +132,35 @@ export function IntakeChatPanel({ adapter }: { adapter: IntakeAdapter }) {
     <section className="intake-chat" aria-labelledby={headingId}>
       <header className="intake-chat-header">
         <h2 id={headingId} className="intake-chat-title">
-          Tell us how you feel
+          Spuneți-ne cum vă simțiți
         </h2>
         <DataSourceBadge source={adapter.source} />
       </header>
 
       <p className="intake-chat-banner">
-        You are talking to an AI assistant that collects information for your doctor. It does not diagnose or
-        prescribe. The final answer comes from your doctor.
+        Vorbiți cu un asistent AI care colectează informații pentru medicul dumneavoastră. Nu pune diagnostice și nu
+        prescrie tratamente. Răspunsul final vine de la medicul dumneavoastră.
       </p>
 
       {current === null && (
         <p className="intake-chat-status" role="status">
-          Loading the conversation…
+          Se încarcă conversația…
         </p>
       )}
 
       {current?.status === 'error' && (
         <div className="intake-chat-error" role="alert">
-          <p>Could not load the conversation.</p>
+          <p>Conversația nu a putut fi încărcată.</p>
           <button type="button" className="ui-button ui-button--secondary" onClick={() => setAttempt((n) => n + 1)}>
-            Try again
+            Încercați din nou
           </button>
         </div>
       )}
 
       {entries && (
-        <ol ref={logRef} className="intake-chat-log" role="log" aria-live="polite" aria-label="Conversation" tabIndex={0}>
+        <ol ref={logRef} className="intake-chat-log" role="log" aria-live="polite" aria-label="Conversație" tabIndex={0}>
           {entries.length === 0 && (
-            <li className="intake-chat-empty">No messages yet. Describe what you feel in your own words.</li>
+            <li className="intake-chat-empty">Niciun mesaj încă. Descrieți ce simțiți cu propriile cuvinte.</li>
           )}
           {entries.map((entry) => (
             <ChatEntryView
@@ -176,7 +176,7 @@ export function IntakeChatPanel({ adapter }: { adapter: IntakeAdapter }) {
 
       <form className="intake-chat-composer" onSubmit={handleSubmit}>
         <label htmlFor={inputId} className="intake-chat-label">
-          Your message
+          Mesajul dumneavoastră
         </label>
         <div className="intake-chat-composer-row">
           <textarea
@@ -196,11 +196,11 @@ export function IntakeChatPanel({ adapter }: { adapter: IntakeAdapter }) {
             disabled={!canSend}
             aria-busy={isSending || undefined}
           >
-            {isSending ? 'Sending…' : 'Send'}
+            {isSending ? 'Se trimite…' : 'Trimiteți'}
           </button>
         </div>
         <p id={hintId} className="intake-chat-hint">
-          Enter to send, Shift+Enter for a new line.
+          Enter pentru a trimite, Shift+Enter pentru o linie nouă.
         </p>
       </form>
     </section>
@@ -217,7 +217,7 @@ interface EntryProps {
 function ChatEntryView({ entry, assistantName, retryDisabled, onRetry }: EntryProps) {
   const { message, delivery } = entry;
   const status = message.role === 'patient' ? deliveryLabel(delivery) : null;
-  const author = message.role === 'patient' ? 'You' : message.role === 'assistant' ? assistantName : 'Notice';
+  const author = message.role === 'patient' ? 'Dumneavoastră' : message.role === 'assistant' ? assistantName : 'Notificare';
   const time = formatTime(message.createdAt);
 
   return (
@@ -237,7 +237,7 @@ function ChatEntryView({ entry, assistantName, retryDisabled, onRetry }: EntryPr
             <>
               {' — '}
               <button type="button" className="ui-button ui-button--secondary" disabled={retryDisabled} onClick={onRetry}>
-                Retry
+                Reîncercați
               </button>
             </>
           )}
@@ -246,16 +246,16 @@ function ChatEntryView({ entry, assistantName, retryDisabled, onRetry }: EntryPr
 
       {entry.partialError && (
         <p className="intake-chat-notice" role="status">
-          Your message was saved, but the assistant could not reply.
+          Mesajul dumneavoastră a fost salvat, dar asistentul nu a putut răspunde.
         </p>
       )}
 
       {entry.redFlag && (
         <div className="intake-chat-redflag" role="alert">
-          <p className="intake-chat-redflag-title">Possible emergency</p>
+          <p className="intake-chat-redflag-title">Posibilă urgență</p>
           <p className="intake-chat-redflag-text">{entry.redFlag.message}</p>
           <a className="ui-button ui-button--danger intake-chat-call" href="tel:112">
-            Call 112
+            Sunați la 112
           </a>
         </div>
       )}

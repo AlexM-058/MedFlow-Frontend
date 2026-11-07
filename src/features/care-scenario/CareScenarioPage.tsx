@@ -13,12 +13,12 @@ import './care-scenario.css';
 type Perspective = 'patient' | 'doctor';
 
 const STEPS = [
-  { id: 'care-step-context', label: 'Your health context' },
-  { id: 'care-step-prescription', label: 'Scan and review a prescription' },
-  { id: 'care-step-schedule', label: 'Confirm the schedule' },
-  { id: 'care-step-chat', label: 'Answer the assistant' },
-  { id: 'care-step-send', label: 'Send to your doctor' },
-  { id: 'care-step-answer', label: "Your doctor's answer" },
+  { id: 'care-step-context', label: 'Contextul dumneavoastră medical' },
+  { id: 'care-step-prescription', label: 'Scanați și verificați o rețetă' },
+  { id: 'care-step-schedule', label: 'Confirmați programul' },
+  { id: 'care-step-chat', label: 'Răspundeți asistentului' },
+  { id: 'care-step-send', label: 'Trimiteți medicului dumneavoastră' },
+  { id: 'care-step-answer', label: "Răspunsul medicului dumneavoastră" },
 ] as const;
 
 /**
@@ -39,7 +39,7 @@ export function CareScenarioPage() {
 
   return (
     <div className="app care-scenario-app">
-      <a className="skip-link" href="#care-scenario-content">Skip to the scenario</a>
+      <a className="skip-link" href="#care-scenario-content">Treceți la scenariu</a>
       <AppHeader />
       <main id="care-scenario-content" className="care-scenario" tabIndex={-1}>
         <ScenarioBody key={run} scenario={scenario} onRestart={restart} />
@@ -73,19 +73,19 @@ function ScenarioBody({ scenario, onRestart }: { scenario: Scenario; onRestart: 
   return (
     <>
       <header className="care-scenario__intro">
-        <p className="care-scenario__eyebrow">DEMO SCENARIO</p>
-        <h1>From prescription to your doctor's answer</h1>
+        <p className="care-scenario__eyebrow">SCENARIU DEMO</p>
+        <h1>De la rețetă la răspunsul medicului dumneavoastră</h1>
         <div className="care-scenario__notice" role="note">
           <p>
-            <strong>Synthetic demo data.</strong> Nothing on this page is sent to the server and a reload starts over.
-            Patient and doctor views are shown together only for the presentation; real accounts sign in separately.
-            {' '}<a href={`${import.meta.env.BASE_URL}demo/synthetic-prescription.svg`} download="synthetic-prescription.svg">Download the synthetic prescription</a> to print or view.
+            <strong>Date demo sintetice.</strong> Nimic de pe această pagină nu este trimis către server, iar reîncărcarea paginii reia demonstrația.
+            Vizualizările de pacient și de medic sunt afișate împreună doar pentru prezentare; conturile reale se autentifică separat.
+            {' '}<a href={`${import.meta.env.BASE_URL}demo/synthetic-prescription.svg`} download="synthetic-prescription.svg">Descărcați rețeta sintetică</a> pentru a o tipări sau a o vizualiza.
           </p>
-          <button type="button" className="ui-button ui-button--secondary" onClick={onRestart}>Restart demo</button>
+          <button type="button" className="ui-button ui-button--secondary" onClick={onRestart}>Reluați demonstrația</button>
         </div>
       </header>
 
-      <div className="care-scenario__tabs" role="tablist" aria-label="Demo perspective" onKeyDown={onTabKey}>
+      <div className="care-scenario__tabs" role="tablist" aria-label="Perspectiva demonstrației" onKeyDown={onTabKey}>
         <button
           ref={patientTab}
           type="button"
@@ -97,7 +97,7 @@ function ScenarioBody({ scenario, onRestart }: { scenario: Scenario; onRestart: 
           className="care-scenario__tab"
           onClick={() => setPerspective('patient')}
         >
-          Patient · Ana Test
+          Pacient · Ana Test
         </button>
         <button
           ref={doctorTab}
@@ -110,7 +110,7 @@ function ScenarioBody({ scenario, onRestart }: { scenario: Scenario; onRestart: 
           className="care-scenario__tab"
           onClick={() => setPerspective('doctor')}
         >
-          Doctor · Dr. Demo Ionescu
+          Medic · Dr. Demo Ionescu
         </button>
       </div>
 
@@ -143,7 +143,7 @@ function PatientJourney({ scenario, refreshKey }: { scenario: Scenario; refreshK
 
   return (
     <div className="care-scenario__journey">
-      <nav className="care-scenario__steps" aria-label="Scenario steps">
+      <nav className="care-scenario__steps" aria-label="Pașii scenariului">
         <ol>
           {STEPS.map((step, index) => (
             <li key={step.id}><a href={`#${step.id}`}><span aria-hidden="true">{index + 1}</span>{step.label}</a></li>
@@ -187,7 +187,7 @@ function SendToDoctor({ scenario }: { scenario: Scenario }) {
     const controller = new AbortController();
     scenario.careCase.getCase(controller.signal).then(
       (value) => { if (!controller.signal.aborted) setCareCase(value); },
-      (reason: unknown) => { if (!controller.signal.aborted) setError(reason instanceof Error ? reason.message : 'The case could not be loaded.'); },
+      (reason: unknown) => { if (!controller.signal.aborted) setError(reason instanceof Error ? reason.message : 'Cazul nu a putut fi încărcat.'); },
     );
     return () => { mounted.current = false; controller.abort(); };
   }, [scenario]);
@@ -201,7 +201,7 @@ function SendToDoctor({ scenario }: { scenario: Scenario }) {
       const updated = await scenario.careCase.submit();
       if (mounted.current) setCareCase(updated);
     } catch (reason) {
-      if (mounted.current) setError(reason instanceof Error ? reason.message : 'The case could not be sent.');
+      if (mounted.current) setError(reason instanceof Error ? reason.message : 'Cazul nu a putut fi trimis.');
     } finally {
       sending.current = false;
       if (mounted.current) setPending(false);
@@ -211,15 +211,15 @@ function SendToDoctor({ scenario }: { scenario: Scenario }) {
   const sent = careCase && careCase.status !== 'draft';
   return (
     <div className="care-scenario__card">
-      <h2>Send to your doctor</h2>
-      <p>Your doctor receives your conversation, the confirmed prescription and your health context. Your doctor decides what happens next.</p>
+      <h2>Trimiteți medicului dumneavoastră</h2>
+      <p>Medicul dumneavoastră primește conversația, rețeta confirmată și contextul dumneavoastră medical. Medicul decide ce urmează.</p>
       {sent ? (
         <p className="care-scenario__status" role="status">
-          Sent to {careCase.doctor.fullName}{careCase.submittedAt ? ` · ${new Date(careCase.submittedAt).toLocaleString()}` : ''}. Switch to the doctor view to continue the demo.
+          Trimis către {careCase.doctor.fullName}{careCase.submittedAt ? ` · ${new Date(careCase.submittedAt).toLocaleString()}` : ''}. Treceți la vizualizarea de medic pentru a continua demonstrația.
         </p>
       ) : (
         <button type="button" className="ui-button ui-button--primary" onClick={() => void submit()} disabled={pending} aria-busy={pending}>
-          {pending ? 'Sending…' : 'Send to my doctor'}
+          {pending ? 'Se trimite…' : 'Trimite medicului meu'}
         </button>
       )}
       {error && <p className="care-scenario__error" role="alert">{error}</p>}
@@ -236,7 +236,7 @@ function DoctorView({ scenario, refreshKey }: { scenario: Scenario; refreshKey: 
     const controller = new AbortController();
     scenario.careCase.getCase(controller.signal).then(
       (value) => { if (!controller.signal.aborted) { setStatus(value.status); setError(null); } },
-      (reason: unknown) => { if (!controller.signal.aborted) setError(reason instanceof Error ? reason.message : 'The case could not be loaded.'); },
+      (reason: unknown) => { if (!controller.signal.aborted) setError(reason instanceof Error ? reason.message : 'Cazul nu a putut fi încărcat.'); },
     );
     return () => controller.abort();
   }, [scenario, attempt, refreshKey]);
@@ -245,17 +245,17 @@ function DoctorView({ scenario, refreshKey }: { scenario: Scenario; refreshKey: 
     return (
       <div className="care-scenario__card">
         <p className="care-scenario__error" role="alert">{error}</p>
-        <button type="button" className="ui-button ui-button--secondary" onClick={() => setAttempt((value) => value + 1)}>Try again</button>
+        <button type="button" className="ui-button ui-button--secondary" onClick={() => setAttempt((value) => value + 1)}>Încercați din nou</button>
       </div>
     );
   }
-  if (status === null) return <p className="care-scenario__card" role="status">Loading the case…</p>;
+  if (status === null) return <p className="care-scenario__card" role="status">Se încarcă cazul…</p>;
   if (status === 'draft') {
     return (
       <div className="care-scenario__card">
-        <h2>No case to review yet</h2>
-        <p>The patient has not sent the case. Complete the patient steps and choose "Send to my doctor" first.</p>
-        <button type="button" className="ui-button ui-button--secondary" onClick={() => setAttempt((value) => value + 1)}>Check again</button>
+        <h2>Nu există încă un caz de verificat</h2>
+        <p>Pacientul nu a trimis cazul. Parcurgeți mai întâi pașii pacientului și alegeți „Trimite medicului meu”.</p>
+        <button type="button" className="ui-button ui-button--secondary" onClick={() => setAttempt((value) => value + 1)}>Verificați din nou</button>
       </div>
     );
   }

@@ -12,7 +12,7 @@ export interface ReviewFieldCardProps {
   onReset: () => void;
 }
 
-const NOT_READABLE = 'Not readable — type it from the paper prescription or ask your doctor';
+const NOT_READABLE = 'Ilizibil — introduceți-l de pe rețeta pe hârtie sau întrebați medicul';
 
 /** One extracted field: value, source quote and the patient's explicit decision. */
 export function ReviewFieldCard({ field, disabled, onConfirm, onEdit, onNotPresent, onReset }: ReviewFieldCardProps) {
@@ -56,13 +56,13 @@ export function ReviewFieldCard({ field, disabled, onConfirm, onEdit, onNotPrese
         <span className="rx-review-field__status">
           {resolution.kind === 'confirmed'
             ? resolution.edited
-              ? 'Corrected by you'
-              : 'Confirmed by you'
+              ? 'Corectat de dumneavoastră'
+              : 'Confirmat de dumneavoastră'
             : resolution.kind === 'not-present'
-              ? 'Not on the prescription'
+              ? 'Nu figurează pe rețetă'
               : unreadable
-                ? 'Not readable'
-                : 'Check this value'}
+                ? 'Ilizibil'
+                : 'Verificați această valoare'}
         </span>
       </div>
 
@@ -71,12 +71,12 @@ export function ReviewFieldCard({ field, disabled, onConfirm, onEdit, onNotPrese
           <p className="rx-review-field__value">{resolution.value}</p>
           {resolution.edited && (
             <p className="rx-review-field__note">
-              {field.extracted === null ? 'The reader could not read this field.' : `The reader saw: “${field.extracted}”`}
+              {field.extracted === null ? 'Cititorul nu a putut citi acest câmp.' : `Cititorul a văzut: „${field.extracted}”`}
             </p>
           )}
         </>
       ) : resolution.kind === 'not-present' ? (
-        <p className="rx-review-field__value">You confirmed this is not written on the prescription.</p>
+        <p className="rx-review-field__value">Ați confirmat că acest element nu este scris pe rețetă.</p>
       ) : unreadable ? (
         <p className="rx-review-field__unreadable">{NOT_READABLE}</p>
       ) : (
@@ -85,13 +85,13 @@ export function ReviewFieldCard({ field, disabled, onConfirm, onEdit, onNotPrese
 
       {field.sourceQuote && (
         <p className="rx-review-field__quote">
-          From the document: <q>{field.sourceQuote}</q>
+          Din document: <q>{field.sourceQuote}</q>
         </p>
       )}
 
       {editing ? (
         <form className="rx-review-field__edit" onSubmit={submitEdit} noValidate>
-          <label htmlFor={inputId}>Type the {field.label.toLowerCase()} exactly as written on the prescription</label>
+          <label htmlFor={inputId}>Introduceți {field.label.toLowerCase()} exact așa cum este scris pe rețetă</label>
           <input
             id={inputId}
             className="rx-review-input"
@@ -107,7 +107,7 @@ export function ReviewFieldCard({ field, disabled, onConfirm, onEdit, onNotPrese
           />
           <div className="rx-review-actions">
             <button type="submit" className="ui-button ui-button--primary" disabled={disabled}>
-              Save my correction
+              Salvați corecția
             </button>
             <button
               type="button"
@@ -118,7 +118,7 @@ export function ReviewFieldCard({ field, disabled, onConfirm, onEdit, onNotPrese
                 setError(null);
               }}
             >
-              Cancel
+              Anulați
             </button>
           </div>
         </form>
@@ -128,11 +128,11 @@ export function ReviewFieldCard({ field, disabled, onConfirm, onEdit, onNotPrese
             <>
               {!unreadable && (
                 <button type="button" className="ui-button ui-button--primary" disabled={disabled} onClick={run(onConfirm)}>
-                  Confirm
+                  Confirmați
                 </button>
               )}
               <button type="button" className="ui-button ui-button--secondary" disabled={disabled} onClick={startEdit}>
-                {unreadable ? 'Type it' : 'Edit'}
+                {unreadable ? 'Introduceți' : 'Editați'}
               </button>
               {canMarkNotPresent && (
                 <button
@@ -141,7 +141,7 @@ export function ReviewFieldCard({ field, disabled, onConfirm, onEdit, onNotPrese
                   disabled={disabled}
                   onClick={run(onNotPresent)}
                 >
-                  Not on the prescription
+                  Nu figurează pe rețetă
                 </button>
               )}
             </>
@@ -155,7 +155,7 @@ export function ReviewFieldCard({ field, disabled, onConfirm, onEdit, onNotPrese
                 onReset();
               }}
             >
-              Change
+              Modificați
             </button>
           )}
         </div>

@@ -36,9 +36,9 @@ type Step =
   | { kind: 'saved'; medications: ConfirmedMedication[] };
 
 const STEPS = [
-  { key: 'scan', label: 'Scan' },
-  { key: 'review', label: 'Review' },
-  { key: 'confirm', label: 'Confirm' },
+  { key: 'scan', label: 'Scanare' },
+  { key: 'review', label: 'Verificare' },
+  { key: 'confirm', label: 'Confirmare' },
 ] as const;
 
 function stepIndex(step: Step): number {
@@ -58,7 +58,7 @@ function formatTime(iso: string): string {
 }
 
 function medicationTitle(index: number, total: number): string {
-  return total > 1 ? `Medication ${index + 1}` : 'Medication';
+  return total > 1 ? `Medicament ${index + 1}` : 'Medicament';
 }
 
 /** Scan → review every extracted field → confirm. Nothing is filled in from assumptions. */
@@ -120,7 +120,7 @@ export function PrescriptionReviewPanel({ adapter, onConfirmed }: PrescriptionRe
     } catch (error) {
       if (controller.signal.aborted || !mountedRef.current) return;
       // The local document stays; no fixture data is substituted.
-      setStep({ kind: 'extract-error', message: errorMessage(error, 'The document could not be read.') });
+      setStep({ kind: 'extract-error', message: errorMessage(error, 'Documentul nu a putut fi citit.') });
     } finally {
       if (abortRef.current === controller) abortRef.current = null;
     }
@@ -161,7 +161,7 @@ export function PrescriptionReviewPanel({ adapter, onConfirmed }: PrescriptionRe
       onConfirmed?.(medications);
     } catch (error) {
       if (!mountedRef.current) return;
-      setSaveError(errorMessage(error, 'Your review could not be saved.'));
+      setSaveError(errorMessage(error, 'Verificarea dumneavoastră nu a putut fi salvată.'));
     } finally {
       savingRef.current = false;
       if (mountedRef.current) setSaving(false);
@@ -177,12 +177,12 @@ export function PrescriptionReviewPanel({ adapter, onConfirmed }: PrescriptionRe
     <section className="rx-review" aria-labelledby={titleId}>
       <header className="rx-review-header">
         <div className="rx-review-header__title">
-          <h2 id={titleId}>Prescription review</h2>
+          <h2 id={titleId}>Verificarea rețetei</h2>
           <DataSourceBadge source={adapter.source} />
         </div>
         <p className="rx-review-muted">
-          You copy your existing prescription. Nothing here changes your treatment; ask your doctor if anything is
-          unclear.
+          Copiați rețeta dumneavoastră existentă. Nimic de aici nu vă modifică tratamentul; întrebați medicul
+          dacă ceva nu este clar.
         </p>
         <ol className="rx-review-steps">
           {STEPS.map((item, index) => (
@@ -204,31 +204,31 @@ export function PrescriptionReviewPanel({ adapter, onConfirmed }: PrescriptionRe
       {step.kind === 'scan' && (
         <div className="rx-review-step">
           <h3 ref={headingRef} tabIndex={-1} className="rx-review-step__title">
-            Step 1: Scan your prescription
+            Pasul 1: Scanați rețeta
           </h3>
-          <p className="rx-review-note">Demo: use only a synthetic printed prescription, never a real one.</p>
-          <DocumentScanner title="Scan prescription" onConfirm={handleScanned} />
+          <p className="rx-review-note">Demo: folosiți doar o rețetă tipărită sintetică, niciodată una reală.</p>
+          <DocumentScanner title="Scanare rețetă" onConfirm={handleScanned} />
         </div>
       )}
 
       {(step.kind === 'extracting' || step.kind === 'extract-error') && (
         <div className="rx-review-step">
           <h3 ref={headingRef} tabIndex={-1} className="rx-review-step__title">
-            Step 1: Reading your prescription
+            Pasul 1: Citirea rețetei dumneavoastră
           </h3>
           <div className="rx-review-layout">
             {document && <OriginalPreview document={document} />}
             <div className="rx-review-column">
               {step.kind === 'extracting' ? (
                 <p className="rx-review-pending" role="status" aria-busy="true">
-                  Reading the document…
+                  Se citește documentul…
                 </p>
               ) : (
                 <>
                   <div className="rx-review-error-box" role="alert">
-                    <p className="rx-review-error-box__title">The document could not be read.</p>
+                    <p className="rx-review-error-box__title">Documentul nu a putut fi citit.</p>
                     <p>{step.message}</p>
-                    <p>Your scan is still on this device. Nothing was filled in for you.</p>
+                    <p>Scanarea dumneavoastră rămâne pe acest dispozitiv. Nu s-a completat nimic în locul dumneavoastră.</p>
                   </div>
                   <div className="rx-review-actions">
                     {document && (
@@ -237,11 +237,11 @@ export function PrescriptionReviewPanel({ adapter, onConfirmed }: PrescriptionRe
                         className="ui-button ui-button--primary"
                         onClick={() => void runExtract(document)}
                       >
-                        Try again
+                        Încercați din nou
                       </button>
                     )}
                     <button type="button" className="ui-button ui-button--secondary" onClick={scanAnother}>
-                      Scan another
+                      Scanați altul
                     </button>
                   </div>
                 </>
@@ -254,21 +254,21 @@ export function PrescriptionReviewPanel({ adapter, onConfirmed }: PrescriptionRe
       {step.kind === 'review' && extracted && (
         <div className="rx-review-step">
           <h3 ref={headingRef} tabIndex={-1} className="rx-review-step__title">
-            Step 2: Check each field against the paper
+            Pasul 2: Verificați fiecare câmp în raport cu hârtia
           </h3>
           <div className="rx-review-layout">
             {document && <OriginalPreview document={document} />}
             <div className="rx-review-column">
               {extracted.documentType !== 'prescription' && (
                 <p className="rx-review-warning-box">
-                  This document was read as “{extracted.documentType.replace('_', ' ')}”, not as a prescription.
-                  Check it carefully.
+                  Acest document a fost citit ca „{extracted.documentType.replace('_', ' ')}”, nu ca rețetă.
+                  Verificați-l cu atenție.
                 </p>
               )}
 
               {extracted.warnings.length > 0 && (
                 <div className="rx-review-warning-box">
-                  <p className="rx-review-warning-box__title">Notes from the document reader</p>
+                  <p className="rx-review-warning-box__title">Observații de la cititorul de documente</p>
                   <ul>
                     {extracted.warnings.map((warning, index) => (
                       <li key={index}>{warning}</li>
@@ -279,12 +279,12 @@ export function PrescriptionReviewPanel({ adapter, onConfirmed }: PrescriptionRe
 
               {extracted.dates.length > 0 && (
                 <div className="rx-review-card">
-                  <h4>Dates on the document</h4>
+                  <h4>Date de pe document</h4>
                   <dl className="rx-review-dates">
                     {extracted.dates.map((date, index) => (
                       <div key={index}>
-                        <dt>{date.label ?? 'Date (label not readable)'}</dt>
-                        <dd>{date.value ?? 'Not readable'}</dd>
+                        <dt>{date.label ?? 'Dată (etichetă ilizibilă)'}</dt>
+                        <dd>{date.value ?? 'Ilizibil'}</dd>
                       </div>
                     ))}
                   </dl>
@@ -293,8 +293,8 @@ export function PrescriptionReviewPanel({ adapter, onConfirmed }: PrescriptionRe
 
               {total === 0 ? (
                 <div className="rx-review-warning-box" role="alert">
-                  <p className="rx-review-warning-box__title">No medication was found on this document.</p>
-                  <p>Scan it again or ask your doctor. Nothing was filled in for you.</p>
+                  <p className="rx-review-warning-box__title">Nu a fost găsit niciun medicament pe acest document.</p>
+                  <p>Scanați-l din nou sau întrebați medicul. Nu s-a completat nimic în locul dumneavoastră.</p>
                 </div>
               ) : (
                 Array.from({ length: total }, (_, index) => (
@@ -322,15 +322,15 @@ export function PrescriptionReviewPanel({ adapter, onConfirmed }: PrescriptionRe
               <div className="rx-review-card rx-review-submit">
                 {missing.length > 0 && (
                   <div id={missingId} className="rx-review-missing">
-                    <p className="rx-review-missing__title">Still needed before you can confirm:</p>
+                    <p className="rx-review-missing__title">Mai este necesar înainte de a putea confirma:</p>
                     <ul>
                       {missing.map((item) => (
                         <li key={item.path}>
                           {total > 1 ? `${medicationTitle(item.medicationIndex, total)} · ` : ''}
                           {item.label}:{' '}
                           {item.reason === 'not-readable'
-                            ? 'not readable, type it from the paper or ask your doctor'
-                            : 'not confirmed yet'}
+                            ? 'ilizibil, introduceți-l de pe hârtie sau întrebați medicul'
+                            : 'neconfirmat încă'}
                         </li>
                       ))}
                     </ul>
@@ -338,9 +338,9 @@ export function PrescriptionReviewPanel({ adapter, onConfirmed }: PrescriptionRe
                 )}
                 {saveError && (
                   <div className="rx-review-error-box" role="alert">
-                    <p className="rx-review-error-box__title">Your review was not saved.</p>
+                    <p className="rx-review-error-box__title">Verificarea dumneavoastră nu a fost salvată.</p>
                     <p>{saveError}</p>
-                    <p>Your answers are kept. You can try again.</p>
+                    <p>Răspunsurile dumneavoastră au fost păstrate. Puteți încerca din nou.</p>
                   </div>
                 )}
                 <div className="rx-review-actions">
@@ -352,10 +352,10 @@ export function PrescriptionReviewPanel({ adapter, onConfirmed }: PrescriptionRe
                     aria-describedby={missing.length > 0 ? missingId : undefined}
                     onClick={() => void handleSave()}
                   >
-                    {saving ? 'Saving…' : saveError ? 'Try saving again' : 'Confirm prescription'}
+                    {saving ? 'Se salvează…' : saveError ? 'Încercați din nou salvarea' : 'Confirmați rețeta'}
                   </button>
                   <button type="button" className="ui-button ui-button--secondary" disabled={saving} onClick={scanAnother}>
-                    Scan another
+                    Scanați altul
                   </button>
                 </div>
               </div>
@@ -367,11 +367,11 @@ export function PrescriptionReviewPanel({ adapter, onConfirmed }: PrescriptionRe
       {step.kind === 'saved' && (
         <div className="rx-review-step">
           <h3 ref={headingRef} tabIndex={-1} className="rx-review-step__title">
-            Step 3: Prescription confirmed
+            Pasul 3: Rețeta a fost confirmată
           </h3>
           {step.medications.length === 0 ? (
             <p className="rx-review-warning-box" role="status">
-              The review was saved, but no medication was returned as confirmed.
+              Verificarea a fost salvată, dar niciun medicament nu a fost returnat ca fiind confirmat.
             </p>
           ) : (
             <ul className="rx-review-confirmed">
@@ -380,27 +380,27 @@ export function PrescriptionReviewPanel({ adapter, onConfirmed }: PrescriptionRe
                   <h4>{medication.name}</h4>
                   <dl className="rx-review-dates">
                     <div>
-                      <dt>Dose</dt>
+                      <dt>Doză</dt>
                       <dd>{medication.doseText}</dd>
                     </div>
                     <div>
-                      <dt>Instruction (as prescribed)</dt>
+                      <dt>Indicație (conform rețetei)</dt>
                       <dd>{medication.instructionOriginal}</dd>
                     </div>
                     <div>
-                      <dt>Duration</dt>
-                      <dd>{medication.durationText ?? 'Not on the prescription'}</dd>
+                      <dt>Durată</dt>
+                      <dd>{medication.durationText ?? 'Nu figurează pe rețetă'}</dd>
                     </div>
                   </dl>
-                  <p className="rx-review-muted">Confirmed by you · {formatTime(medication.confirmedAt)}</p>
+                  <p className="rx-review-muted">Confirmat de dumneavoastră · {formatTime(medication.confirmedAt)}</p>
                 </li>
               ))}
             </ul>
           )}
-          <p className="rx-review-muted">Reminder times are chosen separately; they never change the instruction.</p>
+          <p className="rx-review-muted">Orele de reamintire se aleg separat; ele nu modifică niciodată indicația.</p>
           <div className="rx-review-actions">
             <button type="button" className="ui-button ui-button--secondary" onClick={scanAnother}>
-              Scan another prescription
+              Scanați altă rețetă
             </button>
           </div>
         </div>
@@ -413,9 +413,9 @@ function OriginalPreview({ document }: { document: LocalDocument }) {
   return (
     <figure className="rx-review-original">
       {document.mimeType.startsWith('image/') ? (
-        <img className="rx-review-original__image" src={document.uri} alt="Your scanned prescription (original)" />
+        <img className="rx-review-original__image" src={document.uri} alt="Rețeta scanată de dumneavoastră (original)" />
       ) : (
-        <div className="rx-review-original__pdf">PDF ready — preview not shown</div>
+        <div className="rx-review-original__pdf">PDF pregătit — previzualizarea nu este afișată</div>
       )}
       <figcaption className="rx-review-muted">Original: {document.fileName}</figcaption>
     </figure>

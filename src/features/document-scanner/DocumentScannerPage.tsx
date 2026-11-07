@@ -22,7 +22,7 @@ export function DocumentScannerPage() {
 
   return (
     <div className="app">
-      <a className="skip-link" href="#scanner-content">Skip to scanner</a>
+      <a className="skip-link" href="#scanner-content">Treceți la scaner</a>
       <AppHeader />
       <main id="scanner-content" className="doc-scanner-page" tabIndex={-1}>
         <DocumentScanner
@@ -34,10 +34,10 @@ export function DocumentScannerPage() {
 
         {confirmed && (
           <aside className="doc-scanner-page__result" aria-live="polite">
-            <h3>Ready for later upload</h3>
+            <h3>Pregătit pentru încărcare ulterioară</h3>
             <p>
-              Local <code>ScannedDocument</code> confirmed. Wire this object into{' '}
-              <code>POST /cases/{'{id}'}/documents</code> when that endpoint exists.
+              <code>ScannedDocument</code> local confirmat. Conectați acest obiect la{' '}
+              <code>POST /cases/{'{id}'}/documents</code> când acel endpoint va exista.
             </p>
             <pre className="doc-scanner-page__json">{JSON.stringify(confirmed, null, 2)}</pre>
             <button
@@ -45,7 +45,7 @@ export function DocumentScannerPage() {
               className="ui-button ui-button--secondary"
               onClick={() => setConfirmed(null)}
             >
-              Clear confirmed document
+              Ștergeți documentul confirmat
             </button>
           </aside>
         )}

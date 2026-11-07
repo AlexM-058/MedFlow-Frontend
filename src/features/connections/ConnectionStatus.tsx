@@ -1,10 +1,10 @@
 import type { ConnectionStatus as Status } from '../../auth/contracts';
 
 const LABELS: Record<Status, string> = {
-  pending: 'Waiting for doctor approval',
-  accepted: 'Request accepted',
-  rejected: 'Request declined',
-  cancelled: 'Request cancelled',
+  pending: 'În așteptarea aprobării medicului',
+  accepted: 'Cerere acceptată',
+  rejected: 'Cerere refuzată',
+  cancelled: 'Cerere anulată',
 };
 
 /** `live` only for a single, focused status; lists stay quiet during polling. */

@@ -28,7 +28,7 @@ export function PatientConnectPage({ code }: { code: string }) {
     accountApi.previewDoctor(code, controller.signal).then((doctor) => {
       if (!controller.signal.aborted) setPreview({ code, attempt, doctor, error: null });
     }).catch((error: unknown) => {
-      if (!controller.signal.aborted) setPreview({ code, attempt, doctor: null, error: error instanceof Error ? error.message : 'Could not open this doctor link.' });
+      if (!controller.signal.aborted) setPreview({ code, attempt, doctor: null, error: error instanceof Error ? error.message : 'Nu s-a putut deschide acest link al medicului.' });
     });
     return () => controller.abort();
   }, [code, valid, attempt]);
@@ -51,7 +51,7 @@ export function PatientConnectPage({ code }: { code: string }) {
     setSigningIn(true);
     setSignInError(null);
     try { await auth.signInWithGoogle(`/connect/${code}`); }
-    catch (error) { setSignInError(error instanceof Error ? error.message : 'Could not start Google sign-in.'); }
+    catch (error) { setSignInError(error instanceof Error ? error.message : 'Autentificarea cu Google nu a putut fi pornită.'); }
     finally { signInRef.current = false; setSigningIn(false); }
   }
 
@@ -64,12 +64,12 @@ export function PatientConnectPage({ code }: { code: string }) {
   return (
     <section className="connection-page" aria-labelledby="connection-page-title">
       <header className="connection-page__heading">
-        <p className="connection-eyebrow">YOUR CARE TEAM</p>
-        <h1 id="connection-page-title">Connect with your doctor</h1>
-        <p>Check the doctor's details before requesting a connection. Your doctor must accept before the connection becomes active.</p>
+        <p className="connection-eyebrow">ECHIPA DUMNEAVOASTRĂ MEDICALĂ</p>
+        <h1 id="connection-page-title">Conectați-vă cu medicul dumneavoastră</h1>
+        <p>Verificați datele medicului înainte de a solicita o conexiune. Medicul trebuie să accepte înainte ca conexiunea să devină activă.</p>
       </header>
 
-      {!valid ? <p className="connection-error" role="alert">This doctor link is invalid. Please scan the doctor's QR code again.</p> : !current ? <p role="status">Loading doctor details…</p> : current.error ? (
+      {!valid ? <p className="connection-error" role="alert">Acest link al medicului nu este valid. Vă rugăm să scanați din nou codul QR al medicului.</p> : !current ? <p role="status">Se încarcă datele medicului…</p> : current.error ? (
         <div className="connection-error" role="alert">
           <p>{current.error}</p>
           <button
@@ -79,20 +79,20 @@ export function PatientConnectPage({ code }: { code: string }) {
             aria-busy={retryingPreview}
             onClick={() => setAttempt((value) => value + 1)}
           >
-            {retryingPreview ? 'Trying again…' : 'Try again'}
+            {retryingPreview ? 'Se încearcă din nou…' : 'Încercați din nou'}
           </button>
         </div>
       ) : doctor ? (
         <section className="connection-card" aria-labelledby="connection-doctor-name">
-          <p className="connection-eyebrow">DOCTOR</p>
+          <p className="connection-eyebrow">MEDIC</p>
           <h2 id="connection-doctor-name">{doctor.fullName}</h2>
           <p>{doctor.specialty}</p><p>{doctor.clinic}</p>
 
-          {auth.status === 'loading' || auth.status === 'profile-loading' ? <p role="status">Verifying your account…</p> : auth.status === 'unconfigured' ? (
-            <p className="connection-error" role="alert">Google sign-in is not configured yet. {supportContact}</p>
+          {auth.status === 'loading' || auth.status === 'profile-loading' ? <p role="status">Se verifică contul dumneavoastră…</p> : auth.status === 'unconfigured' ? (
+            <p className="connection-error" role="alert">Autentificarea cu Google nu este încă configurată. {supportContact}</p>
           ) : auth.status === 'error' ? (
             <div className="connection-error" role="alert">
-              <p>{auth.error ?? 'Your account could not be verified.'}</p>
+              <p>{auth.error ?? 'Contul dumneavoastră nu a putut fi verificat.'}</p>
               <button
                 type="button"
                 className="ui-button ui-button--secondary"
@@ -100,19 +100,19 @@ export function PatientConnectPage({ code }: { code: string }) {
                 aria-busy={careTeam.pending}
                 onClick={() => void careTeam.run()}
               >
-                {careTeam.pending ? 'Verifying…' : 'Retry account verification'}
+                {careTeam.pending ? 'Se verifică…' : 'Reîncercați verificarea contului'}
               </button>
             </div>
           ) : !auth.session ? (
             <>
-              <p>Sign in with Google to continue. Scanning this code does not send a request automatically.</p>
+              <p>Autentificați-vă cu Google pentru a continua. Scanarea acestui cod nu trimite automat o cerere.</p>
               {(signInError ?? auth.error) && <p className="connection-error" role="alert">{signInError ?? auth.error}</p>}
               <button type="button" className="ui-button ui-button--primary" disabled={signingIn} aria-busy={signingIn} onClick={() => void signIn()}>
-                {signingIn ? 'Opening Google…' : 'Continue with Google'}
+                {signingIn ? 'Se deschide Google…' : 'Continuați cu Google'}
               </button>
             </>
           ) : auth.profile?.role !== 'patient' ? (
-            <p className="connection-error" role="alert">This account is a doctor account. Sign out and use a patient account to request a connection.</p>
+            <p className="connection-error" role="alert">Acest cont este un cont de medic. Deconectați-vă și folosiți un cont de pacient pentru a solicita o conexiune.</p>
           ) : (
             <PatientConnectionState
               activeDoctor={activeDoctor}
@@ -127,7 +127,7 @@ export function PatientConnectPage({ code }: { code: string }) {
           )}
         </section>
       ) : null}
-      <a className="connection-link" href="#/patient">Back to your account</a>
+      <a className="connection-link" href="#/patient">Înapoi la contul dumneavoastră</a>
     </section>
   );
 }
@@ -149,20 +149,20 @@ function PatientConnectionState({ activeDoctor, connections, latest, pending, se
   const sending = send.pending === 'request';
   const cancelling = cancel?.pending === 'cancel';
 
-  if (phase === 'loading' || phase === 'idle') return <p role="status">Checking your existing connections…</p>;
+  if (phase === 'loading' || phase === 'idle') return <p role="status">Se verifică conexiunile dumneavoastră existente…</p>;
   if (phase === 'error') {
     return (
       <div className="connection-error" role="alert">
         <p>{error}</p>
         <button type="button" className="ui-button ui-button--secondary" onClick={connections.refresh} disabled={refreshing} aria-busy={refreshing}>
-          {refreshing ? 'Checking…' : 'Refresh connection status'}
+          {refreshing ? 'Se verifică…' : 'Reîmprospătați starea conexiunii'}
         </button>
       </div>
     );
   }
 
   if (activeDoctor) {
-    return <p className="connection-status connection-status--accepted" role="status">This doctor is in your care team.</p>;
+    return <p className="connection-status connection-status--accepted" role="status">Acest medic face parte din echipa dumneavoastră medicală.</p>;
   }
 
   // A revoked/invalid link or a forbidden action cannot succeed by clicking again.
@@ -171,14 +171,14 @@ function PatientConnectionState({ activeDoctor, connections, latest, pending, se
   return (
     <>
       {latest && <ConnectionStatus status={latest.status} live />}
-      {error && <p className="connection-error" role="alert">{error} Showing the last known status.</p>}
+      {error && <p className="connection-error" role="alert">{error} Se afișează ultima stare cunoscută.</p>}
 
       {latest?.status === 'accepted' && (
         <div className="connection-notice">
-          <p>Your doctor accepted the request. Your care team is being updated; if this doctor does not appear yet, update it below.</p>
+          <p>Medicul dumneavoastră a acceptat cererea. Echipa dumneavoastră medicală se actualizează; dacă acest medic nu apare încă, actualizați-o mai jos.</p>
           <div className="connection-actions">
             <button type="button" className="ui-button ui-button--primary" disabled={careTeam.pending} aria-busy={careTeam.pending} onClick={() => void careTeam.run()}>
-              {careTeam.pending ? 'Updating care team…' : 'Update care team'}
+              {careTeam.pending ? 'Se actualizează echipa medicală…' : 'Actualizați echipa medicală'}
             </button>
           </div>
         </div>
@@ -191,16 +191,16 @@ function PatientConnectionState({ activeDoctor, connections, latest, pending, se
         {canRequest && (
           <button type="button" className="ui-button ui-button--primary" disabled={sending} aria-busy={sending} onClick={onRequest}>
             {sending
-              ? 'Sending request…'
+              ? 'Se trimite cererea…'
               : send.error && send.retry
-                ? 'Try requesting again'
-                : latest ? 'Request connection again' : 'Request connection'}
+                ? 'Încercați din nou solicitarea'
+                : latest ? 'Solicitați din nou conexiunea' : 'Solicitați conexiunea'}
           </button>
         )}
         {pending && (
           <>
             <button type="button" className="ui-button ui-button--secondary" onClick={connections.refresh} disabled={refreshing} aria-busy={refreshing}>
-              {refreshing ? 'Checking status…' : 'Refresh status'}
+              {refreshing ? 'Se verifică starea…' : 'Reîmprospătați starea'}
             </button>
             <button
               type="button"
@@ -209,12 +209,12 @@ function PatientConnectionState({ activeDoctor, connections, latest, pending, se
               aria-busy={cancelling}
               onClick={() => void connections.cancelConnection(pending.id)}
             >
-              {cancelling ? 'Cancelling…' : 'Cancel request'}
+              {cancelling ? 'Se anulează…' : 'Anulați cererea'}
             </button>
           </>
         )}
       </div>
-      {pending && <p className="connection-meta">Your doctor reviews requests manually. This page checks for an answer while it stays open.</p>}
+      {pending && <p className="connection-meta">Medicul dumneavoastră analizează cererile manual. Această pagină verifică dacă există un răspuns cât timp rămâne deschisă.</p>}
     </>
   );
 }

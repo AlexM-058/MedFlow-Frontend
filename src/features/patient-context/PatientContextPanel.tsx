@@ -72,25 +72,25 @@ export function PatientContextPanel({ adapter }: { adapter: PatientContextAdapte
     <section className="patient-context" aria-labelledby={headingId}>
       <header className="patient-context-header">
         <h2 id={headingId} className="patient-context-title">
-          Your health information
+          Informațiile dumneavoastră de sănătate
         </h2>
         <DataSourceBadge source={adapter.source} />
       </header>
       <p className="patient-context-intro">
-        Check each item. If you are not sure, choose “I don’t know”: your doctor will see it as unknown.
+        Verificați fiecare element. Dacă nu sunteți sigur(ă), alegeți „Nu știu”: medicul dumneavoastră îl va vedea ca necunoscut.
       </p>
 
       {current === null && (
         <p className="patient-context-status" role="status">
-          Loading your health information…
+          Se încarcă informațiile dumneavoastră de sănătate…
         </p>
       )}
 
       {current?.status === 'error' && (
         <div className="patient-context-error" role="alert">
-          <p>Could not load your health information. Nothing was changed.</p>
+          <p>Informațiile dumneavoastră de sănătate nu au putut fi încărcate. Nu s-a modificat nimic.</p>
           <button type="button" className="ui-button ui-button--secondary" onClick={() => setAttempt((n) => n + 1)}>
-            Try again
+            Încercați din nou
           </button>
         </div>
       )}
@@ -141,10 +141,10 @@ function ContextGroupSection({ group, items, onAdd, onConfirm, onMarkUnknown }: 
 
 type ItemAction = 'confirm' | 'unknown';
 
-const PENDING_LABEL: Record<ItemAction, string> = { confirm: 'Confirming…', unknown: 'Saving…' };
+const PENDING_LABEL: Record<ItemAction, string> = { confirm: 'Se confirmă…', unknown: 'Se salvează…' };
 const ERROR_TEXT: Record<ItemAction, string> = {
-  confirm: 'Could not confirm this item. Nothing was changed.',
-  unknown: 'Could not save “I don’t know”. Nothing was changed.',
+  confirm: 'Acest element nu a putut fi confirmat. Nu s-a modificat nimic.',
+  unknown: '„Nu știu” nu a putut fi salvat. Nu s-a modificat nimic.',
 };
 
 interface ItemRowProps {
@@ -195,7 +195,7 @@ function ContextItemRow({ item, onConfirm, onMarkUnknown }: ItemRowProps) {
         <div className="patient-context-conflict">
           {item.note && <p className="patient-context-note">{item.note}</p>}
           <p className="patient-context-conflict-action">
-            Needs your doctor. Do not change your treatment on your own; your doctor will review this.
+            Necesită medicul dumneavoastră. Nu vă schimbați tratamentul pe cont propriu; medicul dumneavoastră va analiza această situație.
           </p>
         </div>
       )}
@@ -210,7 +210,7 @@ function ContextItemRow({ item, onConfirm, onMarkUnknown }: ItemRowProps) {
               aria-busy={pending === 'confirm' || undefined}
               onClick={() => run('confirm')}
             >
-              {pending === 'confirm' ? PENDING_LABEL.confirm : 'Confirm'}
+              {pending === 'confirm' ? PENDING_LABEL.confirm : 'Confirmați'}
             </button>
           )}
           {showUnknown && (
@@ -221,7 +221,7 @@ function ContextItemRow({ item, onConfirm, onMarkUnknown }: ItemRowProps) {
               aria-busy={pending === 'unknown' || undefined}
               onClick={() => run('unknown')}
             >
-              {pending === 'unknown' ? PENDING_LABEL.unknown : 'I don’t know'}
+              {pending === 'unknown' ? PENDING_LABEL.unknown : 'Nu știu'}
             </button>
           )}
         </div>
@@ -236,7 +236,7 @@ function ContextItemRow({ item, onConfirm, onMarkUnknown }: ItemRowProps) {
             disabled={pending !== null}
             onClick={() => run(failed)}
           >
-            Try again
+            Încercați din nou
           </button>
         </div>
       )}
@@ -270,7 +270,7 @@ function AddItemForm({ group, onAdd }: { group: ContextGroup; onAdd: GroupProps[
       if (alive.current) setText('');
     } catch {
       // The typed text stays in the field, so pressing Add again retries.
-      if (alive.current) setError('Could not add this. Your text is kept; try again.');
+      if (alive.current) setError('Nu s-a putut adăuga. Textul dumneavoastră a fost păstrat; încercați din nou.');
     } finally {
       busy.current = false;
       if (alive.current) setSaving(false);
@@ -295,11 +295,11 @@ function AddItemForm({ group, onAdd }: { group: ContextGroup; onAdd: GroupProps[
           onChange={(event) => setText(event.target.value)}
         />
         <button type="submit" className="ui-button ui-button--secondary" disabled={saving} aria-busy={saving || undefined}>
-          {saving ? 'Adding…' : 'Add'}
+          {saving ? 'Se adaugă…' : 'Adăugați'}
         </button>
       </div>
       <p id={hintId} className="patient-context-hint">
-        Required, up to {MAX_ITEM_LENGTH} characters. Write it in your own words.
+        Obligatoriu, maximum {MAX_ITEM_LENGTH} de caractere. Scrieți-l cu propriile cuvinte.
       </p>
       {error && (
         <p id={errorId} className="patient-context-field-error" role="alert">

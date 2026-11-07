@@ -32,7 +32,7 @@ export function PatientFeedbackPanel({ adapter, refreshKey = 0 }: { adapter: Car
       },
       (error: unknown) => {
         if (!controller.signal.aborted) {
-          const message = error instanceof Error && error.message ? error.message : 'The request failed.';
+          const message = error instanceof Error && error.message ? error.message : 'Cererea a eșuat.';
           setSettled({ adapter, attempt, loaded: { status: 'error', message } });
         }
       },
@@ -53,22 +53,22 @@ export function PatientFeedbackPanel({ adapter, refreshKey = 0 }: { adapter: Car
     <section className="patient-feedback" aria-labelledby="patient-feedback-title" aria-busy={loading || undefined}>
       <header className="patient-feedback__header">
         <h2 id="patient-feedback-title" className="patient-feedback__title">
-          Your doctor's answer
+          Răspunsul medicului dumneavoastră
         </h2>
         <DataSourceBadge source={adapter.source} />
       </header>
 
-      {loading && loaded === null && <p role="status">Loading…</p>}
+      {loading && loaded === null && <p role="status">Se încarcă…</p>}
 
       {loaded?.status === 'error' && !loading && (
         <p className="patient-feedback__alert patient-feedback__alert--error" role="alert">
-          Your doctor's answer could not be loaded: {loaded.message}
+          Răspunsul medicului dumneavoastră nu a putut fi încărcat: {loaded.message}
         </p>
       )}
 
       {view?.state === 'pending' && (
         <p className="patient-feedback__pending" role="status">
-          No answer from your doctor yet.
+          Încă nu există un răspuns de la medicul dumneavoastră.
         </p>
       )}
 
@@ -79,7 +79,7 @@ export function PatientFeedbackPanel({ adapter, refreshKey = 0 }: { adapter: Car
           </figcaption>
           <blockquote className="patient-feedback__text">{view.text}</blockquote>
           <p className="patient-feedback__time">
-            Sent <time dateTime={view.createdAt}>{view.timeLabel}</time>
+            Trimis <time dateTime={view.createdAt}>{view.timeLabel}</time>
           </p>
         </figure>
       )}
@@ -92,7 +92,7 @@ export function PatientFeedbackPanel({ adapter, refreshKey = 0 }: { adapter: Car
           disabled={loading}
           aria-busy={loading || undefined}
         >
-          {loading ? 'Refreshing…' : loaded?.status === 'error' ? 'Try again' : 'Refresh'}
+          {loading ? 'Se reîmprospătează…' : loaded?.status === 'error' ? 'Încercați din nou' : 'Reîmprospătați'}
         </button>
       </div>
     </section>

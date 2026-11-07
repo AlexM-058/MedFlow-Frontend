@@ -38,14 +38,14 @@ export function Composer({ onSend, isSending, disabled = false }: ComposerProps)
       <div className="composer__column">
         <div className="composer__row">
           <label htmlFor={inputId} className="visually-hidden">
-            Message to {brand.assistantName}
+            Mesaj pentru {brand.assistantName}
           </label>
           <textarea
             id={inputId}
             className="composer__input"
             rows={1}
             maxLength={2000}
-            placeholder="Type your message..."
+            placeholder="Scrieți mesajul dumneavoastră..."
             value={text}
             disabled={disabled}
             aria-describedby={hintId}
@@ -57,16 +57,16 @@ export function Composer({ onSend, isSending, disabled = false }: ComposerProps)
             className="composer__send"
             disabled={!canSend}
             aria-busy={isSending || undefined}
-            aria-label={isSending ? 'Waiting for simulated reply' : 'Send message'}
+            aria-label={isSending ? 'Se așteaptă răspunsul simulat' : 'Trimiteți mesajul'}
           >
             <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" focusable="false">
               <path fill="currentColor" d="M3.4 20.4 21 12 3.4 3.6 3.4 10l12.6 2-12.6 2z" />
             </svg>
-            <span className="composer__send-label">Send</span>
+            <span className="composer__send-label">Trimite</span>
           </button>
         </div>
         <p id={hintId} className="composer__hint">
-          Enter to send, Shift+Enter for a new line.
+          Enter pentru a trimite, Shift+Enter pentru rând nou.
         </p>
       </div>
     </form>

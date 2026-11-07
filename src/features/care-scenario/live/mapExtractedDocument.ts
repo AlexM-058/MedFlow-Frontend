@@ -6,7 +6,7 @@ import type { CaseDocumentRecord } from '../../../lib/caseApi.ts';
 import type { ExtractedDocument, ExtractedMedication } from '../contracts.ts';
 
 const DOCUMENT_TYPES: ExtractedDocument['documentType'][] = ['prescription', 'lab_result', 'medical_letter', 'other'];
-export const UNEXPECTED_FORMAT_WARNING = 'Part of the extraction result had an unexpected format and is not shown. Check the original document.';
+export const UNEXPECTED_FORMAT_WARNING = 'O parte din rezultatul extragerii avea un format neașteptat și nu este afișată. Verificați documentul original.';
 
 type Raw = Record<string, unknown>;
 const isRecord = (value: unknown): value is Raw => !!value && typeof value === 'object' && !Array.isArray(value);
@@ -18,7 +18,7 @@ function textOrNull(value: unknown): string | null {
   return null;
 }
 
-export function mapExtractedDocument(apiDocument: CaseDocumentRecord, fileName = 'Uploaded document'): ExtractedDocument {
+export function mapExtractedDocument(apiDocument: CaseDocumentRecord, fileName = 'Document încărcat'): ExtractedDocument {
   const warnings: string[] = [];
   let unexpected = false;
   const data = apiDocument.extractedData;

@@ -130,7 +130,7 @@ export function usePatientConnections() {
       },
       (error: unknown) => {
         if (controller.signal.aborted || !getSync().isCurrent(ticket)) return;
-        const message = error instanceof Error && error.message ? error.message : 'Connection requests could not be loaded.';
+        const message = error instanceof Error && error.message ? error.message : 'Cererile de conectare nu au putut fi încărcate.';
         setList((current) => ({
           ...current,
           identity: owner,

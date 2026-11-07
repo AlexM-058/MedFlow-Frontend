@@ -62,7 +62,7 @@
   border: 1px solid var(--color-border-decorative);
   border-radius: var(--radius-pill);
   font-size: var(--font-size-sm);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .rx-review-steps__item[data-status='current'] { border-color: var(--color-border-control); background: var(--color-surface-subtle); }
@@ -154,7 +154,7 @@
   border: 1px dashed var(--color-border-control);
   border-radius: var(--radius-sm);
   background: var(--color-surface-subtle);
-  font-weight: 600;
+  font-weight: 500;
   text-align: center;
 }
 
@@ -196,16 +196,16 @@
   gap: var(--space-1) var(--space-3);
 }
 
-.rx-review-field__label { font-weight: 700; }
+.rx-review-field__label { font-weight: 600; }
 
 .rx-review-field__status {
   font-size: var(--font-size-sm);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .rx-review-field__value {
   font-size: 1.0625rem;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .rx-review-field__note,
@@ -219,7 +219,7 @@
   border-radius: var(--radius-sm);
   background: var(--status-warning-bg);
   color: var(--status-on-tint);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .rx-review-field__edit {
@@ -229,7 +229,7 @@
 
 .rx-review-field__edit label {
   font-size: var(--font-size-sm);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .rx-review-input {
@@ -255,7 +255,7 @@
 .rx-review-error {
   color: var(--status-error-text);
   font-size: var(--font-size-sm);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .rx-review-pending,
@@ -270,14 +270,14 @@
   color: var(--status-on-tint);
 }
 
-.rx-review-pending { background: var(--status-info-bg); border-color: var(--status-info-border); font-weight: 600; }
+.rx-review-pending { background: var(--status-info-bg); border-color: var(--status-info-border); font-weight: 500; }
 .rx-review-error-box { background: var(--status-error-bg); border-color: var(--status-error-border); }
 .rx-review-warning-box,
 .rx-review-missing { background: var(--status-warning-bg); border-color: var(--status-warning-border); }
 
 .rx-review-error-box__title,
 .rx-review-warning-box__title,
-.rx-review-missing__title { font-weight: 700; }
+.rx-review-missing__title { font-weight: 600; }
 
 .rx-review-warning-box ul,
 .rx-review-missing ul { padding-left: 1.25rem; }
@@ -297,7 +297,7 @@
   .rx-review-dates > div { grid-template-columns: minmax(8rem, auto) minmax(0, 1fr); }
 }
 
-.rx-review-dates dt { font-weight: 600; }
+.rx-review-dates dt { font-weight: 500; }
 
 .rx-review-confirmed {
   display: grid;

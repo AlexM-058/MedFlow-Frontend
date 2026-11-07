@@ -8,7 +8,7 @@
   background: var(--color-surface);
   color: var(--color-text);
   font-size: var(--font-size-sm);
-  font-weight: 600;
+  font-weight: 500;
   white-space: nowrap;
 }
 .data-source-badge--fixture { border-style: dashed; background: var(--status-warning-bg); border-color: var(--status-warning-border); }

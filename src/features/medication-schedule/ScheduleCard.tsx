@@ -1,6 +1,11 @@
 import { useId, useRef, useState } from 'react';
 import type { MedicationSchedule } from '../care-scenario/contracts';
-import { formatDate, formatDoseDay, nextDoseOf, upcomingSkipped } from './scheduleLogic';
+import { formatDate, formatDoseDay as formatDoseDayEn, nextDoseOf, upcomingSkipped } from './scheduleLogic';
+
+export function formatDoseDay(...args: Parameters<typeof formatDoseDayEn>): string {
+  const day = formatDoseDayEn(...args);
+  return day === 'today' ? 'astăzi' : day === 'tomorrow' ? 'mâine' : day;
+}
 
 export function ScheduleCard({
   schedule,
@@ -32,7 +37,7 @@ export function ScheduleCard({
     try {
       await onCancel(schedule.id);
     } catch (error) {
-      setCancelError(error instanceof Error && error.message ? error.message : 'The schedule could not be cancelled.');
+      setCancelError(error instanceof Error && error.message ? error.message : 'Programul nu a putut fi anulat.');
     } finally {
       pendingRef.current = false;
       setCancelling(false);
@@ -44,58 +49,58 @@ export function ScheduleCard({
       <div className="med-schedule-card__heading">
         <h3 id={`${id}-title`}>{schedule.medication}</h3>
         <span className={`med-schedule-chip ${ended ? 'med-schedule-chip--ended' : 'med-schedule-chip--active'}`}>
-          {ended ? 'Ended' : 'Active'}
+          {ended ? 'Încheiat' : 'Activ'}
         </span>
       </div>
 
       <p className="med-schedule-meta">
-        Prescription: {schedule.doseText} · «{schedule.instructionOriginal}»
+        Prescripție: {schedule.doseText} · «{schedule.instructionOriginal}»
       </p>
 
       {!ended && (
         <p className="med-schedule-next">
           {next ? (
             <>
-              Next dose: <strong>{next.time}</strong>, {formatDoseDay(next, now)}
+              Următoarea doză: <strong>{next.time}</strong>, {formatDoseDay(next, now)}
             </>
           ) : (
-            'No upcoming doses.'
+            'Nu există doze viitoare.'
           )}
         </p>
       )}
-      {ended && <p>This schedule has ended. It no longer sends reminders.</p>}
+      {ended && <p>Acest program s-a încheiat. Nu mai trimite mementouri.</p>}
 
       <dl className="med-schedule-details">
         <div>
-          <dt>Times</dt>
+          <dt>Ore</dt>
           <dd>{schedule.times.join(', ')}</dd>
         </div>
         <div>
-          <dt>First day</dt>
+          <dt>Prima zi</dt>
           <dd>{formatDate(schedule.startDate)}</dd>
         </div>
         <div>
-          <dt>Last day</dt>
-          <dd>{schedule.endDate ? formatDate(schedule.endDate) : 'No end date given in the prescription'}</dd>
+          <dt>Ultima zi</dt>
+          <dd>{schedule.endDate ? formatDate(schedule.endDate) : 'Prescripția nu indică o dată de încheiere'}</dd>
         </div>
         <div>
-          <dt>Time zone</dt>
+          <dt>Fus orar</dt>
           <dd>{schedule.timezone}</dd>
         </div>
       </dl>
 
       {schedule.timezone !== deviceZone && !ended && (
         <p className="med-schedule-note med-schedule-note--warning">
-          This schedule was set in {schedule.timezone}, but this device is set to {deviceZone}. Reminders still follow{' '}
-          {schedule.timezone} times. If you moved to another time zone, cancel this schedule and set it up again, or ask
-          your doctor.
+          Acest program a fost creat pentru {schedule.timezone}, dar dispozitivul dumneavoastră este setat pe {deviceZone}.
+          Mementourile urmează în continuare ora din {schedule.timezone}. Dacă v-ați mutat în alt fus orar, anulați acest
+          program și configurați-l din nou sau întrebați medicul dumneavoastră.
         </p>
       )}
 
       {skipped.map((item) => (
         <p key={`${item.date}|${item.time}`} className="med-schedule-note med-schedule-note--warning">
-          On {formatDate(item.date)}, {item.time} does not exist in {item.timezone} because the clocks change. That reminder
-          is skipped; it is not moved to another time.
+          În {formatDate(item.date)}, ora {item.time} nu există în {item.timezone} din cauza schimbării orei. Acest memento
+          este omis; nu este mutat la altă oră.
         </p>
       ))}
 
@@ -103,11 +108,11 @@ export function ScheduleCard({
         <div className="med-schedule-actions">
           {!confirming ? (
             <button type="button" className="ui-button ui-button--secondary" onClick={() => setConfirming(true)}>
-              Cancel schedule
+              Anulați programul
             </button>
           ) : (
-            <div className="med-schedule-confirm" role="group" aria-label="Confirm cancellation">
-              <p>Stop all reminders for {schedule.medication}? Your prescription itself does not change.</p>
+            <div className="med-schedule-confirm" role="group" aria-label="Confirmați anularea">
+              <p>Opriți toate mementourile pentru {schedule.medication}? Prescripția dumneavoastră nu se modifică.</p>
               <div className="med-schedule-actions">
                 <button
                   type="button"
@@ -116,7 +121,7 @@ export function ScheduleCard({
                   disabled={cancelling}
                   aria-busy={cancelling}
                 >
-                  {cancelling ? 'Cancelling…' : cancelError ? 'Try again' : 'Yes, cancel schedule'}
+                  {cancelling ? 'Se anulează…' : cancelError ? 'Încercați din nou' : 'Da, anulați programul'}
                 </button>
                 <button
                   type="button"
@@ -127,14 +132,14 @@ export function ScheduleCard({
                   }}
                   disabled={cancelling}
                 >
-                  Keep schedule
+                  Păstrați programul
                 </button>
               </div>
             </div>
           )}
           {cancelError && (
             <p className="med-schedule-note med-schedule-note--error" role="alert">
-              Could not cancel the schedule: {cancelError}
+              Programul nu a putut fi anulat: {cancelError}
             </p>
           )}
         </div>

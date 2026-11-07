@@ -93,7 +93,7 @@ export function applyResult(entries: readonly ChatEntry[], clientMessageId: stri
 
 /** Visible status of a patient message; null when it was delivered. */
 export function deliveryLabel(delivery: Delivery): string | null {
-  if (delivery === 'pending') return 'Sending…';
-  if (delivery === 'failed') return 'Not sent';
+  if (delivery === 'pending') return 'Se trimite…';
+  if (delivery === 'failed') return 'Netrimis';
   return null;
 }

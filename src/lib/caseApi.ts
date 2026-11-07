@@ -91,39 +91,39 @@ function errorFor(status: number, operation: Operation): { message: string; code
         code: 'INVALID_REQUEST',
         message:
           operation === 'upload'
-            ? 'The file is empty or the document type is not valid. Check the file and try again.'
+            ? 'Fișierul este gol sau tipul documentului nu este valid. Verificați fișierul și încercați din nou.'
             : operation === 'case'
-              ? 'The case could not be created. If you have several doctors, choose one and try again.'
-              : 'The request was not accepted. Check what you entered and try again.',
+              ? 'Cazul nu a putut fi creat. Dacă aveți mai mulți medici, alegeți unul și încercați din nou.'
+              : 'Cererea nu a fost acceptată. Verificați ce ați introdus și încercați din nou.',
       };
     case 401:
-      return { code: 'UNAUTHORIZED', message: 'Your session has expired. Please sign in again.' };
+      return { code: 'UNAUTHORIZED', message: 'Sesiunea dumneavoastră a expirat. Vă rugăm să vă autentificați din nou.' };
     case 403:
-      return { code: 'FORBIDDEN', message: 'This account is not allowed to perform that action.' };
+      return { code: 'FORBIDDEN', message: 'Acest cont nu are voie să efectueze această acțiune.' };
     case 404:
-      return { code: 'NOT_FOUND', message: 'This case is not available. It may not exist or you may not have access to it.' };
+      return { code: 'NOT_FOUND', message: 'Acest caz nu este disponibil. Este posibil să nu existe sau să nu aveți acces la el.' };
     case 409:
       return operation === 'case'
-        ? { code: 'NO_ACTIVE_DOCTOR', message: 'You do not have an active doctor yet. Connect with your doctor first.' }
-        : { code: 'CONFLICT', message: 'This action conflicts with the current state. Refresh and try again.' };
+        ? { code: 'NO_ACTIVE_DOCTOR', message: 'Nu aveți încă un medic activ. Conectați-vă mai întâi cu medicul dumneavoastră.' }
+        : { code: 'CONFLICT', message: 'Această acțiune intră în conflict cu starea curentă. Reîmprospătați pagina și încercați din nou.' };
     case 413:
-      return { code: 'FILE_TOO_LARGE', message: 'The file is too large. The maximum size is 10 MB.' };
+      return { code: 'FILE_TOO_LARGE', message: 'Fișierul este prea mare. Dimensiunea maximă este de 10 MB.' };
     case 415:
-      return { code: 'UNSUPPORTED_FILE', message: 'This file type is not supported. Use a JPG, PNG or PDF file.' };
+      return { code: 'UNSUPPORTED_FILE', message: 'Acest tip de fișier nu este acceptat. Folosiți un fișier JPG, PNG sau PDF.' };
     case 502:
     case 503:
     case 504:
       return operation === 'upload'
-        ? { code: 'EXTRACTION_UNAVAILABLE', message: 'The document reading service is unavailable. Your document was not saved; it is still on this device. Please try again.' }
-        : { code: 'SERVICE_UNAVAILABLE', message: 'The service is temporarily unavailable. Please try again.' };
+        ? { code: 'EXTRACTION_UNAVAILABLE', message: 'Serviciul de citire a documentelor nu este disponibil. Documentul dumneavoastră nu a fost salvat; este în continuare pe acest dispozitiv. Vă rugăm să încercați din nou.' }
+        : { code: 'SERVICE_UNAVAILABLE', message: 'Serviciul este temporar indisponibil. Vă rugăm să încercați din nou.' };
     default:
-      return { code: 'UNAVAILABLE', message: 'Case services are unavailable. Please try again.' };
+      return { code: 'UNAVAILABLE', message: 'Serviciile pentru cazuri nu sunt disponibile. Vă rugăm să încercați din nou.' };
   }
 }
 
 type RecordValue = Record<string, unknown>;
 function invalid(): CaseApiError {
-  return new CaseApiError('The service returned an invalid response.', 502, 'INVALID_RESPONSE');
+  return new CaseApiError('Serviciul a returnat un răspuns invalid.', 502, 'INVALID_RESPONSE');
 }
 function record(value: unknown): RecordValue {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw invalid();
@@ -176,11 +176,11 @@ function documentRecord(value: unknown): CaseDocumentRecord {
 
 function baseUrl(): string {
   const configured = import.meta.env.VITE_API_BASE_URL?.trim();
-  if (!configured) throw new CaseApiError(`Case services are not configured yet. ${supportContact}`, 0, 'NOT_CONFIGURED');
+  if (!configured) throw new CaseApiError(`Serviciile pentru cazuri nu sunt încă configurate. ${supportContact}`, 0, 'NOT_CONFIGURED');
   const url = new URL(configured, window.location.origin);
   const local = ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname);
   if (url.username || url.password || url.search || url.hash || (url.protocol !== 'https:' && !(url.protocol === 'http:' && local))) {
-    throw new CaseApiError('The case service URL is not valid.', 0, 'NOT_CONFIGURED');
+    throw new CaseApiError('Adresa serviciului pentru cazuri nu este validă.', 0, 'NOT_CONFIGURED');
   }
   return url.href.replace(/\/$/, '');
 }
@@ -198,7 +198,7 @@ interface RequestOptions {
 async function request(path: string, options: RequestOptions): Promise<unknown> {
   const { method, token, operation, json, binary, signal } = options;
   if (signal?.aborted) throw new DOMException('Cancelled', 'AbortError');
-  if (!token) throw new CaseApiError('Your session has expired. Please sign in again.', 401, 'UNAUTHORIZED');
+  if (!token) throw new CaseApiError('Sesiunea dumneavoastră a expirat. Vă rugăm să vă autentificați din nou.', 401, 'UNAUTHORIZED');
   const controller = new AbortController();
   let timedOut = false;
   const abort = () => controller.abort();
@@ -241,13 +241,13 @@ async function request(path: string, options: RequestOptions): Promise<unknown> 
     if (timedOut) {
       throw new CaseApiError(
         operation === 'upload'
-          ? 'Reading the document took too long. Your document is still on this device. Please try again.'
-          : 'The request took too long. Please try again.',
+          ? 'Citirea documentului a durat prea mult. Documentul dumneavoastră este în continuare pe acest dispozitiv. Vă rugăm să încercați din nou.'
+          : 'Cererea a durat prea mult. Vă rugăm să încercați din nou.',
         0,
         'TIMEOUT',
       );
     }
-    throw new CaseApiError('Could not reach case services. Please try again.');
+    throw new CaseApiError('Serviciile pentru cazuri nu au putut fi contactate. Vă rugăm să încercați din nou.');
   } finally {
     clearTimeout(timeout);
     signal?.removeEventListener('abort', abort);
@@ -268,7 +268,7 @@ export const caseApi = {
   async postMessage(token: string, caseId: string, content: string, signal?: AbortSignal): Promise<CaseMessageRecord> {
     const trimmed = content.trim();
     if (!trimmed || trimmed.length > CASE_MESSAGE_MAX_LENGTH) {
-      throw new CaseApiError(`A message must have between 1 and ${CASE_MESSAGE_MAX_LENGTH} characters.`, 400, 'INVALID_REQUEST');
+      throw new CaseApiError(`Un mesaj trebuie să aibă între 1 și ${CASE_MESSAGE_MAX_LENGTH} caractere.`, 400, 'INVALID_REQUEST');
     }
     return messageRecord(await request(`${caseUrl(caseId)}/messages`, { method: 'POST', token, operation: 'message', json: { content: trimmed }, signal }));
   },
@@ -277,10 +277,10 @@ export const caseApi = {
    * On EXTRACTION_UNAVAILABLE / TIMEOUT nothing is saved: keep the local file and offer a retry.
    */
   async uploadDocument(token: string, caseId: string, file: Blob, documentType: CaseDocumentType, signal?: AbortSignal): Promise<CaseDocumentRecord> {
-    if (!DOCUMENT_TYPES.includes(documentType)) throw new CaseApiError('The document type is not valid.', 400, 'INVALID_REQUEST');
-    if (file.size === 0) throw new CaseApiError('The file is empty. Scan or choose the document again.', 400, 'INVALID_REQUEST');
-    if (file.size > CASE_DOCUMENT_MAX_BYTES) throw new CaseApiError('The file is too large. The maximum size is 10 MB.', 413, 'FILE_TOO_LARGE');
-    if (!ACCEPTED_TYPES.includes(file.type)) throw new CaseApiError('This file type is not supported. Use a JPG, PNG or PDF file.', 415, 'UNSUPPORTED_FILE');
+    if (!DOCUMENT_TYPES.includes(documentType)) throw new CaseApiError('Tipul documentului nu este valid.', 400, 'INVALID_REQUEST');
+    if (file.size === 0) throw new CaseApiError('Fișierul este gol. Scanați sau alegeți din nou documentul.', 400, 'INVALID_REQUEST');
+    if (file.size > CASE_DOCUMENT_MAX_BYTES) throw new CaseApiError('Fișierul este prea mare. Dimensiunea maximă este de 10 MB.', 413, 'FILE_TOO_LARGE');
+    if (!ACCEPTED_TYPES.includes(file.type)) throw new CaseApiError('Acest tip de fișier nu este acceptat. Folosiți un fișier JPG, PNG sau PDF.', 415, 'UNSUPPORTED_FILE');
     const path = `${caseUrl(caseId)}/documents?documentType=${encodeURIComponent(documentType)}`;
     return documentRecord(await request(path, {
       method: 'POST',

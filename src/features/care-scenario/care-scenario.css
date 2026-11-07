@@ -18,7 +18,7 @@
 .care-scenario h2 { font-size: clamp(1.25rem, 3vw, 1.5rem); line-height: 1.25; }
 
 .care-scenario__intro { display: grid; gap: var(--space-3); min-width: 0; }
-.care-scenario__eyebrow { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; }
+.care-scenario__eyebrow { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; }
 
 .care-scenario__notice {
   display: flex;
@@ -53,7 +53,7 @@
   background: transparent;
   color: var(--color-text);
   font: inherit;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
 }
 .care-scenario__tab[aria-selected='true'] { background: var(--brand-primary); color: var(--brand-on-primary); }
@@ -89,7 +89,7 @@
   border-radius: 50%;
   background: var(--brand-primary);
   color: var(--brand-on-primary);
-  font-weight: 700;
+  font-weight: 600;
   font-size: var(--font-size-sm);
 }
 

@@ -30,7 +30,7 @@
   border-radius: var(--radius-sm);
   background: var(--status-info-bg);
   color: var(--status-on-tint);
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.45;
 }
 
@@ -85,7 +85,7 @@
 .intake-chat-bubble--assistant { background: var(--color-surface-subtle); color: var(--color-text); }
 .intake-chat-bubble--system { background: var(--color-surface); color: var(--color-text); border-style: dashed; }
 
-.intake-chat-author { font-size: var(--font-size-sm); font-weight: 700; }
+.intake-chat-author { font-size: var(--font-size-sm); font-weight: 600; }
 .intake-chat-time { font-weight: 400; }
 .intake-chat-text { white-space: pre-wrap; }
 
@@ -96,7 +96,7 @@
   justify-content: flex-end;
   gap: var(--space-2);
 }
-.intake-chat-delivery--failed { color: var(--status-error-text); font-weight: 600; }
+.intake-chat-delivery--failed { color: var(--status-error-text); font-weight: 500; }
 
 .intake-chat-notice {
   max-width: min(100%, 36rem);
@@ -118,12 +118,12 @@
   background: var(--status-error-bg);
   color: var(--status-on-tint);
 }
-.intake-chat-redflag-title { font-size: 1.125rem; font-weight: 700; }
+.intake-chat-redflag-title { font-size: 1.125rem; font-weight: 600; }
 .intake-chat-redflag-text { white-space: pre-wrap; }
 .intake-chat .intake-chat-call { font-size: 1rem; }
 
 .intake-chat-composer { display: grid; gap: var(--space-1); min-width: 0; }
-.intake-chat-label { font-weight: 600; }
+.intake-chat-label { font-weight: 500; }
 .intake-chat-composer-row { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--space-2); min-width: 0; }
 .intake-chat-input {
   flex: 1 1 14rem;

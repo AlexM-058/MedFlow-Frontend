@@ -63,16 +63,16 @@ export const FEEDBACK_MAX_LENGTH = 4000;
 
 // Scripted collection questions. They only collect information: no advice, no diagnosis.
 const INTAKE_QUESTIONS = [
-  'When did this start? An approximate day or time is enough.',
-  'How long does it last each time, or has it been continuous since it started?',
-  'On a scale from 0 (none) to 10 (worst imaginable), how strong is it right now?',
-  'Have you noticed any other symptoms? Please list them, even if they seem unrelated.',
-  'Which medication are you currently taking, including over-the-counter products? Write "I do not know" if you are not sure.',
+  'Când a început? Este suficientă o zi sau o oră aproximativă.',
+  'Cât durează de fiecare dată sau a fost continuu de când a început?',
+  'Pe o scară de la 0 (deloc) la 10 (cea mai puternică imaginabilă), cât de intens este în acest moment?',
+  'Ați observat și alte simptome? Vă rugăm să le enumerați, chiar dacă par fără legătură.',
+  'Ce medicamente luați în prezent, inclusiv produse fără prescripție? Scrieți „Nu știu” dacă nu sunteți sigur(ă).',
 ];
 const INTAKE_DONE =
-  'Thank you. Your answers are saved for your doctor. You can add anything else you want your doctor to know, then send the case.';
+  'Vă mulțumim. Răspunsurile dumneavoastră au fost salvate pentru medic. Puteți adăuga orice altceva doriți să știe medicul, apoi trimiteți cazul.';
 const ASSISTANT_FAILURE =
-  'The assistant could not reply. Your message was saved; send it again to retry the reply.';
+  'Asistentul nu a putut răspunde. Mesajul dumneavoastră a fost salvat; trimiteți-l din nou pentru a reîncerca răspunsul.';
 
 // Synthetic printed prescription (fictional data) used by the extraction fixture.
 const PRESCRIPTION_QUOTES = {
@@ -108,7 +108,7 @@ function clone<T>(value: T): T {
 }
 
 function abortError(): DOMException {
-  return new DOMException('The operation was aborted.', 'AbortError');
+  return new DOMException('Operațiunea a fost anulată.', 'AbortError');
 }
 
 export function createFixtureScenario(options: FixtureScenarioOptions = {}): FixtureScenario {
@@ -129,7 +129,7 @@ export function createFixtureScenario(options: FixtureScenarioOptions = {}): Fix
         {
           id: 'fixture-msg-greeting',
           role: 'assistant',
-          text: `Hello, I am ${assistantName}. I collect information for your doctor; I do not give a diagnosis or treatment. What would you like to tell your doctor about?`,
+          text: `Bună ziua, sunt ${assistantName}. Colectez informații pentru medicul dumneavoastră; nu stabilesc diagnostice și nu recomand tratamente. Ce doriți să le comunicați medicului dumneavoastră?`,
           createdAt: at,
         },
       ],
@@ -191,7 +191,7 @@ export function createFixtureScenario(options: FixtureScenarioOptions = {}): Fix
 
   function findContextItem(id: string): ContextItem {
     const item = store.context.find((entry) => entry.id === id);
-    if (!item) throw new Error('This context item no longer exists.');
+    if (!item) throw new Error('Acest element de context nu mai există.');
     return item;
   }
 
@@ -200,9 +200,9 @@ export function createFixtureScenario(options: FixtureScenarioOptions = {}): Fix
     load: (signal) => run(() => store.context, signal),
     add: (kind: ContextKind, text: string) =>
       run(() => {
-        if (!['allergy', 'condition', 'medication'].includes(kind)) throw new Error('Unknown context kind.');
+        if (!['allergy', 'condition', 'medication'].includes(kind)) throw new Error('Tip de context necunoscut.');
         const trimmed = typeof text === 'string' ? text.trim() : '';
-        if (!trimmed) throw new Error('Write the item before saving it.');
+        if (!trimmed) throw new Error('Scrieți elementul înainte de a-l salva.');
         const at = iso();
         const item: ContextItem = {
           id: nextId('ctx'),
@@ -218,7 +218,7 @@ export function createFixtureScenario(options: FixtureScenarioOptions = {}): Fix
       run(() => {
         const item = findContextItem(id);
         if (item.confirmation.status === 'conflict') {
-          throw new Error('This item is marked as a conflict. Your doctor will review it; it cannot be confirmed here.');
+          throw new Error('Acest element este marcat ca neconcordanță. Medicul dumneavoastră îl va verifica; nu poate fi confirmat aici.');
         }
         item.confirmation = { status: 'confirmed', by: 'patient', at: iso() };
         return item;
@@ -247,7 +247,7 @@ export function createFixtureScenario(options: FixtureScenarioOptions = {}): Fix
     load: (signal) => run(() => store.messages, signal),
     send: (text: string, clientMessageId: string) =>
       run(() => {
-        if (typeof clientMessageId !== 'string' || !clientMessageId.trim()) throw new Error('A client message id is required.');
+        if (typeof clientMessageId !== 'string' || !clientMessageId.trim()) throw new Error('Este necesar un identificator al mesajului.');
         const existing = store.results.get(clientMessageId);
         if (existing) {
           // Retry of a message already saved: never duplicate it. If only the reply failed, retry the reply.
@@ -259,7 +259,7 @@ export function createFixtureScenario(options: FixtureScenarioOptions = {}): Fix
           return existing;
         }
         const trimmed = typeof text === 'string' ? text.trim() : '';
-        if (!trimmed) throw new Error('Write a message before sending it.');
+        if (!trimmed) throw new Error('Scrieți un mesaj înainte de a-l trimite.');
 
         // 1. Persist the patient message first, whatever happens next.
         const patientMessage: IntakeMessage = {
@@ -298,7 +298,7 @@ export function createFixtureScenario(options: FixtureScenarioOptions = {}): Fix
     source: 'fixture',
     extract: (document: LocalDocument, signal) =>
       run(() => {
-        if (!document || typeof document.fileName !== 'string') throw new Error('No document was provided.');
+        if (!document || typeof document.fileName !== 'string') throw new Error('Nu a fost furnizat niciun document.');
         const illegible = document.fileName.toLowerCase().includes('illegible');
         const sourceQuotes: Record<string, string> = {
           'medications.0.name': PRESCRIPTION_QUOTES.name,
@@ -322,7 +322,7 @@ export function createFixtureScenario(options: FixtureScenarioOptions = {}): Fix
             },
           ],
           dates: [{ label: 'Data prescrierii', value: '06.11.2026' }],
-          warnings: illegible ? ['Dose and frequency could not be read'] : [],
+          warnings: illegible ? ['Doza și frecvența nu au putut fi citite'] : [],
           sourceQuotes,
           extractedAt: iso(),
         };
@@ -331,8 +331,8 @@ export function createFixtureScenario(options: FixtureScenarioOptions = {}): Fix
       }, signal),
     saveReview: (documentId: string, fields: ReviewedField[]) =>
       run(() => {
-        if (!store.documents.some((doc) => doc.id === documentId)) throw new Error('This document was not found.');
-        if (!Array.isArray(fields)) throw new Error('No reviewed fields were provided.');
+        if (!store.documents.some((doc) => doc.id === documentId)) throw new Error('Acest document nu a fost găsit.');
+        if (!Array.isArray(fields)) throw new Error('Nu au fost furnizate câmpuri verificate.');
         const medications = buildConfirmedMedications(documentId, fields);
         store.reviews.set(documentId, clone(fields));
         store.medications = store.medications.filter((med) => med.documentId !== documentId).concat(medications);
@@ -347,7 +347,7 @@ export function createFixtureScenario(options: FixtureScenarioOptions = {}): Fix
       const match = /^medications\.(\d+)\./.exec(field.path);
       if (match) indexes.add(Number(match[1]));
     }
-    if (indexes.size === 0) throw new Error('No medication fields were reviewed.');
+    if (indexes.size === 0) throw new Error('Nu au fost verificate câmpuri de medicament.');
     const confirmedAt = iso();
     return [...indexes]
       .sort((a, b) => a - b)
@@ -356,9 +356,9 @@ export function createFixtureScenario(options: FixtureScenarioOptions = {}): Fix
         const get = (key: string) => own.find((field) => field.path === `medications.${index}.${key}`);
         const required = (key: 'name' | 'dose' | 'frequency'): string => {
           const field = get(key);
-          if (!field) throw new Error(`Medication ${index + 1}: the ${key} field is missing.`);
-          if (field.confirmation.status !== 'confirmed') throw new Error(`Medication ${index + 1}: the ${key} is not confirmed yet.`);
-          if (field.value === null || !field.value.trim()) throw new Error(`Medication ${index + 1}: the ${key} has no value. Complete it or ask your doctor.`);
+          if (!field) throw new Error(`Medicamentul ${index + 1}: câmpul „${key}” lipsește.`);
+          if (field.confirmation.status !== 'confirmed') throw new Error(`Medicamentul ${index + 1}: câmpul „${key}” nu este încă confirmat.`);
+          if (field.value === null || !field.value.trim()) throw new Error(`Medicamentul ${index + 1}: câmpul „${key}” nu are valoare. Completați-l sau întrebați medicul dumneavoastră.`);
           return field.value;
         };
         const name = required('name');
@@ -366,7 +366,7 @@ export function createFixtureScenario(options: FixtureScenarioOptions = {}): Fix
         const instructionOriginal = required('frequency');
         const duration = get('duration');
         if (duration && duration.confirmation.status !== 'confirmed') {
-          throw new Error(`Medication ${index + 1}: the duration is not confirmed yet (confirm it, or confirm that none is given).`);
+          throw new Error(`Medicamentul ${index + 1}: durata nu este încă confirmată (confirmați-o sau confirmați că nu este indicată).`);
         }
         const durationText = duration && duration.value !== null && duration.value.trim() ? duration.value : null;
         return {
@@ -396,7 +396,7 @@ export function createFixtureScenario(options: FixtureScenarioOptions = {}): Fix
     cancel: (id: string) =>
       run(() => {
         const found = store.schedules.find((entry) => entry.id === id);
-        if (!found) throw new Error('This schedule was not found.');
+        if (!found) throw new Error('Acest program nu a fost găsit.');
         found.status = 'cancelled';
         return found;
       }),
@@ -426,7 +426,7 @@ export function createFixtureScenario(options: FixtureScenarioOptions = {}): Fix
       counter += 1;
       const item: SummaryItem = {
         id: `fixture-summary-item-${counter}`,
-        text: `Patient reported: "${message.text}"`,
+        text: `Pacientul a relatat: „${message.text}”`,
         sources: [{ kind: 'message', messageId: message.id, quote: message.text }],
       };
       if (hasNegation(message.text)) item.negated = true;
@@ -436,10 +436,10 @@ export function createFixtureScenario(options: FixtureScenarioOptions = {}): Fix
     for (const med of store.medications) {
       counter += 1;
       const quote = med.fields.find((field) => field.path.endsWith('.name'))?.sourceQuote;
-      const label = store.documents.find((doc) => doc.id === med.documentId)?.fileName || 'Prescription';
+      const label = store.documents.find((doc) => doc.id === med.documentId)?.fileName || 'Rețetă';
       items.push({
         id: `fixture-summary-item-${counter}`,
-        text: `Medication confirmed by the patient from a reviewed prescription: ${med.name} ${med.doseText}, "${med.instructionOriginal}"${med.durationText ? `, ${med.durationText}` : ''}`,
+        text: `Medicament confirmat de pacient dintr-o rețetă verificată: ${med.name} ${med.doseText}, "${med.instructionOriginal}"${med.durationText ? `, ${med.durationText}` : ''}`,
         sources: [{ kind: 'document', documentId: med.documentId, label, ...(quote ? { quote } : {}) }],
       });
     }
@@ -447,7 +447,7 @@ export function createFixtureScenario(options: FixtureScenarioOptions = {}): Fix
   }
 
   function requireSubmitted(action: string): void {
-    if (store.status === 'draft') throw new Error(`The case has not been sent to the doctor yet, so ${action} is not available.`);
+    if (store.status === 'draft') throw new Error(`Cazul nu a fost încă trimis medicului, așa că ${action} nu este disponibil.`);
   }
 
   const careCase: CareCaseAdapter = {
@@ -457,7 +457,7 @@ export function createFixtureScenario(options: FixtureScenarioOptions = {}): Fix
       run(() => {
         if (store.status === 'draft') {
           if (!store.messages.some((message) => message.role === 'patient')) {
-            throw new Error('Add at least one message before sending the case to your doctor.');
+            throw new Error('Adăugați cel puțin un mesaj înainte de a trimite cazul medicului dumneavoastră.');
           }
           store.status = 'pending_doctor';
           store.submittedAt = iso();
@@ -469,14 +469,14 @@ export function createFixtureScenario(options: FixtureScenarioOptions = {}): Fix
     getFeedback: (signal) => run(() => store.feedback, signal),
     sendFeedback: (text: string, basedOnVariant: number | null) =>
       run(() => {
-        requireSubmitted('feedback');
+        requireSubmitted('răspunsul');
         const trimmed = typeof text === 'string' ? text.trim() : '';
-        if (!trimmed) throw new Error('Write your feedback before sending it.');
-        if (trimmed.length > FEEDBACK_MAX_LENGTH) throw new Error(`Feedback can have at most ${FEEDBACK_MAX_LENGTH} characters.`);
+        if (!trimmed) throw new Error('Scrieți răspunsul înainte de a-l trimite.');
+        if (trimmed.length > FEEDBACK_MAX_LENGTH) throw new Error(`Răspunsul poate avea cel mult ${FEEDBACK_MAX_LENGTH} de caractere.`);
         if (basedOnVariant !== null) {
           const count = store.variants?.options.length ?? 0;
           if (!Number.isInteger(basedOnVariant) || basedOnVariant < 0 || basedOnVariant >= count) {
-            throw new Error('The selected variant does not exist. Request the variants first.');
+            throw new Error('Varianta selectată nu există. Solicitați mai întâi variantele.');
           }
         }
         const feedback: DoctorFeedback = {
@@ -493,28 +493,28 @@ export function createFixtureScenario(options: FixtureScenarioOptions = {}): Fix
       }),
     requestVariants: () =>
       run(() => {
-        requireSubmitted('decision support');
+        requireSubmitted('suportul decizional');
         const variants: DecisionVariants = {
           generatedBy: 'fixture',
           createdAt: iso(),
           options: [
             {
-              option: 'Demo option 1 (synthetic): ask the patient for home blood pressure readings for 7 days before deciding.',
-              reasoning: 'Synthetic demo text, written in advance; it was not generated from this case.',
-              confidence: 'Not applicable (demo data)',
-              confirmationPath: 'The doctor reviews the readings and decides.',
+              option: 'Opțiunea demo 1 (sintetică): solicitarea de la pacient a valorilor tensiunii arteriale măsurate acasă timp de 7 zile, înainte de decizie.',
+              reasoning: 'Text demo sintetic, scris în prealabil; nu a fost generat pe baza acestui caz.',
+              confidence: 'Nu se aplică (date demo)',
+              confirmationPath: 'Medicul verifică valorile și decide.',
             },
             {
-              option: 'Demo option 2 (synthetic): invite the patient for an in-person visit to review the symptoms and the current medication.',
-              reasoning: 'Synthetic demo text, written in advance; it was not generated from this case.',
-              confidence: 'Not applicable (demo data)',
-              confirmationPath: 'The doctor examines the patient and decides.',
+              option: 'Opțiunea demo 2 (sintetică): invitarea pacientului la o consultație în persoană pentru evaluarea simptomelor și a medicației actuale.',
+              reasoning: 'Text demo sintetic, scris în prealabil; nu a fost generat pe baza acestui caz.',
+              confidence: 'Nu se aplică (date demo)',
+              confirmationPath: 'Medicul examinează pacientul și decide.',
             },
             {
-              option: 'Demo option 3 (synthetic): ask the patient follow-up questions before giving any recommendation.',
-              reasoning: 'Synthetic demo text, written in advance; it was not generated from this case.',
-              confidence: 'Not applicable (demo data)',
-              confirmationPath: 'The doctor reads the answers and decides.',
+              option: 'Opțiunea demo 3 (sintetică): adresarea unor întrebări suplimentare pacientului înainte de orice recomandare.',
+              reasoning: 'Text demo sintetic, scris în prealabil; nu a fost generat pe baza acestui caz.',
+              confidence: 'Nu se aplică (date demo)',
+              confirmationPath: 'Medicul citește răspunsurile și decide.',
             },
           ],
           // Listed from stored statuses only; nothing is inferred from text.
@@ -555,24 +555,24 @@ function seedContext(at: string): ContextItem[] {
     {
       id: 'fixture-ctx-condition-hbp',
       kind: 'condition',
-      text: 'High blood pressure',
+      text: 'Tensiune arterială mare',
       source: patientInput,
       confirmation: { status: 'unconfirmed' },
     },
     {
       id: 'fixture-ctx-medication-unknown',
       kind: 'medication',
-      text: 'Current medication not yet provided',
+      text: 'Medicația actuală nu a fost încă furnizată',
       source: patientInput,
       confirmation: { status: 'unknown' },
     },
     {
       id: 'fixture-ctx-conflict-synthetic',
       kind: 'allergy',
-      text: 'Aspirin allergy: answered "yes" in one form and "no" in another',
+      text: 'Alergie la aspirină: răspuns „da” într-un formular și „nu” în altul',
       source: patientInput,
       confirmation: { status: 'conflict' },
-      note: 'Synthetic conflict for the demo (labelled); not detected automatically.',
+      note: 'Neconcordanță sintetică pentru demonstrație (etichetată); nu a fost detectată automat.',
     },
   ];
 }

@@ -27,7 +27,7 @@
 .connection-page h2 { font-size: clamp(1.25rem, 3vw, 1.5rem); }
 .connection-page h3 { font-size: 1.125rem; }
 .connection-page p { margin: 0; }
-.connection-eyebrow { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; }
+.connection-eyebrow { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; }
 
 .connection-card {
   padding: clamp(1rem, 3vw, 1.5rem);
@@ -57,7 +57,7 @@
 .connection-link { color: var(--color-text); text-underline-offset: 0.2em; min-height: 2.75rem; display: inline-flex; align-items: center; }
 .connection-error { display: grid; gap: var(--space-3, 0.75rem); padding: 1rem; border: 1px solid var(--status-error-border); border-radius: var(--radius-sm, 0.5rem); background: var(--status-error-bg); color: var(--color-text); }
 .connection-status { justify-self: start; padding: 0.375rem 0.75rem; border: 1px solid var(--color-border-control); border-radius: var(--radius-sm, 0.5rem); background: var(--color-surface-subtle); font-size: 0.875rem; }
-.connection-status--accepted { font-weight: 700; }
+.connection-status--accepted { font-weight: 600; }
 .connection-note { font-size: 0.875rem; padding-block: 0.5rem; }
 
 .connection-actions {

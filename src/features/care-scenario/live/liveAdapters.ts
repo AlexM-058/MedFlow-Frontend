@@ -10,7 +10,7 @@ import { mapExtractedDocument } from './mapExtractedDocument';
 export { mapExtractedDocument, UNEXPECTED_FORMAT_WARNING } from './mapExtractedDocument';
 
 export class LiveNotAvailableError extends Error {
-  constructor(message = 'This step is not connected to the server yet') {
+  constructor(message = 'Acest pas nu este încă conectat la server') {
     super(message);
     this.name = 'LiveNotAvailableError';
   }
@@ -30,7 +30,7 @@ async function readLocalFile(document: LocalDocument, signal?: AbortSignal): Pro
     blob = await response.blob();
   } catch (error) {
     if (signal?.aborted) throw new DOMException('Cancelled', 'AbortError');
-    throw new Error('The scanned document could not be read on this device. Scan it again.', { cause: error });
+    throw new Error('Documentul scanat nu a putut fi citit pe acest dispozitiv. Scanați-l din nou.', { cause: error });
   }
   // Object URLs keep their type, but other URIs may not: use the declared type then.
   return blob.type ? blob : new Blob([blob], { type: document.mimeType });
@@ -42,7 +42,7 @@ export function createLivePrescriptionAdapter(options: LivePrescriptionOptions):
     async extract(document: LocalDocument, signal?: AbortSignal): Promise<ExtractedDocument> {
       if (signal?.aborted) throw new DOMException('Cancelled', 'AbortError');
       const token = options.getToken();
-      if (!token) throw new CaseApiError('Your session has expired. Please sign in again.', 401, 'UNAUTHORIZED');
+      if (!token) throw new CaseApiError('Sesiunea a expirat. Vă rugăm să vă autentificați din nou.', 401, 'UNAUTHORIZED');
       const file = await readLocalFile(document, signal);
       const caseId = await options.getCaseId();
       if (signal?.aborted) throw new DOMException('Cancelled', 'AbortError');

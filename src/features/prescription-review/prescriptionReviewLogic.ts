@@ -9,10 +9,10 @@ export type FieldKey = 'name' | 'dose' | 'frequency' | 'duration';
 export const FIELD_KEYS: readonly FieldKey[] = ['name', 'dose', 'frequency', 'duration'];
 
 export const FIELD_LABELS: Record<FieldKey, string> = {
-  name: 'Name',
-  dose: 'Dose',
-  frequency: 'Instruction',
-  duration: 'Duration',
+  name: 'Denumire',
+  dose: 'Doză',
+  frequency: 'Indicație',
+  duration: 'Durată',
 };
 
 /** Only Duration may be absent from a prescription; name, dose and instruction are required. */
@@ -83,7 +83,7 @@ function update(
   apply: (field: ReviewFieldState) => ReviewFieldState | string,
 ): ActionResult {
   const index = fields.findIndex((field) => field.path === path);
-  if (index === -1) return { ok: false, error: `Unknown field ${path}.` };
+  if (index === -1) return { ok: false, error: `Câmp necunoscut ${path}.` };
   const next = apply(fields[index]);
   if (typeof next === 'string') return { ok: false, error: next };
   const copy = fields.slice();
@@ -95,7 +95,7 @@ function update(
 export function confirmField(fields: ReviewFieldState[], path: string, at: string): ActionResult {
   return update(fields, path, (field) => {
     if (field.extracted === null) {
-      return 'This field could not be read. Type it from the paper prescription or ask your doctor.';
+      return 'Acest câmp nu a putut fi citit. Introduceți-l de pe rețeta pe hârtie sau întrebați medicul.';
     }
     return { ...field, resolution: { kind: 'confirmed', value: field.extracted, edited: false, at } };
   });
@@ -104,7 +104,7 @@ export function confirmField(fields: ReviewFieldState[], path: string, at: strin
 /** "Edit": the patient's own transcription. Whitespace-only text is rejected. */
 export function editField(fields: ReviewFieldState[], path: string, text: string, at: string): ActionResult {
   const value = text.trim();
-  if (value === '') return { ok: false, error: 'Type the value exactly as written on the prescription.' };
+  if (value === '') return { ok: false, error: 'Introduceți valoarea exact așa cum este scrisă pe rețetă.' };
   return update(fields, path, (field) => ({
     ...field,
     resolution: { kind: 'confirmed', value, edited: value !== field.extracted, at },
@@ -115,7 +115,7 @@ export function editField(fields: ReviewFieldState[], path: string, text: string
 export function markNotPresent(fields: ReviewFieldState[], path: string, at: string): ActionResult {
   return update(fields, path, (field) => {
     if (!NOT_PRESENT_ALLOWED.has(field.key)) {
-      return `${field.label} is required. Type it from the paper prescription or ask your doctor.`;
+      return `${field.label} este obligatoriu. Introduceți-l de pe rețeta pe hârtie sau întrebați medicul.`;
     }
     return { ...field, resolution: { kind: 'not-present', at } };
   });

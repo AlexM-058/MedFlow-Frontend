@@ -14,7 +14,7 @@ export function MessageList({ messages, isBusy = false }: MessageListProps) {
       aria-live="polite"
       aria-relevant="additions text"
       aria-busy={isBusy}
-      aria-label="Conversation"
+      aria-label="Conversație"
     >
       {messages.map((message) => (
         <MessageItem key={message.id} message={message} />
