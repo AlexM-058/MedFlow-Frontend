@@ -4,6 +4,8 @@ import { brand } from './brand/brand.config';
 import { AuthProvider } from './auth/AuthProvider';
 import { useAuth } from './auth/authContext';
 import { CaseInbox } from './features/cases/CaseInbox';
+import { LivePatientContext } from './features/patient-context/LivePatientContext';
+import { LocalChatPage } from './features/local-chat/LocalChatPage';
 import type { AccountProfile } from './auth/contracts';
 import { readAppRoute, subscribeToRoute, navigate } from './auth/navigation';
 import { AccountLayout, AccountSessionControls, AuthBoundary, DoctorInvitationPage } from './auth/AuthPages';
@@ -59,7 +61,7 @@ function VerifiedDoctor() {
 function PatientAccount() {
   const { profile } = useAuth();
   if (profile?.role === 'doctor') return <section className="account-card"><h1>Contul dumneavoastră de medic este pregătit</h1><a className="ui-button ui-button--primary" href="#/doctor">Deschideți spațiul de lucru al medicului</a><AccountSessionControls /></section>;
-  return <><PatientJourney /><CaseInbox /><AccountSessionControls /></>;
+  return <><LivePatientContext /><PatientJourney /><CaseInbox /><AccountSessionControls /></>;
 }
 
 function SignedInControls() {
@@ -80,6 +82,7 @@ function Routes() {
   if (route === '/demo/doctor') return DoctorApp ? <DoctorApp onExit={() => navigate('/demo/patient')} /> : <AccountLayout><p role="status">Demo-ul pentru medic nu este disponibil încă.</p></AccountLayout>;
   if (route === '/demo/scan') return <DocumentScannerPage />;
   if (route === '/demo/care') return <CareScenarioPage />;
+  if (route === '/demo/local-chat') return <LocalChatPage />;
   if (route === '/auth/callback') return <AccountLayout><p role="status">Se finalizează autentificarea cu Google…</p></AccountLayout>;
   const connect = /^\/connect\/([^/]+)$/.exec(route);
   const invitation = /^\/doctor\/invite\/([^/]+)$/.exec(route);
