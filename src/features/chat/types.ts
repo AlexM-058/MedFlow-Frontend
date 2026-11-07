@@ -1,4 +1,4 @@
-export type ChatSender = 'ai' | 'patient';
+export type ChatSender = 'ai' | 'patient' | 'doctor' | 'system';
 
 export interface ChatMessage {
   id: string;

@@ -1,71 +1,37 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { useAuth } from '../../auth/authContext';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { caseApi, type CaseMessageRecord } from '../../lib/caseApi';
-import {
-  chooseCase,
-  MAX_MESSAGE_LENGTH,
-  mergeMessages,
-  orderMessages,
-  SENDER_LABELS,
-  senderKind,
-  validDraft,
-} from './chatLogic';
+import { Composer } from '../chat/Composer';
+import { MessageList } from '../chat/MessageList';
+import type { ChatMessage } from '../chat/types';
+import { mergeMessages, orderMessages, toChatMessage, validDraft } from './chatLogic';
 import './patient-chat.css';
 
 const REFRESH_MS = 15_000;
 
-type Setup = { phase: 'loading' } | { phase: 'ready'; caseId: string } | { phase: 'error'; message: string };
-
-const errorText = (error: unknown, fallback: string) => (error instanceof Error && error.message ? error.message : fallback);
+interface Outgoing { id: string; text: string; createdAt: string }
 
 /**
- * The patient's real conversation. Every message is saved in the case, so the doctor sees it; the
- * assistant (a local AI model) only asks collection questions and never diagnoses or prescribes.
- * A message is saved before the assistant is asked: if the assistant is unavailable, nothing the
- * patient wrote is lost and the doctor still receives it.
+ * The patient's real conversation, in the chat layout of the design: the assistant, the doctor and notices on the
+ * left, the patient on the right. Every message is saved in the case (the doctor sees it) BEFORE the assistant is
+ * asked: if the assistant is unavailable or a send fails, nothing the patient wrote is lost. The assistant (a local
+ * AI model) only asks collection questions and never diagnoses or prescribes.
  */
-export function PatientChat() {
-  const { session, profile } = useAuth();
-  const token = session?.access_token ?? null;
-  const doctors = profile?.activeDoctors ?? [];
-  const doctorKey = doctors.map((doctor) => doctor.id).join(',');
-  const [setup, setSetup] = useState<Setup>({ phase: 'loading' });
-  const [attempt, setAttempt] = useState(0);
-  const [messages, setMessages] = useState<CaseMessageRecord[]>([]);
+export function PatientChat({ caseId, token, onOpenDocuments }: { caseId: string; token: string; onOpenDocuments?: () => void }) {
+  const [saved, setSaved] = useState<CaseMessageRecord[]>([]);
+  const [sendingNow, setSendingNow] = useState<Outgoing | null>(null);
+  const [failed, setFailed] = useState<Outgoing[]>([]);
+  const [asking, setAsking] = useState(false);
   const [revision, setRevision] = useState(0);
-  const [draft, setDraft] = useState('');
-  const [sending, setSending] = useState<'saving' | 'asking' | null>(null);
-  const [problem, setProblem] = useState<string | null>(null);
   const [assistantNote, setAssistantNote] = useState<string | null>(null);
   const [finishedNote, setFinishedNote] = useState<string | null>(null);
   const busy = useRef(false);
   const end = useRef<HTMLDivElement>(null);
-  const caseId = setup.phase === 'ready' ? setup.caseId : null;
-
-  // Find the conversation with the connected doctor, or open it. Nothing else is shown until this is ready.
-  useEffect(() => {
-    if (!token || doctorKey === '') return;
-    const controller = new AbortController();
-    const connected = doctorKey.split(',');
-    (async () => {
-      try {
-        const cases = await caseApi.listCases(token, 0, controller.signal);
-        const existing = chooseCase(cases, connected);
-        const opened = existing ?? await caseApi.createCase(token, connected[0], controller.signal);
-        if (!controller.signal.aborted) setSetup({ phase: 'ready', caseId: opened.id });
-      } catch (error) {
-        if (!controller.signal.aborted) setSetup({ phase: 'error', message: errorText(error, 'Conversația nu a putut fi pornită.') });
-      }
-    })();
-    return () => controller.abort();
-  }, [token, doctorKey, attempt]);
 
   // Load and keep the saved messages fresh (the doctor may write too).
   useEffect(() => {
-    if (!token || !caseId) return;
     const controller = new AbortController();
     caseApi.listMessages(token, caseId, 0, controller.signal).then(
-      (loaded) => { if (!controller.signal.aborted) setMessages((current) => mergeMessages(current, loaded)); },
+      (loaded) => { if (!controller.signal.aborted) setSaved((current) => mergeMessages(current, loaded)); },
       () => { /* Keep what is on screen; the next refresh tries again. */ },
     );
     return () => controller.abort();
@@ -76,34 +42,29 @@ export function PatientChat() {
     return () => window.clearInterval(timer);
   }, []);
 
-  useEffect(() => { end.current?.scrollIntoView({ block: 'nearest' }); }, [messages, sending]);
+  useEffect(() => { end.current?.scrollIntoView({ block: 'nearest' }); }, [saved, sendingNow, asking, failed]);
 
-  async function submit(event: FormEvent) {
-    event.preventDefault();
-    const text = validDraft(draft);
-    if (!text || busy.current || !token || !caseId) return;
-    busy.current = true;
-    setSending('saving');
-    setProblem(null);
+  /** Saves the message, then asks the assistant for the next question. Never drops the text. */
+  const deliver = useCallback(async (item: Outgoing) => {
     setAssistantNote(null);
     try {
-      const saved = await caseApi.postMessage(token, caseId, text);
-      setMessages((current) => mergeMessages(current, [saved]));
-      setDraft('');
-    } catch (error) {
-      setProblem(`${errorText(error, 'Mesajul nu a putut fi trimis.')} Textul a rămas în câmp; puteți încerca din nou.`);
+      const message = await caseApi.postMessage(token, caseId, item.text);
+      setSaved((current) => mergeMessages(current, [message]));
+      setSendingNow(null);
+    } catch {
+      setSendingNow(null);
+      setFailed((current) => [...current, item]);
       busy.current = false;
-      setSending(null);
       return;
     }
     // The Backend may have added an emergency notice while saving, so refresh before asking the assistant.
     setRevision((value) => value + 1);
-    setSending('asking');
+    setAsking(true);
     try {
       const answer = await caseApi.askLocalQuestion(token, caseId);
       if (answer.message) {
         const question = answer.message;
-        setMessages((current) => mergeMessages(current, [question]));
+        setSaved((current) => mergeMessages(current, [question]));
         setFinishedNote(null);
       } else {
         setFinishedNote(answer.notice);
@@ -112,64 +73,61 @@ export function PatientChat() {
       setAssistantNote('Mesajul dumneavoastră a fost trimis medicului. Asistentul nu este disponibil acum, așa că nu a pus o întrebare.');
     } finally {
       busy.current = false;
-      setSending(null);
+      setAsking(false);
     }
+  }, [token, caseId]);
+
+  const send = useCallback((text: string): boolean => {
+    const valid = validDraft(text);
+    if (!valid || busy.current) return false;
+    busy.current = true;
+    const item: Outgoing = { id: `local-${Date.now()}`, text: valid, createdAt: new Date().toISOString() };
+    setSendingNow(item);
+    void deliver(item);
+    return true;
+  }, [deliver]);
+
+  function retry(item: Outgoing) {
+    if (busy.current) return;
+    busy.current = true;
+    setFailed((current) => current.filter((entry) => entry.id !== item.id));
+    setSendingNow(item);
+    void deliver(item);
   }
 
-  if (doctorKey === '') return null;
-
-  if (setup.phase === 'loading') return <section className="patient-chat" aria-busy="true"><p role="status">Se pregătește conversația…</p></section>;
-
-  if (setup.phase === 'error') {
-    return (
-      <section className="patient-chat">
-        <p role="alert">{setup.message}</p>
-        <button type="button" className="ui-button ui-button--primary" onClick={() => { setSetup({ phase: 'loading' }); setAttempt((value) => value + 1); }}>Încercați din nou</button>
-      </section>
-    );
-  }
-
-  const ordered = orderMessages(messages);
+  const messages: ChatMessage[] = useMemo(() => [
+    ...orderMessages(saved).map(toChatMessage),
+    ...(sendingNow ? [{ id: sendingNow.id, sender: 'patient' as const, text: sendingNow.text, createdAt: sendingNow.createdAt }] : []),
+    ...failed.map((item) => ({ id: item.id, sender: 'patient' as const, text: item.text, createdAt: item.createdAt })),
+  ], [saved, sendingNow, failed]);
+  const sending = sendingNow !== null || asking;
 
   return (
-    <section className="patient-chat" aria-labelledby="patient-chat-title">
-      <h2 id="patient-chat-title">Discuție cu asistentul</h2>
-      <p>Asistentul vă pune câteva întrebări, ca medicul dumneavoastră să înțeleagă situația. Nu pune diagnostice și nu recomandă tratament. Medicul citește tot ce scrieți și vă răspunde personal.</p>
-      <p className="patient-chat__urgent"><strong>Dacă este o urgență, sunați la 112.</strong></p>
-
-      {ordered.length === 0 && <p className="patient-chat__empty">Scrieți mai jos ce vă supără sau ce doriți să știe medicul.</p>}
-      <ol className="patient-chat__messages" aria-label="Conversația" aria-live="polite">
-        {ordered.map((message) => {
-          const kind = senderKind(message.senderRole);
-          return (
-            <li key={message.id} className={`patient-chat__message patient-chat__message--${kind}`}>
-              <span className="patient-chat__who">{SENDER_LABELS[kind]}</span>
-              <p>{message.content}</p>
-              <time dateTime={message.createdAt}>{new Date(message.createdAt).toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' })}</time>
-            </li>
-          );
-        })}
-      </ol>
-      {sending === 'asking' && <p role="status" className="patient-chat__status">Asistentul pregătește următoarea întrebare…</p>}
-      {assistantNote && <p role="status" className="patient-chat__note">{assistantNote}</p>}
-      {finishedNote && sending === null && <p role="status" className="patient-chat__note">{finishedNote}</p>}
-      {problem && <p role="alert" className="patient-chat__problem">{problem}</p>}
-
-      <form className="patient-chat__form" onSubmit={(event) => void submit(event)}>
-        <label htmlFor="patient-chat-draft">Mesajul dumneavoastră</label>
-        <textarea
-          id="patient-chat-draft"
-          value={draft}
-          onChange={(event) => setDraft(event.target.value)}
-          maxLength={MAX_MESSAGE_LENGTH}
-          readOnly={sending !== null}
-          rows={3}
-        />
-        <button type="submit" className="ui-button ui-button--primary" disabled={sending !== null || validDraft(draft) === null} aria-busy={sending !== null}>
-          {sending === 'saving' ? 'Se trimite…' : sending === 'asking' ? 'Se așteaptă asistentul…' : 'Trimiteți'}
-        </button>
-      </form>
-      <div ref={end} />
+    <section className="chat patient-chat" aria-label="Conversație cu asistentul">
+      <div className="patient-chat__intro">
+        <p>Asistentul vă pune câteva întrebări, ca medicul dumneavoastră să înțeleagă situația. Nu pune diagnostice și nu recomandă tratament. Medicul citește tot ce scrieți.</p>
+        <p className="patient-chat__urgent"><strong>Dacă este o urgență, sunați la 112.</strong></p>
+        {onOpenDocuments && (
+          <button type="button" className="ui-button ui-button--secondary" onClick={onOpenDocuments}>Adăugați sau actualizați documente medicale</button>
+        )}
+      </div>
+      <div className="chat__scroll">
+        <div className="chat__column">
+          {messages.length === 0 && <p className="chat__empty">Scrieți mai jos ce vă supără sau ce doriți să știe medicul.</p>}
+          <MessageList messages={messages} isBusy={sending} />
+          {asking && <p className="chat__status" role="status">Asistentul pregătește următoarea întrebare…</p>}
+          {assistantNote && <p className="chat__status" role="status">{assistantNote}</p>}
+          {finishedNote && !sending && <p className="chat__status" role="status">{finishedNote}</p>}
+          {failed.map((item) => (
+            <div key={item.id} className="notice notice--error" role="alert">
+              <p>Mesajul nu a putut fi trimis, dar textul a fost păstrat: „{item.text.length > 80 ? `${item.text.slice(0, 80)}…` : item.text}”.</p>
+              <button type="button" className="ui-button ui-button--secondary" disabled={sending} onClick={() => retry(item)}>Reîncercați trimiterea</button>
+            </div>
+          ))}
+          <div ref={end} />
+        </div>
+      </div>
+      <Composer onSend={send} isSending={sending} />
     </section>
   );
 }

@@ -1,4 +1,5 @@
 import type { CaseMessageRecord, CaseRecord } from '../../lib/caseApi.ts';
+import type { ChatMessage } from '../chat/types.ts';
 
 export type ChatSender = 'patient' | 'assistant' | 'doctor' | 'system';
 
@@ -15,6 +16,17 @@ export function senderKind(role: string): ChatSender {
   if (role === 'doctor') return 'doctor';
   if (role === 'ai') return 'assistant';
   return 'system';
+}
+
+/** A saved case message as the chat shows it: the patient on the right, everyone else on the left. */
+export function toChatMessage(message: CaseMessageRecord): ChatMessage {
+  const kind = senderKind(message.senderRole);
+  return {
+    id: message.id,
+    sender: kind === 'assistant' ? 'ai' : kind,
+    text: message.content,
+    createdAt: message.createdAt,
+  };
 }
 
 export const MAX_MESSAGE_LENGTH = 2000;

@@ -3,7 +3,6 @@ import { useAuth } from '../../auth/authContext';
 import type { AccountProfile } from '../../auth/contracts';
 import { formatDateTime, statusLabel } from '../patient-context/contextLogic';
 import { caseApi, type CaseDecision, type CaseMessageRecord, type LocalCaseSummary } from '../../lib/caseApi';
-import { CaseDocuments } from './CaseDocuments';
 import { ControlQuestionsPanel } from './ControlQuestionsPanel';
 import './cases.css';
 
@@ -196,7 +195,6 @@ export function CaseConversation({ caseId, token, profile, drafts, changeDraft }
           onClick={() => void askLocalQuestion()}>{sending === 'question' ? 'Se așteaptă agentul local…' : 'Cereți o întrebare de clarificare (AI local)'}</button>
         <p>Salvați mai întâi mesajul. AI-ul local colectează informații pentru medic; nu diagnostichează și nu prescrie.</p>
       </div>}
-      {profile.role === 'patient' && <CaseDocuments caseId={caseId} token={token} />}
       {profile.role === 'doctor' && <form className="case-inbox__form" onSubmit={(event) => void send('feedback', event)}>
         <label htmlFor={feedbackFieldId}>Feedback-ul dumneavoastră pentru pacient</label>
         <textarea id={feedbackFieldId} value={feedbackDraft} onChange={(event) => changeDraft('feedback', event.target.value)} maxLength={10000} required readOnly={!!sending} />

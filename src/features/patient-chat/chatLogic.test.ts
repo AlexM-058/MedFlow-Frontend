@@ -1,5 +1,5 @@
 import type { CaseMessageRecord, CaseRecord } from '../../lib/caseApi.ts';
-import { chooseCase, MAX_MESSAGE_LENGTH, mergeMessages, orderMessages, senderKind, validDraft } from './chatLogic.ts';
+import { chooseCase, MAX_MESSAGE_LENGTH, mergeMessages, orderMessages, senderKind, toChatMessage, validDraft } from './chatLogic.ts';
 
 const assert = {
   equal(actual: unknown, expected: unknown) {
@@ -40,5 +40,9 @@ const merged = mergeMessages(shown, [message('a', 'patient', '2026-11-07T10:00:0
 assert.equal(merged.map((entry) => entry.id), ['a', 's', 'b']);
 assert.equal(mergeMessages(merged, []).length, 3);
 assert.equal(mergeMessages([], []).length, 0);
+
+// In the chat the patient is on the right; the assistant, the doctor and notices on the left, each with its label.
+assert.equal(['patient', 'ai', 'doctor', 'system', 'x'].map((role) => toChatMessage(message('m', role, '2026-11-07T10:00:00Z', 'Text')).sender), ['patient', 'ai', 'doctor', 'system', 'system']);
+assert.equal(toChatMessage(message('m1', 'patient', '2026-11-07T10:00:00Z', 'Am sete.')), { id: 'm1', sender: 'patient', text: 'Am sete.', createdAt: '2026-11-07T10:00:00Z' });
 
 console.log('chatLogic: ok');

@@ -7,9 +7,12 @@ const assert = {
 };
 
 assert.equal(journeyStage({ doctorCount: 0 }), 'connect');
-// As soon as a doctor is connected the chat opens, with no prescription step in between.
-assert.equal(journeyStage({ doctorCount: 1 }), 'chat');
-assert.equal(journeyStage({ doctorCount: 3 }), 'chat');
+assert.equal(journeyStage({ doctorCount: 0, step: 'chat' }), 'connect'); // no doctor: nothing else is possible
+// Once a doctor is connected the journey starts at the prescription and moves where the patient chooses.
+assert.equal(journeyStage({ doctorCount: 1 }), 'prescription');
+assert.equal(journeyStage({ doctorCount: 1, step: 'prescription' }), 'prescription');
+assert.equal(journeyStage({ doctorCount: 3, step: 'documents' }), 'documents');
+assert.equal(journeyStage({ doctorCount: 1, step: 'chat' }), 'chat');
 
 const code = 'synthetic_doctor_code_1234';
 assert.equal(extractConnectCode(code), code);

@@ -4,6 +4,8 @@ import type { ChatMessage } from './types';
 const SENDER_LABEL: Record<ChatMessage['sender'], string> = {
   ai: brand.assistantName,
   patient: 'Dumneavoastră',
+  doctor: 'Medicul dumneavoastră',
+  system: 'Important',
 };
 
 export function MessageItem({ message }: { message: ChatMessage }) {

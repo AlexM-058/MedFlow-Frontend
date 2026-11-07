@@ -1,15 +1,17 @@
 import { isOpaqueCode } from '../../auth/navigation.ts';
 
-export type JourneyStage = 'connect' | 'chat';
+export type JourneyStage = 'connect' | 'prescription' | 'documents' | 'chat';
+export type JourneyStep = Exclude<JourneyStage, 'connect'>;
 
 /**
- * The patient's single active step, derived from state (never from a stored flag):
- * 1. connect to a doctor (QR)  2. chat with the assistant.
- * The chat opens as soon as a doctor is connected (the message has a recipient). A prescription
- * is no longer required first; it can be added later, and the assistant never decides from it.
+ * The patient's single active step:
+ * 1. connect to a doctor (QR), which comes from the account (never from a stored flag);
+ * 2. add the prescription  3. upload or update the medical documentation  4. the conversation.
+ * Steps 2 and 3 are optional (the patient can skip them); `step` is where the patient is in them. Without a
+ * connected doctor nothing else is possible: a message needs a recipient.
  */
-export function journeyStage(input: { doctorCount: number }): JourneyStage {
-  return input.doctorCount < 1 ? 'connect' : 'chat';
+export function journeyStage(input: { doctorCount: number; step?: JourneyStep }): JourneyStage {
+  return input.doctorCount < 1 ? 'connect' : (input.step ?? 'prescription');
 }
 
 /**
