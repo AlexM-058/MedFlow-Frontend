@@ -8,22 +8,24 @@ import { declareItem, KIND_EXAMPLES, KIND_LABELS, KINDS, MAX_ITEM_LENGTH, validI
  * A round "+" button, always within reach, that opens a small window to add health data in three taps: choose what
  * (Alergie / Afecțiune / Medicament), write it in your own words, "Adăugați". What is added is saved and confirmed by
  * the patient in the same step, and the window lists what is already there. It replaces the long panel that used to
- * sit on the page. `raised` lifts the button above a message box at the bottom of the screen.
+ * sit on the page. The chat reuses HealthDataModal from its own compact attachment menu.
  */
-export function AddHealthData({ token, raised = false }: { token: string; raised?: boolean }) {
+export function AddHealthData({ token }: { token: string }) {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <button type="button" className={`fab${raised ? ' fab--raised' : ''}`} aria-label="Adăugați date medicale" title="Adăugați date medicale" onClick={() => setOpen(true)}>
+      <button type="button" className="fab" aria-label="Adăugați date medicale" title="Adăugați date medicale" onClick={() => setOpen(true)}>
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
           <path d="M12 5v14M5 12h14" />
         </svg>
       </button>
-      <Modal open={open} title="Adăugați date medicale" onClose={() => setOpen(false)}>
-        <AddForm token={token} />
-      </Modal>
+      <HealthDataModal token={token} open={open} onClose={() => setOpen(false)} />
     </>
   );
+}
+
+export function HealthDataModal({ token, open, onClose }: { token: string; open: boolean; onClose: () => void }) {
+  return <Modal open={open} title="Adăugați date medicale" onClose={onClose}><AddForm token={token} /></Modal>;
 }
 
 function AddForm({ token }: { token: string }) {

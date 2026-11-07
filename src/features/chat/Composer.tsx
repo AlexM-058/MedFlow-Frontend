@@ -1,4 +1,4 @@
-import { useId, useState, type FormEvent, type KeyboardEvent } from 'react';
+import { useId, useState, type FormEvent, type KeyboardEvent, type ReactNode } from 'react';
 import { brand } from '../../brand/brand.config';
 
 interface ComposerProps {
@@ -7,9 +7,10 @@ interface ComposerProps {
   /** A reply is pending: typing stays possible, sending is blocked. */
   isSending: boolean;
   disabled?: boolean;
+  actions?: ReactNode;
 }
 
-export function Composer({ onSend, isSending, disabled = false }: ComposerProps) {
+export function Composer({ onSend, isSending, disabled = false, actions }: ComposerProps) {
   const [text, setText] = useState('');
   const inputId = useId();
   const hintId = useId();
@@ -37,6 +38,7 @@ export function Composer({ onSend, isSending, disabled = false }: ComposerProps)
     <form className="composer" onSubmit={handleSubmit}>
       <div className="composer__column">
         <div className="composer__row">
+          {actions}
           <label htmlFor={inputId} className="visually-hidden">
             Mesaj pentru {brand.assistantName}
           </label>

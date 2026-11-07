@@ -54,7 +54,7 @@ export function PatientJourney() {
         <>
           {stage === 'prescription' && <PrescriptionStep caseId={state.caseId} token={token} onContinue={() => setStep('documents')} onSkip={() => setStep('documents')} />}
           {stage === 'documents' && <DocumentsStep caseId={state.caseId} token={token} onContinue={() => setStep('chat')} onSkip={() => setStep('chat')} />}
-          <AddHealthData token={token} raised={stage === 'chat'} />
+          {stage !== 'chat' && <AddHealthData token={token} />}
           {stage === 'chat' && <PatientChat caseId={state.caseId} token={token} onOpenDocuments={() => setStep('documents')} />}
         </>
       )}

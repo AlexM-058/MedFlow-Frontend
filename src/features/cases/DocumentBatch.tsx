@@ -12,6 +12,7 @@ import {
   type BatchStop,
 } from './batchUpload';
 import { loadRarWasm } from './rarWasm';
+import './batch.css';
 
 const STATUS_TEXT: Record<BatchItem['status'], string> = {
   pending: 'În așteptare',
@@ -89,47 +90,81 @@ export function DocumentBatch({ caseId, token, onFinished }: { caseId: string; t
   const stats = summarizeBatch(items);
   const left = stats.pending + stats.reading;
 
+  const percent = stats.total === 0 ? 0 : Math.round(((stats.done + stats.failed) / stats.total) * 100);
+  const locked = running || preparing;
+  const sheetState = (item: BatchItem) => (item.status === 'done' && item.empty ? 'empty' : item.status);
+  const SYMBOL: Record<string, string> = { done: '✓', empty: '!', failed: '!', pending: '•', reading: '' };
+
   return (
-    <section className="case-inbox__batch" aria-label="Încărcare mai multe foi">
-      <div className="step__choices">
-        <label htmlFor={inputId} className={`ui-button ui-button--primary${running || preparing ? ' is-disabled' : ''}`}>Încărcați document</label>
-        <label htmlFor={cameraId} className={`ui-button ui-button--secondary${running || preparing ? ' is-disabled' : ''}`}>Cameră</label>
+    <section className="batch" aria-label="Încărcare documente">
+      <div className="batch__choices">
+        <label htmlFor={inputId} className={`batch__tile${locked ? ' batch__tile--disabled' : ''}`}>
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" /><path d="M14 3v5h5M9 13h6M9 17h4" />
+          </svg>
+          <span>Încărcați document</span>
+        </label>
+        <label htmlFor={cameraId} className={`batch__tile${locked ? ' batch__tile--disabled' : ''}`}>
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z" /><circle cx="12" cy="13" r="3.5" />
+          </svg>
+          <span>Cameră</span>
+        </label>
       </div>
-      <input id={cameraId} type="file" accept="image/jpeg,image/png" capture="environment" disabled={running || preparing}
+      <input id={cameraId} type="file" accept="image/jpeg,image/png" capture="environment" disabled={locked}
         className="doctor-sr-only" onChange={(event) => { const chosen = event.target.files; void choose(chosen); event.target.value = ''; }} />
-      <input id={inputId} type="file" multiple accept="image/jpeg,image/png,application/pdf,.rar,application/vnd.rar,application/x-rar-compressed" disabled={running || preparing}
+      <input id={inputId} type="file" multiple accept="image/jpeg,image/png,application/pdf,.rar,application/vnd.rar,application/x-rar-compressed" disabled={locked}
         className="doctor-sr-only" onChange={(event) => { const chosen = event.target.files; void choose(chosen); event.target.value = ''; }} />
-      <p className="step__hint">Mai multe deodată: JPG, PNG, PDF sau o arhivă RAR (cel mult {BATCH_MAX_FILES} fișiere).</p>
-      {preparing && <p role="status">Se deschid arhivele…</p>}
+      <p className="batch__hint">Mai multe deodată: JPG, PNG, PDF sau o arhivă RAR (cel mult {BATCH_MAX_FILES} fișiere).</p>
+      {preparing && <p className="batch__status" role="status">Se deschid arhivele…</p>}
+
       {items.length > 0 && (
-        <>
-          <p role="status" aria-live="polite">
-            {running ? `Se citește foaia ${Math.min(stats.done + stats.failed + 1, stats.total)} din ${stats.total}…` : `Terminat: ${stats.done} din ${stats.total} citite${stats.failed ? `, ${stats.failed} cu probleme` : ''}.`}
-          </p>
+        <div className="batch__result">
+          <div className="batch__progress">
+            <div className="batch__bar" role="progressbar" aria-label="Progres citire" aria-valuemin={0} aria-valuemax={stats.total} aria-valuenow={stats.done + stats.failed}>
+              <span style={{ width: `${percent}%` }} />
+            </div>
+            <p className="batch__status" role="status" aria-live="polite">
+              {running
+                ? `Se citește foaia ${Math.min(stats.done + stats.failed + 1, stats.total)} din ${stats.total}…`
+                : `Gata: ${stats.done} din ${stats.total} citite${stats.failed ? `, ${stats.failed} cu probleme` : ''}.`}
+            </p>
+          </div>
+
           {!running && stats.empty > 0 && (
-            <p role="alert">{stats.empty === 1 ? 'O foaie a fost citită, dar fără date.' : `${stats.empty} foi au fost citite, dar fără date.`} Încercați o poză mai clară, cu toată foaia în cadru și lumină bună.</p>
+            <p className="batch__alert" role="alert">
+              {stats.empty === 1 ? 'O foaie a fost citită, dar fără date.' : `${stats.empty} foi au fost citite, dar fără date.`} Încercați o poză mai clară, cu toată foaia în cadru și lumină bună.
+            </p>
           )}
-          <progress max={stats.total} value={stats.done + stats.failed} aria-label="Progres citire" />
-          <details open={stats.failed > 0 || stats.empty > 0 || undefined}>
+          {!running && stopped && <p className="batch__alert" role="alert">{STOP_TEXT[stopped]}</p>}
+
+          <details className="batch__details" open={stats.failed > 0 || stats.empty > 0 || undefined}>
             <summary>Detalii pe foi ({stats.total})</summary>
-            <ul aria-label="Foile încărcate">
-              {items.map((item) => (
-                <li key={item.id}>
-                  <strong>{item.name}</strong>: {STATUS_TEXT[item.status]}
-                  {item.note && item.status === 'done' && <span className={item.empty ? 'batch-note batch-note--empty' : 'batch-note'}> {item.note}</span>}
-                  {item.message && item.status === 'failed' && <span role="alert"> {item.message}</span>}
-                </li>
-              ))}
-            </ul>
+            <ol className="batch__sheets" aria-label="Foile încărcate">
+              {items.map((item) => {
+                const state = sheetState(item);
+                return (
+                  <li key={item.id} className={`batch__sheet batch__sheet--${state}`}>
+                    <span className="batch__icon" aria-hidden="true">{SYMBOL[state]}</span>
+                    <span className="batch__sheet-body">
+                      <strong className="batch__name">{item.name}</strong>
+                      <span className="visually-hidden">: {STATUS_TEXT[item.status]}.</span>
+                      {item.note && item.status === 'done' && <span className="batch__note">{item.note}</span>}
+                      {item.message && item.status === 'failed' && <span className="batch__note" role="alert">{item.message}</span>}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
           </details>
+
           {running && <button type="button" className="ui-button ui-button--secondary" onClick={() => controller.current?.abort()}>Opriți citirea</button>}
-          {!running && stopped && <p role="alert">{STOP_TEXT[stopped]}</p>}
           {!running && (stats.failed > 0 || left > 0) && (
             <button type="button" className="ui-button ui-button--primary" onClick={() => void start(retryable(items))}>
               {left > 0 ? 'Reluați foile rămase' : 'Reîncercați foile cu probleme'}
             </button>
           )}
-        </>
+        </div>
       )}
     </section>
   );

@@ -114,7 +114,6 @@
 
 /* ---- Round "+" button: add health data from anywhere in the journey ---- */
 .fab { position: fixed; z-index: 50; inset-inline-end: var(--gutter); bottom: calc(5.5rem + env(safe-area-inset-bottom)); display: grid; place-items: center; width: 3.75rem; height: 3.75rem; border: 0; border-radius: 50%; background: var(--brand-primary); color: var(--brand-on-primary); box-shadow: var(--shadow-float); cursor: pointer; transition: transform 0.15s var(--ease-out), box-shadow 0.15s ease; }
-.fab--raised { bottom: calc(8.5rem + env(safe-area-inset-bottom)); }
 .fab:hover { transform: scale(1.05); }
 .fab:active { transform: scale(0.96); }
 .fab:focus-visible { outline: 3px solid var(--color-focus-ring); outline-offset: 3px; }
