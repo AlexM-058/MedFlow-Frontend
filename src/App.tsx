@@ -6,7 +6,8 @@ import { useAuth } from './auth/authContext';
 import type { AccountProfile } from './auth/contracts';
 import { readAppRoute, subscribeToRoute, navigate } from './auth/navigation';
 import { AccountLayout, AccountSessionControls, AuthBoundary, DoctorInvitationPage } from './auth/AuthPages';
-import { PatientConnectPage, PatientAccountPage } from './features/connections';
+import { PatientConnectPage } from './features/connections';
+import { PatientJourney } from './features/patient-journey';
 import { AdminPage } from './features/admin';
 import { ChatPage } from './features/chat/ChatPage';
 import { DocumentScannerPage } from './features/document-scanner';
@@ -57,7 +58,7 @@ function VerifiedDoctor() {
 function PatientAccount() {
   const { profile } = useAuth();
   if (profile?.role === 'doctor') return <section className="account-card"><h1>Contul dumneavoastră de medic este pregătit</h1><a className="ui-button ui-button--primary" href="#/doctor">Deschideți spațiul de lucru al medicului</a><AccountSessionControls /></section>;
-  return <><PatientAccountPage /><AccountSessionControls /></>;
+  return <><PatientJourney /><AccountSessionControls /></>;
 }
 
 function SignedInControls() {

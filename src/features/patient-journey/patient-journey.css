@@ -1,0 +1,23 @@
+/* Patient journey: layout only. Colors, radii and type come from the shared tokens.
+   Larger type and controls on purpose: the flow must work for older patients with a little help. */
+.journey { display: grid; gap: var(--space-6); font-size: 1.125rem; line-height: 1.6; }
+.journey__progress { font-weight: 600; font-size: 1.25rem; }
+.journey__steps { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.journey__step { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-3); border: 1px solid var(--color-border-decorative); border-radius: var(--radius-pill); font-size: var(--font-size-md); color: var(--color-text-secondary); background: var(--color-surface); }
+.journey__step-number { display: grid; place-items: center; width: 1.75rem; height: 1.75rem; border-radius: 50%; border: 1px solid var(--color-border-control); font-weight: 500; }
+.journey__step[aria-current='step'] { color: var(--color-text); border-color: var(--brand-primary); font-weight: 500; }
+.journey__step[aria-current='step'] .journey__step-number { background: var(--brand-primary); color: var(--brand-on-primary); border-color: var(--brand-primary); }
+.journey__step[data-done='true'] { color: var(--color-text); }
+.journey__step[data-done='true'] .journey__step-number { border-color: var(--status-success-border); background: var(--status-success-bg); }
+.journey__panel { display: grid; gap: var(--space-4); padding: clamp(1rem, 3vw, 1.75rem); border: 1px solid var(--color-border-decorative); border-radius: var(--radius-md); background: var(--color-surface); }
+.journey__panel h2 { font-size: 1.5rem; line-height: 1.3; }
+.journey__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.journey__help { padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm); background: var(--color-surface-subtle); }
+.journey__code-form { display: grid; gap: var(--space-2); }
+.journey__code-row { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+.journey__code-input { flex: 1 1 14rem; min-height: 3.25rem; padding: var(--space-2) var(--space-3); border: 1px solid var(--color-border-control); border-radius: var(--radius-sm); background: var(--color-surface); font-size: 1.125rem; }
+.journey .ui-button { min-height: 3.25rem; font-size: 1.0625rem; }
+.journey__meds { display: grid; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.journey__med { padding: var(--space-3) var(--space-4); border: 1px solid var(--color-border-decorative); border-radius: var(--radius-sm); background: var(--color-surface-subtle); }
+.journey__med strong { font-weight: 600; }
+.journey__muted { color: var(--color-text-secondary); font-size: var(--font-size-md); }
