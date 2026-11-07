@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { caseApi } from '../../lib/caseApi';
+import { ArchiveError, extractRar, isRarFile } from './archive';
 import {
   BATCH_MAX_FILES,
   createBatch,
@@ -9,6 +10,7 @@ import {
   type BatchItem,
   type BatchStop,
 } from './batchUpload';
+import { loadRarWasm } from './rarWasm';
 
 const STATUS_TEXT: Record<BatchItem['status'], string> = {
   pending: 'În așteptare',
@@ -32,6 +34,7 @@ export function DocumentBatch({ caseId, token, onFinished }: { caseId: string; t
   const inputId = useId();
   const [items, setItems] = useState<BatchItem[]>([]);
   const [running, setRunning] = useState(false);
+  const [preparing, setPreparing] = useState(false);
   const [stopped, setStopped] = useState<BatchStop>(null);
   const controller = useRef<AbortController | null>(null);
   useEffect(() => () => controller.current?.abort(), []);
@@ -52,12 +55,28 @@ export function DocumentBatch({ caseId, token, onFinished }: { caseId: string; t
     onFinished();
   }
 
-  function choose(files: FileList | null) {
-    const list = files ? Array.from(files) : [];
-    if (list.length === 0) return;
-    const batch = createBatch(list);
+  /** Photos and PDFs go in as they are; a .rar is opened here in the browser (nothing is uploaded or saved). */
+  async function choose(files: FileList | null) {
+    const picked = files ? Array.from(files) : [];
+    if (picked.length === 0) return;
+    setPreparing(true);
+    const documents: File[] = [];
+    const rejected: { name: string; reason: string }[] = [];
+    for (const file of picked) {
+      if (!isRarFile(file)) { documents.push(file); continue; }
+      try {
+        const opened = await extractRar(await file.arrayBuffer(), await loadRarWasm());
+        documents.push(...opened.files);
+        rejected.push(...opened.skipped.map((entry) => ({ name: `${file.name} › ${entry.name}`, reason: entry.reason })));
+      } catch (error) {
+        rejected.push({ name: file.name, reason: error instanceof ArchiveError ? error.message : 'Arhiva nu a putut fi deschisă.' });
+      }
+    }
+    const batch = createBatch(documents, rejected);
     setItems(batch);
-    void start(batch);
+    setPreparing(false);
+    if (batch.some((item) => item.status === 'pending')) void start(batch);
+    else setStopped(null);
   }
 
   const stats = summarizeBatch(items);
@@ -65,10 +84,11 @@ export function DocumentBatch({ caseId, token, onFinished }: { caseId: string; t
 
   return (
     <section className="case-inbox__batch" aria-label="Încărcare mai multe foi">
-      <p>Alegeți toate foile deodată (cel mult {BATCH_MAX_FILES}, JPG, PNG sau PDF). Se citesc pe rând, iar ce eșuează poate fi reîncercat.</p>
-      <label htmlFor={inputId} className="ui-button ui-button--secondary">Alegeți fotografiile</label>
-      <input id={inputId} type="file" multiple accept="image/jpeg,image/png,application/pdf" disabled={running}
-        className="doctor-sr-only" onChange={(event) => { choose(event.target.files); event.target.value = ''; }} />
+      <p>Alegeți toate foile deodată (cel mult {BATCH_MAX_FILES}, JPG, PNG sau PDF) sau o arhivă RAR cu ele. Arhiva se deschide pe acest dispozitiv, nu se încarcă. Foile se citesc pe rând, iar ce eșuează poate fi reîncercat.</p>
+      <label htmlFor={inputId} className="ui-button ui-button--secondary">Alegeți fotografiile sau o arhivă RAR</label>
+      <input id={inputId} type="file" multiple accept="image/jpeg,image/png,application/pdf,.rar,application/vnd.rar,application/x-rar-compressed" disabled={running || preparing}
+        className="doctor-sr-only" onChange={(event) => { const chosen = event.target.files; void choose(chosen); event.target.value = ''; }} />
+      {preparing && <p role="status">Se deschid arhivele…</p>}
       {items.length > 0 && (
         <>
           <p role="status" aria-live="polite">

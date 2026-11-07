@@ -32,11 +32,22 @@ export function precheck(file: File): string | null {
   return null;
 }
 
-export function createBatch(files: File[]): BatchItem[] {
-  return files.slice(0, BATCH_MAX_FILES).map((file, id) => {
+/**
+ * `rejected` = entries that could not even become a file (e.g. refused inside an archive): they are listed as
+ * failed with their reason, so nothing disappears silently. Files over the limit are reported the same way.
+ */
+export function createBatch(files: File[], rejected: { name: string; reason: string }[] = []): BatchItem[] {
+  const items: BatchItem[] = files.slice(0, BATCH_MAX_FILES).map((file, id) => {
     const problem = precheck(file);
     return { id, file, name: file.name || `Foaia ${id + 1}`, status: problem ? 'failed' : 'pending', ...(problem ? { message: problem } : {}) };
   });
+  const notAdded = files.length - items.length;
+  const extra = [
+    ...(notAdded > 0 ? [{ name: `Încă ${notAdded} fișiere`, reason: `Nu au fost adăugate (cel mult ${BATCH_MAX_FILES} odată). Reluați-le într-un lot nou.` }] : []),
+    ...rejected,
+  ];
+  for (const entry of extra) items.push({ id: 0, file: new File([], entry.name), name: entry.name, status: 'failed', message: entry.reason });
+  return items.map((item, id) => ({ ...item, id })); // ids follow the final order
 }
 
 export function summarizeBatch(items: BatchItem[]) {

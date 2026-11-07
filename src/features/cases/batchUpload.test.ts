@@ -18,7 +18,14 @@ async function main() {
   check('over 10 MB refused', precheck({ type: 'image/png', size: 11 * 1024 * 1024 } as File) !== null);
   const created = createBatch([png('1.png'), new File(['x'], 'b.txt', { type: 'text/plain' })]);
   check('refused file is failed at once with a reason', created[1]?.status === 'failed' && !!created[1]?.message);
-  check('batch is capped', createBatch(Array.from({ length: 60 }, (_, i) => png(`${i}.png`))).length === BATCH_MAX_FILES);
+  const overflow = createBatch(Array.from({ length: 60 }, (_, i) => png(`${i}.png`)));
+  check('only 40 files are read, the rest is reported (not lost silently)', overflow.filter((item) => item.status === 'pending').length === BATCH_MAX_FILES
+    && overflow.length === BATCH_MAX_FILES + 1 && overflow[BATCH_MAX_FILES]?.status === 'failed' && /20 fișiere/.test(overflow[BATCH_MAX_FILES]?.name ?? ''));
+  const withRejected = createBatch([png('a.png')], [{ name: 'dosar.rar › poza.bmp', reason: 'Conținutul nu este o imagine.' }]);
+  check('entries refused inside an archive are listed with their reason', withRejected.length === 2 && withRejected[1]?.status === 'failed'
+    && withRejected[1]?.message === 'Conținutul nu este o imagine.' && withRejected[1]?.name === 'dosar.rar › poza.bmp' && withRejected.map((item) => item.id).join() === '0,1');
+  check('a refused archive entry is not retried', retryable(withRejected)[1]?.status === 'failed');
+
 
   // All sheets are read one after another, never two at once.
   let running = 0;
