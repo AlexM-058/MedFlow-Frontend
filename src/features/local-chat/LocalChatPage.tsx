@@ -5,7 +5,23 @@ import '../cases/cases.css';
 type Message = { id: string; text: string; role: 'patient' | 'assistant'; pending?: boolean; failed?: boolean };
 type Reply = { text: string; questionId: string | null };
 
+/** Standalone page for the technical test of the local agent (route /demo/local-chat). */
 export function LocalChatPage() {
+  return <div className="app" style={{ height: 'auto', minHeight: '100dvh' }}>
+    <AppHeader />
+    <main style={{ width: 'min(100%, 48rem)', marginInline: 'auto', padding: 'var(--gutter)', boxSizing: 'border-box' }}>
+      <LocalChat heading="h1" />
+    </main>
+  </div>;
+}
+
+/**
+ * The conversation with the local agent, usable inside any page (patient journey, demo route).
+ * The agent only asks predefined collection questions; it never diagnoses or prescribes.
+ * Synthetic and not saved: the conversation lives in this component and is not sent to a doctor.
+ */
+export function LocalChat({ heading = 'h2' }: { heading?: 'h1' | 'h2' }) {
+  const Heading = heading;
   const [messages, setMessages] = useState<Message[]>([]);
   const [draft, setDraft] = useState('');
   const [asked, setAsked] = useState<string[]>([]);
@@ -54,11 +70,8 @@ export function LocalChatPage() {
     controller.current?.abort();
     setMessages([]); setDraft(''); setAsked([]); setDone(false); setError(null);
   }
-  return <div className="app" style={{ height: 'auto', minHeight: '100dvh' }}>
-    <AppHeader />
-    <main style={{ width: 'min(100%, 48rem)', marginInline: 'auto', padding: 'var(--gutter)', boxSizing: 'border-box' }}>
-      <section className="case-inbox" aria-label="Conversație de test cu agentul local">
-        <h1>Conversație cu asistentul local</h1>
+  return <section className="case-inbox" aria-label="Conversație de test cu agentul local">
+        <Heading>Conversație cu asistentul local</Heading>
         <p>Test tehnic cu modelul care rulează pe laptop. Folosiți numai informații fictive. Conversația nu este salvată și nu este trimisă unui medic; se șterge la reîncărcarea paginii.</p>
         <p>MedFlow ajută la colectarea informațiilor pentru comunicarea cu medicul. Asistentul nu diagnostichează, nu prescrie și nu monitorizează urgențe.</p>
         <button type="button" className="ui-button ui-button--secondary" disabled={pending} onClick={restart}>Conversație nouă</button>
@@ -77,7 +90,5 @@ export function LocalChatPage() {
           <button className="ui-button ui-button--primary" disabled={pending || done || !draft.trim()}>{pending ? 'Se așteaptă răspunsul…' : error ? 'Reîncercați mesajul' : 'Trimiteți'}</button>
         </form>
         <div ref={scrollTarget} />
-      </section>
-    </main>
-  </div>;
+  </section>;
 }
