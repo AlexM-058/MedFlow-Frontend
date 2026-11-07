@@ -8,7 +8,7 @@ import { LivePatientContext } from './features/patient-context/LivePatientContex
 import { LocalChatPage } from './features/local-chat/LocalChatPage';
 import type { AccountProfile } from './auth/contracts';
 import { readAppRoute, subscribeToRoute, navigate } from './auth/navigation';
-import { AccountLayout, AccountSessionControls, AuthBoundary, DoctorInvitationPage } from './auth/AuthPages';
+import { AccountLayout, AuthBoundary, DoctorInvitationPage } from './auth/AuthPages';
 import { PatientConnectPage } from './features/connections';
 import { PatientJourney } from './features/patient-journey';
 import { AdminPage } from './features/admin';
@@ -53,23 +53,19 @@ function PatientWorkspace() {
 
 function VerifiedDoctor() {
   const { profile } = useAuth();
-  if (profile?.role !== 'doctor') return <section className="account-card"><h1>Accesul medicilor se face doar pe bază de invitație</h1><p>Deschideți invitația trimisă de echipa {brand.productName} și autentificați-vă cu contul Google invitat. Accesarea acestei pagini nu oferă drepturi de medic.</p><a href="#/patient">Mergeți la contul de pacient</a><AccountSessionControls /></section>;
+  if (profile?.role !== 'doctor') return <section className="account-card"><h1>Accesul medicilor se face doar pe bază de invitație</h1><p>Deschideți invitația trimisă de echipa {brand.productName} și autentificați-vă cu contul Google invitat. Accesarea acestei pagini nu oferă drepturi de medic.</p><a href="#/patient">Mergeți la contul de pacient</a></section>;
   if (DoctorAccountWorkspace) return <DoctorAccountWorkspace profile={profile} />;
-  return <section className="account-card"><h1>Bun venit, {profile.fullName}</h1><p>Contul dumneavoastră de medic a fost verificat. Spațiul pentru codul QR și cererile de conectare este integrat separat. În această previzualizare nu sunt afișate date ale pacienților.</p><AccountSessionControls /></section>;
+  return <section className="account-card"><h1>Bun venit, {profile.fullName}</h1><p>Contul dumneavoastră de medic a fost verificat. Spațiul pentru codul QR și cererile de conectare este integrat separat. În această previzualizare nu sunt afișate date ale pacienților.</p></section>;
 }
 
 function PatientAccount() {
   const { profile } = useAuth();
-  if (profile?.role === 'doctor') return <section className="account-card"><h1>Contul dumneavoastră de medic este pregătit</h1><a className="ui-button ui-button--primary" href="#/doctor">Deschideți spațiul de lucru al medicului</a><AccountSessionControls /></section>;
+  if (profile?.role === 'doctor') return <section className="account-card"><h1>Contul dumneavoastră de medic este pregătit</h1><a className="ui-button ui-button--primary" href="#/doctor">Deschideți spațiul de lucru al medicului</a></section>;
   // Nothing but the current step until a doctor is connected; then the doctor's message comes first.
   const connected = (profile?.activeDoctors.length ?? 0) > 0;
-  return <>{connected && <DoctorMessageNotice />}<PatientJourney />{connected && <LivePatientContext />}<AccountSessionControls /></>;
+  return <>{connected && <DoctorMessageNotice />}<PatientJourney />{connected && <LivePatientContext />}</>;
 }
 
-function SignedInControls() {
-  const { session } = useAuth();
-  return session ? <AccountSessionControls /> : null;
-}
 
 /** There is no shared landing page: the root and the old /home go to the patient sign-in. */
 function RedirectToPatient() {
@@ -91,7 +87,7 @@ function Routes() {
   const portal = route === '/doctor' || invitation ? 'doctor' : 'patient';
   return (
     <AccountLayout portal={portal}>
-      {connect ? <><PatientConnectPage key={connect[1]} code={connect[1]} /><SignedInControls /></> : invitation ? <DoctorInvitationPage key={invitation[1]} token={invitation[1]} /> : route === '/doctor' ? (
+      {connect ? <><PatientConnectPage key={connect[1]} code={connect[1]} /></> : invitation ? <DoctorInvitationPage key={invitation[1]} token={invitation[1]} /> : route === '/doctor' ? (
         <AuthBoundary destination="/doctor" doctor><VerifiedDoctor /></AuthBoundary>
       ) : route === '/admin' ? (
         <AuthBoundary destination="/admin"><AdminPage /></AuthBoundary>

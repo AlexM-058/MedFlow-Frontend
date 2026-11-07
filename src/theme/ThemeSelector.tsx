@@ -8,9 +8,33 @@ const LABELS: Record<ThemePreference, string> = {
   system: 'Sistem',
 };
 
-export function ThemeSelector() {
+/** The three theme choices as a radio group. Used by the theme selector and by the account menu. */
+export function ThemeOptions() {
   const { preference, setPreference } = useTheme();
   const groupName = useId();
+  return (
+    <fieldset className="theme-selector__options">
+      <legend className="visually-hidden">Aspect</legend>
+      <p className="theme-selector__heading" aria-hidden="true">Aspect</p>
+      {THEME_PREFERENCES.map((option) => (
+        <label key={option} className="theme-selector__option">
+          <input
+            type="radio"
+            name={`theme-preference-${groupName}`}
+            value={option}
+            checked={preference === option}
+            onChange={() => setPreference(option)}
+            className="theme-selector__input visually-hidden"
+          />
+          <span className="theme-selector__label">{LABELS[option]}</span>
+        </label>
+      ))}
+    </fieldset>
+  );
+}
+
+export function ThemeSelector() {
+  const { preference } = useTheme();
   const panel = useRef<HTMLDetailsElement>(null);
 
   useEffect(() => {
@@ -36,23 +60,9 @@ export function ThemeSelector() {
           <path d="M12 4a8 8 0 0 1 0 16Z" fill="currentColor" stroke="none" />
         </svg>
       </summary>
-      <fieldset className="theme-selector__panel">
-      <legend className="visually-hidden">Aspect</legend>
-      <p className="theme-selector__heading" aria-hidden="true">Aspect</p>
-      {THEME_PREFERENCES.map((option) => (
-        <label key={option} className="theme-selector__option">
-          <input
-            type="radio"
-            name={`theme-preference-${groupName}`}
-            value={option}
-            checked={preference === option}
-            onChange={() => setPreference(option)}
-            className="theme-selector__input visually-hidden"
-          />
-          <span className="theme-selector__label">{LABELS[option]}</span>
-        </label>
-      ))}
-      </fieldset>
+      <div className="theme-selector__panel">
+        <ThemeOptions />
+      </div>
     </details>
   );
 }

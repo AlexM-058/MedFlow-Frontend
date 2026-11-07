@@ -1,6 +1,5 @@
 import { useId, useRef, useState, type FormEvent } from 'react';
 import { useAuth } from '../../auth/authContext';
-import { AccountSessionControls } from '../../auth/AuthPages';
 import { EMPTY_FORM, STATUS_LABEL, validateInvitationForm, type DoctorInvitation, type InvitationForm, type InvitationFormErrors } from './adminLogic';
 import { useAdminPanel } from './useAdminPanel';
 import './admin.css';
@@ -45,7 +44,6 @@ export function AdminPage() {
           <InvitationList panel={panel} />
         </>
       )}
-      <AccountSessionControls />
     </section>
   );
 }

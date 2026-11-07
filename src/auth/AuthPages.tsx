@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { BrandMark } from '../components/BrandMark';
 import { brand } from '../brand/brand.config';
-import { ThemeSelector } from '../theme/ThemeSelector';
+import { AccountMenu } from '../components/AccountMenu';
 import { useAuth } from './authContext';
 import { accountApi, AccountApiError } from '../lib/accountApi';
 import { isOpaqueCode } from './navigation';
@@ -20,7 +20,7 @@ export function AccountLayout({ children, portal = 'patient' }: { children: Reac
     <div className="account-shell" data-portal={portal}>
       <header className="account-shell__header">
         <a href={`#/${portal}`} aria-label={`${brand.productName} – ${portal === 'doctor' ? 'portalul medicilor' : 'portalul pacienților'}`}><BrandMark /></a>
-        <ThemeSelector />
+        <AccountMenu />
       </header>
       <main className="account-shell__main">{children}</main>
       <footer className="account-shell__footer">
@@ -64,25 +64,6 @@ export function GoogleSignIn({ destination = '/patient', doctor = false }: { des
   );
 }
 
-export function AccountSessionControls() {
-  const { session, signOut } = useAuth();
-  const [pending, setPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  async function exit() {
-    setPending(true);
-    setError(null);
-    try { await signOut(); } catch (reason) { setError(reason instanceof Error ? reason.message : 'Deconectarea nu a reușit.'); }
-    finally { setPending(false); }
-  }
-  return (
-    <div className="account-session">
-      <span className="account-small">{session?.user.email}</span>
-      <button className="ui-button ui-button--secondary" type="button" onClick={() => void exit()} disabled={pending} aria-busy={pending || undefined}>{pending ? 'Se deconectează…' : 'Deconectare'}</button>
-      {error && <p className="account-error" role="alert">{error}</p>}
-    </div>
-  );
-}
-
 /** Real routes fail closed; they never render the demo DoctorApp. */
 export function AuthBoundary({ children, destination, doctor = false, allowProfileError = false }: { children: ReactNode; destination: string; doctor?: boolean; allowProfileError?: boolean }) {
   const { status, session, error, refreshProfile } = useAuth();
@@ -93,7 +74,6 @@ export function AuthBoundary({ children, destination, doctor = false, allowProfi
       <h1>Nu am putut încărca contul dumneavoastră</h1>
       <p className="account-error" role="alert">{error}</p>
       <button className="ui-button ui-button--secondary" type="button" onClick={() => void refreshProfile()}>Încercați din nou</button>
-      <AccountSessionControls />
     </section>
   );
   return children;
@@ -131,7 +111,6 @@ export function DoctorInvitationPage({ token }: { token: string }) {
         {accepted ? (
           profile?.role === 'doctor' ? <a className="ui-button ui-button--primary" href="#/doctor">Deschideți spațiul de lucru al medicului</a> : <><p role="status">Accesul a fost acordat. Reîncărcați profilul înainte de a continua.</p><button className="ui-button ui-button--secondary" onClick={() => void refreshProfile()}>Reîncărcați profilul</button></>
         ) : <button className="ui-button ui-button--primary" type="button" onClick={() => void accept()} disabled={pending} aria-busy={pending || undefined}>{pending ? 'Se acceptă invitația…' : 'Acceptați invitația'}</button>}
-        <AccountSessionControls />
       </section>
     </AuthBoundary>
   );
