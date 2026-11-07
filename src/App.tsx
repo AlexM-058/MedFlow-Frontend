@@ -52,7 +52,7 @@ function PatientWorkspace() {
 function VerifiedDoctor() {
   const { profile } = useAuth();
   if (profile?.role !== 'doctor') return <section className="account-card"><h1>Accesul medicilor se face doar pe bază de invitație</h1><p>Deschideți invitația trimisă de echipa {brand.productName} și autentificați-vă cu contul Google invitat. Accesarea acestei pagini nu oferă drepturi de medic.</p><a href="#/patient">Mergeți la contul de pacient</a><AccountSessionControls /></section>;
-  if (DoctorAccountWorkspace) return <><DoctorAccountWorkspace profile={profile} onExit={() => navigate('/patient')} /><CaseInbox /></>;
+  if (DoctorAccountWorkspace) return <><DoctorAccountWorkspace profile={profile} onExit={() => navigate('/patient')} /></>;
   return <section className="account-card"><h1>Bun venit, {profile.fullName}</h1><p>Contul dumneavoastră de medic a fost verificat. Spațiul pentru codul QR și cererile de conectare este integrat separat. În această previzualizare nu sunt afișate date ale pacienților.</p><AccountSessionControls /></section>;
 }
 

@@ -1,6 +1,7 @@
 .account-shell { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
 .account-shell__header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; width: min(100%, 80rem); margin-inline: auto; padding: clamp(1rem, 3vw, 2rem); }
 .account-shell__main { flex: 1; width: min(100%, 52rem); margin-inline: auto; padding: clamp(1rem, 4vw, 3rem); min-width: 0; }
+.account-shell__main:has(.doctor-shell) { width: min(100%, 80rem); }
 .account-shell__footer { display: flex; flex-wrap: wrap; justify-content: center; gap: .75rem 1.5rem; padding: 1rem; font-size: var(--font-size-sm); }
 .account-shell a:not(.ui-button) { color: var(--color-text); text-underline-offset: .25em; overflow-wrap: anywhere; }
 /* Layout only; visuals and states come from src/styles/buttons.css. */
