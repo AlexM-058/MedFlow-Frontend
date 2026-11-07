@@ -18,11 +18,7 @@ export function ConnectStage() {
         {scanning ? (
           <QrScanner onCode={(code) => navigate(`/connect/${code}`)} onClose={() => setScanning(false)} />
         ) : (
-          <>
-            <button type="button" className="ui-button ui-button--primary journey__big-button" onClick={() => setScanning(true)}>Scanați codul QR</button>
-            {/* TEMPORARY: opens the synthetic local-agent chat without a connected doctor. Remove once the real flow is tested. */}
-            <button type="button" className="ui-button ui-button--secondary journey__big-button" onClick={() => navigate('/demo/local-chat')}>Deschideți chatul (temporar, test)</button>
-          </>
+          <button type="button" className="ui-button ui-button--primary journey__big-button" onClick={() => setScanning(true)}>Scanați codul QR</button>
         )}
       </section>
       <PendingConnections />

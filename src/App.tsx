@@ -3,7 +3,6 @@ import { AppHeader } from './components/AppHeader';
 import { brand } from './brand/brand.config';
 import { AuthProvider } from './auth/AuthProvider';
 import { useAuth } from './auth/authContext';
-import { CaseInbox } from './features/cases/CaseInbox';
 import { DoctorMessageNotice } from './features/doctor-notice';
 import { LivePatientContext } from './features/patient-context/LivePatientContext';
 import { LocalChatPage } from './features/local-chat/LocalChatPage';
@@ -22,7 +21,7 @@ import { ThemeProvider } from './theme/ThemeProvider';
 // Claude owns this optional module. Patient development works before its handoff.
 const doctorModules = import.meta.glob<{
   DoctorApp: ComponentType<{ onExit: () => void }>;
-  DoctorAccountWorkspace?: ComponentType<{ profile: AccountProfile; onExit: () => void }>;
+  DoctorAccountWorkspace?: ComponentType<{ profile: AccountProfile }>;
 }>(
   './features/doctor/index.ts',
   { eager: true },
@@ -55,7 +54,7 @@ function PatientWorkspace() {
 function VerifiedDoctor() {
   const { profile } = useAuth();
   if (profile?.role !== 'doctor') return <section className="account-card"><h1>Accesul medicilor se face doar pe bază de invitație</h1><p>Deschideți invitația trimisă de echipa {brand.productName} și autentificați-vă cu contul Google invitat. Accesarea acestei pagini nu oferă drepturi de medic.</p><a href="#/patient">Mergeți la contul de pacient</a><AccountSessionControls /></section>;
-  if (DoctorAccountWorkspace) return <><DoctorAccountWorkspace profile={profile} onExit={() => navigate('/patient')} /></>;
+  if (DoctorAccountWorkspace) return <DoctorAccountWorkspace profile={profile} />;
   return <section className="account-card"><h1>Bun venit, {profile.fullName}</h1><p>Contul dumneavoastră de medic a fost verificat. Spațiul pentru codul QR și cererile de conectare este integrat separat. În această previzualizare nu sunt afișate date ale pacienților.</p><AccountSessionControls /></section>;
 }
 
@@ -64,7 +63,7 @@ function PatientAccount() {
   if (profile?.role === 'doctor') return <section className="account-card"><h1>Contul dumneavoastră de medic este pregătit</h1><a className="ui-button ui-button--primary" href="#/doctor">Deschideți spațiul de lucru al medicului</a><AccountSessionControls /></section>;
   // Nothing but the current step until a doctor is connected; then the doctor's message comes first.
   const connected = (profile?.activeDoctors.length ?? 0) > 0;
-  return <>{connected && <DoctorMessageNotice />}{connected && <LivePatientContext />}<PatientJourney />{connected && <CaseInbox />}<AccountSessionControls /></>;
+  return <>{connected && <DoctorMessageNotice />}<PatientJourney />{connected && <LivePatientContext />}<AccountSessionControls /></>;
 }
 
 function SignedInControls() {

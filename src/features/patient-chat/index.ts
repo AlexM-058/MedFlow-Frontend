@@ -1,0 +1,1 @@
+export { PatientChat } from './PatientChat';
