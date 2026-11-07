@@ -1,0 +1,1 @@
+export { DoctorMessageNotice } from './DoctorMessageNotice';
