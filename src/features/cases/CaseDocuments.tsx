@@ -3,6 +3,7 @@ import type { ConfirmedMedication } from '../care-scenario/contracts';
 import { createLivePrescriptionAdapter } from '../care-scenario/live/liveAdapters';
 import { PrescriptionReviewPanel } from '../prescription-review';
 import { DocumentBatch } from './DocumentBatch';
+import { MedicationListReview } from './MedicationListReview';
 
 /**
  * Optional step inside a case: the patient adds a prescription photo, the server reads it, and the
@@ -62,6 +63,7 @@ export function CaseDocuments({ caseId, token }: { caseId: string; token: string
         <summary>Încărcați mai multe foi deodată (dosar întreg)</summary>
         <DocumentBatch caseId={caseId} token={token} onFinished={() => setRevision((value) => value + 1)} />
       </details>
+      <MedicationListReview caseId={caseId} token={token} refreshKey={revision} onSaved={() => setRevision((value) => value + 1)} />
     </section>
   );
 }
