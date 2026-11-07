@@ -14,7 +14,6 @@ import { brand } from '../../../brand/brand.config';
 export interface DoctorAccountWorkspaceProps {
   /** Server profile from /me; the app shell mounts this only for role 'doctor'. */
   profile: AccountProfile;
-  onExit: () => void;
 }
 
 type Section = 'patients' | 'requests';
@@ -29,7 +28,7 @@ const SECTIONS: { id: Section; label: string }[] = [
  * button, account) and one main area with the patient backlog. Never falls back to demo fixtures: failures show errors
  * and retry, not sample data.
  */
-export function DoctorAccountWorkspace({ profile, onExit }: DoctorAccountWorkspaceProps) {
+export function DoctorAccountWorkspace({ profile }: DoctorAccountWorkspaceProps) {
   const { session, signOut } = useAuth();
   const token = session?.access_token ?? null;
   const requests = useConnectionRequests(token);
@@ -100,9 +99,6 @@ export function DoctorAccountWorkspace({ profile, onExit }: DoctorAccountWorkspa
         </button>
 
         <div className="doctor-shell__foot">
-          <button type="button" className="doctor-button doctor-button--secondary" onClick={onExit}>
-            Zona pentru pacienți
-          </button>
           <button type="button" className="doctor-button doctor-button--secondary" onClick={() => void handleSignOut()} disabled={signingOut} aria-busy={signingOut}>
             {signingOut ? 'Se deconectează…' : 'Deconectare'}
           </button>
