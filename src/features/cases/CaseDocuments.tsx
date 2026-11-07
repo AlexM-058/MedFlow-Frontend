@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ConfirmedMedication } from '../care-scenario/contracts';
 import { createLivePrescriptionAdapter } from '../care-scenario/live/liveAdapters';
 import { PrescriptionReviewPanel } from '../prescription-review';
+import { DocumentBatch } from './DocumentBatch';
 
 /**
  * Optional step inside a case: the patient adds a prescription photo, the server reads it, and the
@@ -16,6 +17,7 @@ export function CaseDocuments({ caseId, token }: { caseId: string; token: string
   );
   const [confirmed, setConfirmed] = useState<ConfirmedMedication[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [revision, setRevision] = useState(0);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -27,7 +29,7 @@ export function CaseDocuments({ caseId, token }: { caseId: string; token: string
       },
     );
     return () => controller.abort();
-  }, [adapter]);
+  }, [adapter, revision]);
 
   const onConfirmed = useCallback((medications: ConfirmedMedication[]) => {
     setConfirmed((current) => [
@@ -55,6 +57,10 @@ export function CaseDocuments({ caseId, token }: { caseId: string; token: string
       <details>
         <summary>{confirmed.length > 0 ? 'Adăugați o altă rețetă' : 'Adăugați o rețetă'}</summary>
         <PrescriptionReviewPanel adapter={adapter} onConfirmed={onConfirmed} />
+      </details>
+      <details>
+        <summary>Încărcați mai multe foi deodată (dosar întreg)</summary>
+        <DocumentBatch caseId={caseId} token={token} onFinished={() => setRevision((value) => value + 1)} />
       </details>
     </section>
   );
