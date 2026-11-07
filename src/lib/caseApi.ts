@@ -26,6 +26,19 @@ export interface CaseMessageRecord {
   createdAt: string;
 }
 
+export interface CaseDecision {
+  id: string;
+  caseId: string;
+  doctorId: string;
+  text: string;
+  createdAt: string;
+}
+
+function decisionRecord(value: unknown): CaseDecision {
+  const data = record(value);
+  return { id: string(data.id), caseId: string(data.case_id), doctorId: string(data.doctor_id), text: string(data.final_response), createdAt: string(data.created_at) };
+}
+
 export interface CaseDocumentRecord {
   id: string;
   caseId: string;
@@ -257,6 +270,24 @@ async function request(path: string, options: RequestOptions): Promise<unknown> 
 const caseUrl = (caseId: string) => `/cases/${encodeURIComponent(caseId)}`;
 
 export const caseApi = {
+  async listCases(token: string, offset = 0, signal?: AbortSignal): Promise<CaseRecord[]> {
+    const data = record(await request(`/cases?limit=50&offset=${offset}`, { method: 'GET', token, operation: 'case', signal }));
+    if (!Array.isArray(data.cases)) throw invalid();
+    return data.cases.map(caseRecord);
+  },
+  async listMessages(token: string, caseId: string, offset = 0, signal?: AbortSignal): Promise<CaseMessageRecord[]> {
+    const data = record(await request(`${caseUrl(caseId)}/messages?limit=100&offset=${offset}`, { method: 'GET', token, operation: 'message', signal }));
+    if (!Array.isArray(data.messages)) throw invalid();
+    return data.messages.map(messageRecord);
+  },
+  async getDecision(token: string, caseId: string, signal?: AbortSignal): Promise<CaseDecision | null> {
+    const data = record(await request(`${caseUrl(caseId)}/decision`, { method: 'GET', token, operation: 'case', signal }));
+    return data.decision === null ? null : decisionRecord(data.decision);
+  },
+  async sendDecision(token: string, caseId: string, text: string): Promise<CaseDecision> {
+    const data = record(await request(`${caseUrl(caseId)}/decision`, { method: 'POST', token, operation: 'case', json: { finalResponse: text } }));
+    return decisionRecord(data.decision);
+  },
   /** Patient opens a case with their active doctor (409 NO_ACTIVE_DOCTOR when none). */
   async createCase(token: string, doctorId?: string, signal?: AbortSignal): Promise<CaseRecord> {
     return caseRecord(await request('/cases', { method: 'POST', token, operation: 'case', json: doctorId ? { doctorId } : {}, signal }));

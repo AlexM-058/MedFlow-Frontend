@@ -3,6 +3,7 @@ import { AppHeader } from './components/AppHeader';
 import { brand } from './brand/brand.config';
 import { AuthProvider } from './auth/AuthProvider';
 import { useAuth } from './auth/authContext';
+import { CaseInbox } from './features/cases/CaseInbox';
 import type { AccountProfile } from './auth/contracts';
 import { readAppRoute, subscribeToRoute, navigate } from './auth/navigation';
 import { AccountLayout, AccountSessionControls, AuthBoundary, DoctorInvitationPage } from './auth/AuthPages';
@@ -51,14 +52,14 @@ function PatientWorkspace() {
 function VerifiedDoctor() {
   const { profile } = useAuth();
   if (profile?.role !== 'doctor') return <section className="account-card"><h1>Accesul medicilor se face doar pe bază de invitație</h1><p>Deschideți invitația trimisă de echipa {brand.productName} și autentificați-vă cu contul Google invitat. Accesarea acestei pagini nu oferă drepturi de medic.</p><a href="#/patient">Mergeți la contul de pacient</a><AccountSessionControls /></section>;
-  if (DoctorAccountWorkspace) return <DoctorAccountWorkspace profile={profile} onExit={() => navigate('/patient')} />;
+  if (DoctorAccountWorkspace) return <><DoctorAccountWorkspace profile={profile} onExit={() => navigate('/patient')} /><CaseInbox /></>;
   return <section className="account-card"><h1>Bun venit, {profile.fullName}</h1><p>Contul dumneavoastră de medic a fost verificat. Spațiul pentru codul QR și cererile de conectare este integrat separat. În această previzualizare nu sunt afișate date ale pacienților.</p><AccountSessionControls /></section>;
 }
 
 function PatientAccount() {
   const { profile } = useAuth();
   if (profile?.role === 'doctor') return <section className="account-card"><h1>Contul dumneavoastră de medic este pregătit</h1><a className="ui-button ui-button--primary" href="#/doctor">Deschideți spațiul de lucru al medicului</a><AccountSessionControls /></section>;
-  return <><PatientJourney /><AccountSessionControls /></>;
+  return <><PatientJourney /><CaseInbox /><AccountSessionControls /></>;
 }
 
 function SignedInControls() {

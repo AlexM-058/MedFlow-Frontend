@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useId, useState } from 'react';
 import type { ConfirmedMedication, MedicationSchedule, ScheduleAdapter } from '../care-scenario/contracts';
 import { DataSourceBadge } from '../care-scenario/DataSourceBadge';
-import { ScheduleCard, formatDoseDay } from './ScheduleCard';
+import { ScheduleCard } from './ScheduleCard';
+import { formatDoseDay } from './scheduleLabels';
 import { NotSchedulableCard, ScheduleForm, type ScheduleRequest } from './ScheduleForm';
 import { classifyRegimen, deviceTimeZone, effectiveStatus, nextDose, PERMISSION_MESSAGES } from './scheduleLogic';
 import { useReminders } from './useReminders';

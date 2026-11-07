@@ -1,11 +1,7 @@
 import { useId, useRef, useState } from 'react';
 import type { MedicationSchedule } from '../care-scenario/contracts';
-import { formatDate, formatDoseDay as formatDoseDayEn, nextDoseOf, upcomingSkipped } from './scheduleLogic';
-
-export function formatDoseDay(...args: Parameters<typeof formatDoseDayEn>): string {
-  const day = formatDoseDayEn(...args);
-  return day === 'today' ? 'astăzi' : day === 'tomorrow' ? 'mâine' : day;
-}
+import { formatDate, nextDoseOf, upcomingSkipped } from './scheduleLogic';
+import { formatDoseDay } from './scheduleLabels';
 
 export function ScheduleCard({
   schedule,
