@@ -58,7 +58,12 @@ export function MedicationListReview({ caseId, token, refreshKey, onSaved, mode 
   }
 
   async function save() {
+    if (status.kind === 'saving') return;
     const { reviews, skipped } = buildReviews(documents, rows, effective, new Date().toISOString(), { includeReviewed });
+    if (reviews.length === 0) {
+      setStatus({ kind: 'error', text: 'Verificați toate medicamentele de pe cel puțin o foaie înainte de a o adăuga în dosar.' });
+      return;
+    }
     setStatus({ kind: 'saving', text: `Se salvează 0 din ${reviews.length}…` });
     let saved = 0;
     try {
@@ -69,7 +74,7 @@ export function MedicationListReview({ caseId, token, refreshKey, onSaved, mode 
       }
       setStatus({
         kind: 'done',
-        text: `Salvat. ${saved} foi confirmate.${skipped.length ? ` ${skipped.length} foi rămân neconfirmate, pentru că au medicamente nebifate.` : ''}`,
+        text: `Adăugat în dosar: ${saved} foi confirmate.${skipped.length ? ` ${skipped.length} foi rămân neconfirmate, pentru că au medicamente nebifate.` : ''}`,
       });
       setDecisions({});
       setOpen({});
@@ -131,8 +136,9 @@ export function MedicationListReview({ caseId, token, refreshKey, onSaved, mode 
           );
         })}
       </ul>
+      <p className="step__hint">Medicamentele verificate intră în tratamentul din dosar după salvare.</p>
       <button type="button" className="ui-button ui-button--primary" disabled={ready === 0 || status.kind === 'saving'} onClick={() => void save()}>
-        Salvați ({ready} din {rows.length})
+        {status.kind === 'saving' ? 'Se salvează…' : mode === 'update' ? 'Salvați modificările' : 'Adaugă în dosar'} ({ready} din {rows.length})
       </button>
       {status.text && <p role={status.kind === 'error' ? 'alert' : 'status'}>{status.text}</p>}
     </section>

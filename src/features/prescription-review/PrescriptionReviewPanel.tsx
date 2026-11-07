@@ -341,7 +341,7 @@ export function PrescriptionReviewPanel({ adapter, onConfirmed, compact = false 
                   else setFixing('missing');
                 }}
               >
-                {saving ? 'Se salvează…' : 'Confirmați rețeta'}
+                {saving ? 'Se adaugă în dosar…' : 'Adaugă în dosar'}
               </button>
             )}
             {total > 0 && fixing === 'none' && (
@@ -454,7 +454,7 @@ export function PrescriptionReviewPanel({ adapter, onConfirmed, compact = false 
                     aria-describedby={missing.length > 0 ? missingId : undefined}
                     onClick={() => void handleSave()}
                   >
-                    {saving ? 'Se salvează…' : saveError ? 'Încercați din nou salvarea' : 'Confirmați rețeta'}
+                    {saving ? 'Se adaugă în dosar…' : saveError ? 'Încercați din nou salvarea' : 'Adaugă în dosar'}
                   </button>
                   <button type="button" className="ui-button ui-button--secondary" disabled={saving} onClick={scanAnother}>
                     {compact ? 'Altă poză' : 'Scanați altul'}

@@ -100,12 +100,12 @@ export function DocumentsStep({ caseId, token, onContinue, onSkip }: StepProps) 
       </StepShell>
       <Modal open={modal === 'upload'} title="Încărcați documente" onClose={close}>
         <DocumentBatch caseId={caseId} token={token} onFinished={refresh} />
-        <MedicationListReview caseId={caseId} token={token} refreshKey={revision} mode="pending" onSaved={refresh} />
         <FindingsSummary caseId={caseId} token={token} refreshKey={revision} />
+        <MedicationListReview caseId={caseId} token={token} refreshKey={revision} mode="pending" onSaved={refresh} />
       </Modal>
       <Modal open={modal === 'update'} title="Actualizați medicamentele" onClose={close}>
-        <MedicationListReview caseId={caseId} token={token} refreshKey={revision} mode="update" onSaved={refresh} />
         <FindingsSummary caseId={caseId} token={token} refreshKey={revision} />
+        <MedicationListReview caseId={caseId} token={token} refreshKey={revision} mode="update" onSaved={refresh} />
       </Modal>
     </>
   );
