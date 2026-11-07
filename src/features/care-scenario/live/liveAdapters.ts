@@ -1,10 +1,11 @@
-// Live adapters for domains that have a Backend endpoint today. Only prescription
-// extraction exists (POST /cases/:id/documents). Review and the confirmed list have
-// no endpoint yet: they reject with LiveNotAvailableError; there is no silent fixture
-// fallback. Domains without endpoints (context, intake, schedule, case summary,
-// feedback, variants) have no live adapter here.
+// Live adapters for domains that have a Backend endpoint today: prescription extraction
+// (POST /cases/:id/documents), the patient's review (POST /cases/:id/documents/:docId/review)
+// and the confirmed list (GET /cases/:id/documents). There is no silent fixture fallback.
+// Domains without endpoints (context, intake, schedule, case summary, feedback, variants)
+// have no live adapter here.
 import { CaseApiError, caseApi } from '../../../lib/caseApi';
-import type { ConfirmedMedication, ExtractedDocument, LocalDocument, PrescriptionAdapter } from '../contracts';
+import type { ConfirmedMedication, ExtractedDocument, LocalDocument, PrescriptionAdapter, ReviewedField } from '../contracts';
+import { mapConfirmedMedications } from './mapConfirmedMedications';
 import { mapExtractedDocument } from './mapExtractedDocument';
 
 export { mapExtractedDocument, UNEXPECTED_FORMAT_WARNING } from './mapExtractedDocument';
@@ -36,24 +37,43 @@ async function readLocalFile(document: LocalDocument, signal?: AbortSignal): Pro
   return blob.type ? blob : new Blob([blob], { type: document.mimeType });
 }
 
+/** Old rows saved while the extraction service was down: they hold no reading, so they are never shown as one. */
+function isFailedExtraction(data: unknown): boolean {
+  return !!data && typeof data === 'object' && (data as { extraction_status?: unknown }).extraction_status === 'unavailable';
+}
+
 export function createLivePrescriptionAdapter(options: LivePrescriptionOptions): PrescriptionAdapter {
+  function requireToken(): string {
+    const token = options.getToken();
+    if (!token) throw new CaseApiError('Sesiunea a expirat. Vă rugăm să vă autentificați din nou.', 401, 'UNAUTHORIZED');
+    return token;
+  }
+  async function listConfirmed(signal?: AbortSignal): Promise<ConfirmedMedication[]> {
+    const token = requireToken();
+    const caseId = await options.getCaseId();
+    return mapConfirmedMedications(await caseApi.listDocuments(token, caseId, signal));
+  }
   return {
     source: 'live',
     async extract(document: LocalDocument, signal?: AbortSignal): Promise<ExtractedDocument> {
       if (signal?.aborted) throw new DOMException('Cancelled', 'AbortError');
-      const token = options.getToken();
-      if (!token) throw new CaseApiError('Sesiunea a expirat. Vă rugăm să vă autentificați din nou.', 401, 'UNAUTHORIZED');
+      const token = requireToken();
       const file = await readLocalFile(document, signal);
       const caseId = await options.getCaseId();
       if (signal?.aborted) throw new DOMException('Cancelled', 'AbortError');
       const uploaded = await caseApi.uploadDocument(token, caseId, file, 'prescription', signal);
+      if (isFailedExtraction(uploaded.extractedData)) {
+        // The Backend no longer answers like this, but never present "nothing read" as "no medication found".
+        throw new CaseApiError('Serviciul de citire a documentelor nu este disponibil. Încercați din nou.', 503, 'EXTRACTION_UNAVAILABLE');
+      }
       return mapExtractedDocument(uploaded, document.fileName);
     },
-    async saveReview(): Promise<ConfirmedMedication[]> {
-      throw new LiveNotAvailableError();
+    async saveReview(documentId: string, fields: ReviewedField[]): Promise<ConfirmedMedication[]> {
+      const token = requireToken();
+      const caseId = await options.getCaseId();
+      await caseApi.reviewDocument(token, caseId, documentId, fields);
+      return (await listConfirmed()).filter((medication) => medication.documentId === documentId);
     },
-    async listConfirmed(): Promise<ConfirmedMedication[]> {
-      throw new LiveNotAvailableError();
-    },
+    listConfirmed,
   };
 }

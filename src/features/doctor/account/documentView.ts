@@ -1,4 +1,5 @@
 import type { CaseDocumentRecord } from '../../../lib/caseApi.ts';
+import { mapConfirmedMedications } from '../../care-scenario/live/mapConfirmedMedications.ts';
 import { mapExtractedDocument } from '../../care-scenario/live/mapExtractedDocument.ts';
 
 export type DocumentStatus = 'extracted' | 'empty' | 'unavailable';
@@ -10,10 +11,22 @@ export interface DocumentView {
   sizeLabel: string;
   status: DocumentStatus;
   statusLabel: string;
-  medications: { name: string; dose: string; frequency: string; duration: string }[];
+  /** Patient review state of a prescription; null when it does not apply (other documents, nothing read). */
+  review: 'confirmed' | 'unreviewed' | null;
+  reviewLabel: string | null;
+  medications: {
+    name: string; dose: string; frequency: string; duration: string;
+    /** Only on confirmed rows: fields the patient changed, with what the reader saw. */
+    corrections?: { label: string; readerSaw: string; patientValue: string }[];
+  }[];
   dates: { label: string; value: string }[];
   warnings: string[];
 }
+
+export const REVIEW_LABELS = {
+  confirmed: 'Confirmat de pacient',
+  unreviewed: 'Neconfirmat de pacient: citit automat, poate conține erori',
+} as const;
 
 const TYPE_LABELS: Record<string, string> = {
   prescription: 'Rețetă',
@@ -56,16 +69,36 @@ export function describeDocument(document: CaseDocumentRecord): DocumentView {
     sizeLabel: formatSize(document.sizeBytes),
   };
   if (extractionUnavailable(document.extractedData)) {
-    return { ...base, status: 'unavailable', statusLabel: STATUS_LABELS.unavailable, medications: [], dates: [], warnings: [] };
+    return { ...base, status: 'unavailable', statusLabel: STATUS_LABELS.unavailable, review: null, reviewLabel: null, medications: [], dates: [], warnings: [] };
   }
   const mapped = mapExtractedDocument(document);
-  const medications = mapped.medications.map((medication) => ({
-    name: medication.name ?? MISSING,
-    dose: medication.dose ?? MISSING,
-    frequency: medication.frequency ?? MISSING,
-    duration: medication.duration ?? MISSING,
-  }));
+  // A reviewed prescription shows what the patient confirmed (and what they changed); otherwise the
+  // reader's output is shown, clearly marked as unconfirmed.
+  const confirmed = mapConfirmedMedications([document]);
+  const medications: DocumentView['medications'] = confirmed.length > 0
+    ? confirmed.map((medication) => {
+        const corrections = medication.fields
+          .filter((field) => (field.extracted ?? null) !== (field.value ?? null))
+          .map((field) => ({ label: field.label, readerSaw: field.extracted ?? MISSING, patientValue: field.value ?? MISSING }));
+        return {
+          name: medication.name,
+          dose: medication.doseText,
+          frequency: medication.instructionOriginal,
+          duration: medication.durationText ?? MISSING,
+          ...(corrections.length > 0 ? { corrections } : {}),
+        };
+      })
+    : mapped.medications.map((medication) => ({
+        name: medication.name ?? MISSING,
+        dose: medication.dose ?? MISSING,
+        frequency: medication.frequency ?? MISSING,
+        duration: medication.duration ?? MISSING,
+      }));
+  const review: DocumentView['review'] = confirmed.length > 0 ? 'confirmed' : mapped.medications.length > 0 ? 'unreviewed' : null;
   const dates = mapped.dates.map((entry) => ({ label: entry.label ?? 'Dată', value: entry.value ?? MISSING }));
   const status: DocumentStatus = medications.length > 0 || dates.length > 0 ? 'extracted' : 'empty';
-  return { ...base, status, statusLabel: STATUS_LABELS[status], medications, dates, warnings: mapped.warnings };
+  return {
+    ...base, status, statusLabel: STATUS_LABELS[status], review, reviewLabel: review ? REVIEW_LABELS[review] : null,
+    medications, dates, warnings: mapped.warnings,
+  };
 }

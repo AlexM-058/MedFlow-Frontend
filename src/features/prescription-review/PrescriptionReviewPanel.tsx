@@ -206,7 +206,9 @@ export function PrescriptionReviewPanel({ adapter, onConfirmed }: PrescriptionRe
           <h3 ref={headingRef} tabIndex={-1} className="rx-review-step__title">
             Pasul 1: Scanați rețeta
           </h3>
-          <p className="rx-review-note">Demo: folosiți doar o rețetă tipărită sintetică, niciodată una reală.</p>
+          {adapter.source !== 'live' && (
+            <p className="rx-review-note">Demo: folosiți doar o rețetă tipărită sintetică, niciodată una reală.</p>
+          )}
           <DocumentScanner title="Scanare rețetă" onConfirm={handleScanned} />
         </div>
       )}

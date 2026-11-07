@@ -1,5 +1,5 @@
 import type { CaseDocumentRecord } from '../../../lib/caseApi.ts';
-import { describeDocument, formatSize, MISSING } from './documentView.ts';
+import { describeDocument, formatSize, MISSING, REVIEW_LABELS } from './documentView.ts';
 
 const assert = {
   equal(actual: unknown, expected: unknown) {
@@ -8,7 +8,7 @@ const assert = {
 };
 
 const doc = (extractedData: unknown, over: Partial<CaseDocumentRecord> = {}): CaseDocumentRecord =>
-  ({ id: 'd1', caseId: 'c1', uploadedBy: 'p1', documentType: 'prescription', mimeType: 'image/jpeg', sizeBytes: 1_300_000, extractedData, createdAt: '2026-11-07T09:00:00Z', ...over });
+  ({ id: 'd1', caseId: 'c1', uploadedBy: 'p1', documentType: 'prescription', mimeType: 'image/jpeg', sizeBytes: 1_300_000, extractedData, review: null, reviewedAt: null, createdAt: '2026-11-07T09:00:00Z', ...over });
 
 // Extracted medications are copied as text; a missing field is a dash, never a guess.
 const extracted = describeDocument(doc({
@@ -42,5 +42,36 @@ assert.equal(describeDocument(doc({}, { documentType: 'lab_result' })).typeLabel
 assert.equal(formatSize(512), '512 B');
 assert.equal(formatSize(2048), '2 KB');
 assert.equal(formatSize(-1), MISSING);
+
+// Review state: an unreviewed prescription is marked unconfirmed; a reviewed one shows the patient's
+// confirmed values and what they changed compared with the reader.
+assert.equal(extracted.review, 'unreviewed');
+assert.equal(extracted.reviewLabel, REVIEW_LABELS.unreviewed);
+assert.equal(describeDocument(doc({ medications: [], dates: [] })).review, null);
+
+const reviewField = (path: string, label: string, readerSaw: string | null, value: string | null) => ({
+  path, label, extracted: readerSaw, value, confirmation: { status: 'confirmed', by: 'patient', at: '2026-11-07T10:00:00Z' },
+});
+const reviewed = describeDocument(doc(
+  { medications: [{ name: 'Amlodipină', dose: '5 mg', frequency: 'zilnic', duration: null }], dates: [] },
+  {
+    reviewedAt: '2026-11-07T10:00:00Z',
+    review: {
+      fields: [
+        reviewField('medications.0.name', 'Medicament', 'Amlodipină', 'Amlodipină'),
+        reviewField('medications.0.dose', 'Doză', '5 mg', '10 mg'),
+        reviewField('medications.0.frequency', 'Frecvență', 'zilnic', 'zilnic'),
+        reviewField('medications.0.duration', 'Durată', null, null),
+      ],
+      medications: [{ name: 'Amlodipină', dose: '10 mg', frequency: 'zilnic', duration: null }],
+    },
+  },
+));
+assert.equal(reviewed.review, 'confirmed');
+assert.equal(reviewed.reviewLabel, REVIEW_LABELS.confirmed);
+assert.equal(reviewed.medications[0]?.dose, '10 mg');
+assert.equal(reviewed.medications[0]?.corrections, [{ label: 'Doză', readerSaw: '5 mg', patientValue: '10 mg' }]);
+// A broken review is never shown as confirmed.
+assert.equal(describeDocument(doc({ medications: [{ name: 'X', dose: '1 mg', frequency: 'zilnic', duration: null }] }, { review: { medications: [{ name: 'X' }] } })).review, 'unreviewed');
 
 console.log('documentView: ok');

@@ -35,7 +35,9 @@ function captureViaFileInput(preferCamera: boolean): Promise<ScanCaptureResult |
   return new Promise((resolve) => {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = 'image/jpeg,image/png,application/pdf,image/*';
+    // Only what the Backend accepts (JPEG, PNG, PDF). No `image/*`: it would let HEIC/WebP through and
+    // fail only at upload; with a restricted list phones convert photos to JPEG themselves.
+    input.accept = 'image/jpeg,image/png,application/pdf';
     if (preferCamera) {
       input.setAttribute('capture', 'environment');
     }

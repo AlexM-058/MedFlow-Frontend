@@ -11,6 +11,8 @@ const base = (extractedData: unknown, documentType = 'prescription'): CaseDocume
   mimeType: 'image/jpeg',
   sizeBytes: 1234,
   extractedData,
+  review: null,
+  reviewedAt: null,
   createdAt: '2026-11-07T09:00:00.000Z',
 });
 

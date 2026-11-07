@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useState } from 'react';
+import { Fragment, useEffect, useId, useMemo, useState } from 'react';
 import { caseApi, type CaseDocumentRecord } from '../../../lib/caseApi';
 import { describeDocument, MISSING } from './documentView';
 
@@ -50,17 +50,31 @@ export function DoctorPatientDocuments({ token, caseId }: { token: string; caseI
                 </summary>
                 {view.status === 'unavailable' && <p>Citirea automată a documentului nu a fost disponibilă. Documentul a fost primit, dar conținutul lui nu a putut fi extras.</p>}
                 {view.status === 'empty' && <p>Din document nu s-au putut citi câmpuri.</p>}
+                {view.reviewLabel && (
+                  <p className={`doctor-documents__review doctor-documents__review--${view.review}`}>{view.reviewLabel}</p>
+                )}
                 {view.medications.length > 0 && (
                   <table className="doctor-documents__table">
-                    <caption className="doctor-sr-only">Medicamente extrase</caption>
+                    <caption className="doctor-sr-only">{view.review === 'confirmed' ? 'Medicamente confirmate de pacient' : 'Medicamente extrase'}</caption>
                     <thead><tr><th scope="col">Medicament</th><th scope="col">Doză</th><th scope="col">Frecvență</th><th scope="col">Durată</th></tr></thead>
                     <tbody>{view.medications.map((medication, index) => (
-                      <tr key={index}>
-                        <th scope="row">{medication.name}</th>
-                        <td>{medication.dose}</td>
-                        <td>{medication.frequency}</td>
-                        <td>{medication.duration}</td>
-                      </tr>
+                      <Fragment key={index}>
+                        <tr>
+                          <th scope="row">{medication.name}</th>
+                          <td>{medication.dose}</td>
+                          <td>{medication.frequency}</td>
+                          <td>{medication.duration}</td>
+                        </tr>
+                        {medication.corrections && (
+                          <tr className="doctor-documents__corrections">
+                            <td colSpan={4}>
+                              {medication.corrections.map((correction, position) => (
+                                <p key={position}>Corectat de pacient, {correction.label}: cititorul a văzut „{correction.readerSaw}”, pacientul a confirmat „{correction.patientValue}”</p>
+                              ))}
+                            </td>
+                          </tr>
+                        )}
+                      </Fragment>
                     ))}</tbody>
                   </table>
                 )}

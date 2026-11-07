@@ -5,7 +5,7 @@
 // from the HTTP status (English), and the server text is kept only for diagnostics.
 // Transport rules mirror accountApi.ts.
 import { supportContact } from '../brand/brandAsset';
-import type { ContextItem, ContextKind } from '../features/care-scenario/contracts';
+import type { ContextItem, ContextKind, ReviewedField } from '../features/care-scenario/contracts';
 
 function contextRecord(value: unknown): ContextItem {
   const data = record(value);
@@ -84,6 +84,9 @@ export interface CaseDocumentRecord {
   sizeBytes: number;
   /** Raw `extracted_data` from the extraction service; validate before use (see live/mapExtractedDocument.ts). */
   extractedData: unknown;
+  /** The patient's review of the extracted data (`{fields, medications}`), or null when not reviewed yet. */
+  review: unknown;
+  reviewedAt: string | null;
   createdAt: string;
 }
 
@@ -97,6 +100,7 @@ export type CaseApiErrorCode =
   | 'FILE_TOO_LARGE'
   | 'UNSUPPORTED_FILE'
   | 'EXTRACTION_UNAVAILABLE'
+  | 'UNREADABLE_DOCUMENT'
   | 'SERVICE_UNAVAILABLE'
   | 'TIMEOUT'
   | 'NOT_CONFIGURED'
@@ -131,7 +135,7 @@ const DEFAULT_TIMEOUT_MS = 15000;
 /** Extraction can take up to 60 s on the server, plus the upload itself. */
 const UPLOAD_TIMEOUT_MS = 70000;
 
-type Operation = 'case' | 'message' | 'upload';
+type Operation = 'case' | 'message' | 'upload' | 'review';
 
 function errorFor(status: number, operation: Operation): { message: string; code: CaseApiErrorCode } {
   switch (status) {
@@ -159,6 +163,11 @@ function errorFor(status: number, operation: Operation): { message: string; code
       return { code: 'FILE_TOO_LARGE', message: 'Fișierul este prea mare. Dimensiunea maximă este de 10 MB.' };
     case 415:
       return { code: 'UNSUPPORTED_FILE', message: 'Acest tip de fișier nu este acceptat. Folosiți un fișier JPG, PNG sau PDF.' };
+    case 422:
+      // Upload: the server read the file but found no usable text. Review: the review does not match the document.
+      return operation === 'review'
+        ? { code: 'INVALID_REQUEST', message: 'Verificarea nu corespunde documentului citit. Reîncărcați pagina și reluați verificarea.' }
+        : { code: 'UNREADABLE_DOCUMENT', message: 'Nu am putut citi documentul. Faceți o poză mai clară, cu toată rețeta în cadru, și încercați din nou. Documentul rămâne pe acest dispozitiv.' };
     case 502:
     case 503:
     case 504:
@@ -236,6 +245,8 @@ function documentRecord(value: unknown): CaseDocumentRecord {
     mimeType: string(data.mime_type),
     sizeBytes: data.size_bytes,
     extractedData: data.extracted_data ?? null,
+    review: data.review ?? null,
+    reviewedAt: typeof data.reviewed_at === 'string' && data.reviewed_at ? data.reviewed_at : null,
     createdAt: string(data.created_at),
   };
 }
@@ -393,8 +404,18 @@ export const caseApi = {
     return messageRecord(await request(`${caseUrl(caseId)}/messages`, { method: 'POST', token, operation: 'message', json: { content: trimmed }, signal }));
   },
   /**
+   * Saves the patient's review of an extracted prescription (patient only). The server checks it against
+   * what the reader extracted; a mismatch is a 422 (INVALID_REQUEST). Returns the updated document.
+   */
+  async reviewDocument(token: string, caseId: string, documentId: string, fields: ReviewedField[], signal?: AbortSignal): Promise<CaseDocumentRecord> {
+    return documentRecord(await request(`${caseUrl(caseId)}/documents/${encodeURIComponent(documentId)}/review`, {
+      method: 'POST', token, operation: 'review', json: { fields }, signal,
+    }));
+  },
+  /**
    * Uploads the raw file; the server extracts it (up to 60 s) and stores only the result.
-   * On EXTRACTION_UNAVAILABLE / TIMEOUT nothing is saved: keep the local file and offer a retry.
+   * On any failure (UNREADABLE_DOCUMENT, EXTRACTION_UNAVAILABLE, TIMEOUT) NOTHING is saved on the server:
+   * keep the local file and offer a retry.
    */
   async uploadDocument(token: string, caseId: string, file: Blob, documentType: CaseDocumentType, signal?: AbortSignal): Promise<CaseDocumentRecord> {
     if (!DOCUMENT_TYPES.includes(documentType)) throw new CaseApiError('Tipul documentului nu este valid.', 400, 'INVALID_REQUEST');
