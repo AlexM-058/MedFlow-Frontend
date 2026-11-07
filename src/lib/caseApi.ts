@@ -8,6 +8,9 @@ import { supportContact } from '../brand/brandAsset';
 
 export type CaseDocumentType = 'prescription' | 'lab_result' | 'medical_letter' | 'other';
 
+/** Backlog state computed by the Backend for a doctor: see Backend README, GET /cases. */
+export type CaseReviewState = 'new' | 'needs_review' | 'up_to_date';
+
 export interface CaseRecord {
   id: string;
   patientId: string;
@@ -16,6 +19,10 @@ export interface CaseRecord {
   status: string;
   createdAt: string;
   updatedAt: string;
+  /** Doctor list only. Optional: absent when the Backend could not compute them. */
+  lastMessage?: { senderRole: string; content: string; createdAt: string } | null;
+  reviewState?: CaseReviewState;
+  lastActivityAt?: string;
 }
 
 export interface CaseMessageRecord {
@@ -160,7 +167,24 @@ function caseRecord(value: unknown): CaseRecord {
     status: string(data.status),
     createdAt: string(data.created_at),
     updatedAt: string(data.updated_at),
+    ...backlogFields(data),
   };
+}
+/** Additive Backend fields: a malformed value is ignored (the case itself stays valid), never invented. */
+function backlogFields(data: RecordValue): Partial<Pick<CaseRecord, 'lastMessage' | 'reviewState' | 'lastActivityAt'>> {
+  const fields: Partial<Pick<CaseRecord, 'lastMessage' | 'reviewState' | 'lastActivityAt'>> = {};
+  const state = data.review_state;
+  if (state === 'new' || state === 'needs_review' || state === 'up_to_date') fields.reviewState = state;
+  if (typeof data.last_activity_at === 'string' && data.last_activity_at) fields.lastActivityAt = data.last_activity_at;
+  const last = data.last_message;
+  if (last === null) fields.lastMessage = null;
+  else if (last && typeof last === 'object' && !Array.isArray(last)) {
+    const message = last as RecordValue;
+    if (typeof message.sender_role === 'string' && typeof message.content === 'string' && typeof message.created_at === 'string') {
+      fields.lastMessage = { senderRole: message.sender_role, content: message.content, createdAt: message.created_at };
+    }
+  }
+  return fields;
 }
 function messageRecord(value: unknown): CaseMessageRecord {
   const data = record(value);

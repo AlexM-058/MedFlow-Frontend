@@ -5,7 +5,7 @@ import { caseApi, type CaseDecision, type CaseMessageRecord } from '../../lib/ca
 import './cases.css';
 
 function errorText(error: unknown) { return error instanceof Error ? error.message : 'Datele nu au putut fi încărcate.'; }
-type Drafts = { message: string; feedback: string };
+export type Drafts = { message: string; feedback: string };
 function useLoad<T>(load: (signal: AbortSignal) => Promise<T>, revision: number) {
   const [result, setResult] = useState<{ load: typeof load; revision: number; data?: T; error?: string } | null>(null);
   useEffect(() => {
@@ -92,7 +92,7 @@ function CaseInboxForUser({ token, profile }: { token: string; profile: AccountP
   );
 }
 
-function CaseConversation({ caseId, token, profile, drafts, changeDraft }: { caseId: string; token: string; profile: AccountProfile; drafts: Drafts; changeDraft: (kind: keyof Drafts, text: string) => void }) {
+export function CaseConversation({ caseId, token, profile, drafts, changeDraft }: { caseId: string; token: string; profile: AccountProfile; drafts: Drafts; changeDraft: (kind: keyof Drafts, text: string) => void }) {
   const messageFieldId = useId();
   const feedbackFieldId = useId();
   const [revision, setRevision] = useState(0);

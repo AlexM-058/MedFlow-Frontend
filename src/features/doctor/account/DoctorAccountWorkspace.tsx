@@ -1,9 +1,9 @@
 import { useId, useRef, useState } from 'react';
 import { useAuth } from '../../../auth/authContext';
 import type { AccountProfile } from '../../../auth/contracts';
-import { CaseInbox } from '../../cases/CaseInbox';
 import { DoctorDialog } from '../shared/DoctorDialog';
 import { ConnectionQrPanel } from './ConnectionQrPanel';
+import { DoctorBacklog } from './DoctorBacklog';
 import { ConnectionRequestsPanel } from './ConnectionRequestsPanel';
 import { useConnectionRequests } from './useConnectionRequests';
 import '../doctor.css';
@@ -26,7 +26,7 @@ const SECTIONS: { id: Section; label: string }[] = [
 
 /**
  * Real doctor workspace backed by the account API. One shell: a side bar (sections, QR code
- * button, account) and one main area. Never falls back to demo fixtures: failures show errors
+ * button, account) and one main area with the patient backlog. Never falls back to demo fixtures: failures show errors
  * and retry, not sample data.
  */
 export function DoctorAccountWorkspace({ profile, onExit }: DoctorAccountWorkspaceProps) {
@@ -115,7 +115,15 @@ export function DoctorAccountWorkspace({ profile, onExit }: DoctorAccountWorkspa
       </aside>
 
       <div className="doctor-account-content doctor-shell__main">
-        {section === 'patients' && <CaseInbox />}
+        {section === 'patients' && (
+          <DoctorBacklog
+            token={token}
+            profile={profile}
+            requests={requests.state.requests}
+            requestsPhase={requests.state.phase}
+            onShowQr={() => setQrOpen(true)}
+          />
+        )}
         {section === 'requests' && (
           <ConnectionRequestsPanel
             state={requests.state}
