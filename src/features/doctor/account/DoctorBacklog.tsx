@@ -11,6 +11,7 @@ import {
   type BacklogFilter,
   type BacklogRow,
 } from './backlogLogic';
+import { DoctorPatientDocuments } from './DoctorPatientDocuments';
 import './doctor-backlog.css';
 
 const REFRESH_MS = 30_000;
@@ -83,6 +84,7 @@ export function DoctorBacklog({ token, profile, requests, requestsPhase, onShowQ
           </button>
           <h2>{openRow.patientName}</h2>
         </div>
+        {token && <DoctorPatientDocuments token={token} caseId={caseId} />}
         {token && (
           <CaseConversation
             caseId={caseId}

@@ -316,6 +316,12 @@ export const caseApi = {
   async createCase(token: string, doctorId?: string, signal?: AbortSignal): Promise<CaseRecord> {
     return caseRecord(await request('/cases', { method: 'POST', token, operation: 'case', json: doctorId ? { doctorId } : {}, signal }));
   },
+  /** Documents of a case, newest first. Visible to the case's patient and doctor only (Backend checks). */
+  async listDocuments(token: string, caseId: string, signal?: AbortSignal): Promise<CaseDocumentRecord[]> {
+    const data = await request(`${caseUrl(caseId)}/documents`, { method: 'GET', token, operation: 'case', signal });
+    if (!Array.isArray(data)) throw invalid();
+    return data.map(documentRecord);
+  },
   async getCase(token: string, id: string, signal?: AbortSignal): Promise<CaseRecord> {
     return caseRecord(await request(caseUrl(id), { method: 'GET', token, operation: 'case', signal }));
   },

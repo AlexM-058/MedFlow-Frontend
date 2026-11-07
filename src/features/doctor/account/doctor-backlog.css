@@ -186,3 +186,101 @@
     max-width: none;
   }
 }
+
+/* Documents of one patient, shown above the conversation. */
+.doctor-documents {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border-decorative);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-subtle);
+}
+
+.doctor-documents__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.doctor-documents__head h3 {
+  font-size: 1.25rem;
+}
+
+.doctor-documents__note {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.doctor-documents__list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.doctor-documents__item {
+  padding: var(--space-3);
+  border: 1px solid var(--color-border-decorative);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
+
+.doctor-documents__item > summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  cursor: pointer;
+}
+
+.doctor-documents__title {
+  font-weight: 600;
+}
+
+.doctor-documents__meta {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+/* Status is conveyed by the text; the color only reinforces it. */
+.doctor-documents__status {
+  padding: 0.125rem var(--space-2);
+  border-radius: var(--radius-pill);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  background: var(--color-surface-subtle);
+}
+
+.doctor-documents__status--extracted {
+  background: var(--doctor-status-uptodate-bg);
+  color: var(--doctor-status-uptodate-text);
+}
+
+.doctor-documents__status--unavailable {
+  background: var(--doctor-status-review-bg);
+  color: var(--doctor-status-review-text);
+}
+
+.doctor-documents__table {
+  width: 100%;
+  margin-top: var(--space-3);
+  border-collapse: collapse;
+}
+
+.doctor-documents__table th,
+.doctor-documents__table td {
+  padding: var(--space-2);
+  border-bottom: 1px solid var(--color-border-decorative);
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.doctor-documents__dates {
+  margin: var(--space-3) 0 0;
+  padding-left: var(--space-4);
+}
