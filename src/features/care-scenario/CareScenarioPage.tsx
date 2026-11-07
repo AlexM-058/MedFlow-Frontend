@@ -79,7 +79,6 @@ function ScenarioBody({ scenario, onRestart }: { scenario: Scenario; onRestart: 
           <p>
             <strong>Date demo sintetice.</strong> Nimic de pe această pagină nu este trimis către server, iar reîncărcarea paginii reia demonstrația.
             Vizualizările de pacient și de medic sunt afișate împreună doar pentru prezentare; conturile reale se autentifică separat.
-            {' '}<a href={`${import.meta.env.BASE_URL}demo/synthetic-prescription.svg`} download="synthetic-prescription.svg">Descărcați rețeta sintetică</a> pentru a o tipări sau a o vizualiza.
           </p>
           <button type="button" className="ui-button ui-button--secondary" onClick={onRestart}>Reluați demonstrația</button>
         </div>

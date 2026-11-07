@@ -28,8 +28,8 @@ Modified integration files:
 - `doctor/case/useResource.ts`
 - `doctor-feedback/PatientFeedbackPanel.tsx`
 
-Added `public/demo/synthetic-prescription.svg`, linked in the demo introduction,
-and root `DEMO_RUNBOOK.md`. The sample is fictional and clearly labelled.
+`public/demo/synthetic-prescription.svg` (and its link in the demo introduction)
+was removed when preparing the app for production; root `DEMO_RUNBOOK.md` remains.
 
 ## Verification
 
