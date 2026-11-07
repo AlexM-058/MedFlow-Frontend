@@ -18,7 +18,7 @@ export function StepShell({ title, hint, children, primary, secondary }: {
   secondary?: StepAction;
 }) {
   return (
-    <section className="step" aria-labelledby="step-title">
+    <section className="step step--screen" aria-labelledby="step-title">
       <header className="step__head">
         <h2 id="step-title">{title}</h2>
         {hint && <p className="step__hint">{hint}</p>}

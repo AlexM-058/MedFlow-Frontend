@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { caseApi } from '../../lib/caseApi';
 import { ArchiveError, extractRar, isRarFile } from './archive';
 import {
@@ -30,8 +30,9 @@ const STOP_TEXT: Record<Exclude<BatchStop, null>, string> = {
  * stops the others and can be retried. The photos stay on this device; the server keeps only what it read.
  * Nothing counts as confirmed here: the patient verifies the medicines afterwards.
  */
-export function DocumentBatch({ caseId, token, onFinished, extraAction }: { caseId: string; token: string; onFinished: () => void; extraAction?: ReactNode }) {
+export function DocumentBatch({ caseId, token, onFinished }: { caseId: string; token: string; onFinished: () => void }) {
   const inputId = useId();
+  const cameraId = useId();
   const [items, setItems] = useState<BatchItem[]>([]);
   const [running, setRunning] = useState(false);
   const [preparing, setPreparing] = useState(false);
@@ -85,12 +86,14 @@ export function DocumentBatch({ caseId, token, onFinished, extraAction }: { case
   return (
     <section className="case-inbox__batch" aria-label="Încărcare mai multe foi">
       <div className="step__choices">
-        <label htmlFor={inputId} className={`ui-button ui-button--primary${running || preparing ? ' is-disabled' : ''}`}>Încărcați</label>
-        {extraAction}
+        <label htmlFor={inputId} className={`ui-button ui-button--primary${running || preparing ? ' is-disabled' : ''}`}>Încărcați document</label>
+        <label htmlFor={cameraId} className={`ui-button ui-button--secondary${running || preparing ? ' is-disabled' : ''}`}>Cameră</label>
       </div>
+      <input id={cameraId} type="file" accept="image/jpeg,image/png" capture="environment" disabled={running || preparing}
+        className="doctor-sr-only" onChange={(event) => { const chosen = event.target.files; void choose(chosen); event.target.value = ''; }} />
       <input id={inputId} type="file" multiple accept="image/jpeg,image/png,application/pdf,.rar,application/vnd.rar,application/x-rar-compressed" disabled={running || preparing}
         className="doctor-sr-only" onChange={(event) => { const chosen = event.target.files; void choose(chosen); event.target.value = ''; }} />
-      <p className="step__hint">Fotografii (JPG, PNG), PDF sau o arhivă RAR, cel mult {BATCH_MAX_FILES} fișiere. Arhiva se deschide pe acest dispozitiv.</p>
+      <p className="step__hint">Mai multe deodată: JPG, PNG, PDF sau o arhivă RAR (cel mult {BATCH_MAX_FILES} fișiere).</p>
       {preparing && <p role="status">Se deschid arhivele…</p>}
       {items.length > 0 && (
         <>

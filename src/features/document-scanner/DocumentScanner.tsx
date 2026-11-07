@@ -21,6 +21,8 @@ export type DocumentScannerProps = {
   compact?: boolean;
   /** Label of the main button in compact mode (default "Încărcați"). */
   uploadLabel?: string;
+  /** Label of the camera button in compact mode (default "Fotografiați"). */
+  cameraLabel?: string;
 };
 
 export function DocumentScanner({
@@ -29,6 +31,7 @@ export function DocumentScanner({
   title = 'Scanare document medical',
   compact = false,
   uploadLabel = 'Încărcați',
+  cameraLabel = 'Fotografiați',
 }: DocumentScannerProps) {
   const [phase, setPhase] = useState<ScannerPhase>('idle');
   const [draft, setDraft] = useState<ScannedDocument | null>(null);
@@ -184,7 +187,7 @@ export function DocumentScanner({
               disabled={phase === 'capturing'}
               onClick={() => void startCapture(!compact)}
             >
-              {compact ? 'Fotografiați' : 'Alegeți din galerie'}
+              {compact ? cameraLabel : 'Alegeți din galerie'}
             </button>
             {onCancel && (
               <button type="button" className="ui-button ui-button--secondary" onClick={handleCancel}>

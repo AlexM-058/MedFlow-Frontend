@@ -75,6 +75,8 @@ export function PrescriptionReviewPanel({ adapter, onConfirmed, compact = false 
   const [fields, setFields] = useState<ReviewFieldState[]>([]);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  /** Compact mode: none = just the summary; missing = only what could not be read; all = every field, to correct. */
+  const [fixing, setFixing] = useState<'none' | 'missing' | 'all'>('none');
 
   const documentRef = useRef<LocalDocument | null>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -114,6 +116,7 @@ export function PrescriptionReviewPanel({ adapter, onConfirmed, compact = false 
     setExtracted(null);
     setFields([]);
     setSaveError(null);
+    setFixing('none');
     try {
       const result = await adapter.extract(target, controller.signal);
       if (controller.signal.aborted || !mountedRef.current) return;
@@ -141,6 +144,7 @@ export function PrescriptionReviewPanel({ adapter, onConfirmed, compact = false 
     setExtracted(null);
     setFields([]);
     setSaveError(null);
+    setFixing('none');
     setStep({ kind: 'scan' });
   };
 
@@ -150,13 +154,14 @@ export function PrescriptionReviewPanel({ adapter, onConfirmed, compact = false 
     return null;
   };
 
-  const handleSave = async () => {
-    if (savingRef.current || !extracted || !canConfirm(fields)) return;
+  const handleSave = async (override?: ReviewFieldState[]) => {
+    const toSave = override ?? fields;
+    if (savingRef.current || !extracted || !canConfirm(toSave)) return;
     savingRef.current = true;
     setSaving(true);
     setSaveError(null);
     try {
-      const medications = await adapter.saveReview(extracted.id, toReviewedFields(fields));
+      const medications = await adapter.saveReview(extracted.id, toReviewedFields(toSave));
       if (!mountedRef.current) return;
       setStep({ kind: 'saved', medications });
       // The original preview is no longer shown; release the local object URL.
@@ -213,7 +218,7 @@ export function PrescriptionReviewPanel({ adapter, onConfirmed, compact = false 
           {adapter.source !== 'live' && (
             <p className="rx-review-note">Demo: folosiți doar o rețetă tipărită sintetică, niciodată una reală.</p>
           )}
-          <DocumentScanner title="Scanare rețetă" onConfirm={handleScanned} compact={compact} uploadLabel="Încărcați rețeta" />
+          <DocumentScanner title="Scanare rețetă" onConfirm={handleScanned} compact={compact} uploadLabel="Încărcați document" cameraLabel="Cameră" />
         </div>
       )}
 
@@ -257,23 +262,102 @@ export function PrescriptionReviewPanel({ adapter, onConfirmed, compact = false 
         </div>
       )}
 
-      {step.kind === 'review' && extracted && (
+      {compact && step.kind === 'review' && extracted && (
+        <div className="rx-review-step rx-compact">
+          <h3 ref={headingRef} tabIndex={-1} className="visually-hidden">Verificați rețeta față de hârtie</h3>
+          {extracted.warnings.length > 0 && (
+            <p className="rx-review-warning-box">
+              {extracted.warnings[0]}{extracted.warnings.length > 1 ? ` (+${extracted.warnings.length - 1} observații)` : ''}
+            </p>
+          )}
+          {total === 0 ? (
+            <p className="rx-review-warning-box" role="alert">Nu am găsit niciun medicament pe această poză. Încercați o poză mai clară.</p>
+          ) : (
+            <ul className="rx-summary" aria-label="Medicamente citite">
+              {Array.from({ length: total }, (_, index) => {
+                const shown = fields.filter((field) => field.medicationIndex === index).map((field) => (
+                  field.resolution.kind === 'confirmed' ? field.resolution.value
+                    : field.resolution.kind === 'not-present' ? null
+                      : field.extracted
+                ));
+                const [name, dose, frequency, duration] = shown;
+                return (
+                  <li key={index}>
+                    <strong>{name ?? 'Medicament necitit'}</strong>
+                    <span>{[dose ?? 'doză necitită', frequency ?? 'frecvență necitită', duration].filter(Boolean).join(' · ')}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+
+          {fixing !== 'none' && total > 0 && (
+            <div className="rx-compact__fix">
+              {fixing === 'missing' && <p className="rx-review-muted">Completați ce nu am putut citi, după rețeta de hârtie.</p>}
+              {Array.from({ length: total }, (_, index) => {
+                const visible = fields.filter((field) => field.medicationIndex === index && (fixing === 'all' || field.resolution.kind === 'pending'));
+                if (visible.length === 0) return null;
+                return (
+                  <section key={index} className="rx-review-card" aria-labelledby={`${uid}-fix-${index}`}>
+                    {total > 1 && <h4 id={`${uid}-fix-${index}`}>{medicationTitle(index, total)}</h4>}
+                    <div className="rx-review-fields">
+                      {visible.map((field) => (
+                        <ReviewFieldCard
+                          key={field.path}
+                          field={field}
+                          disabled={saving}
+                          onConfirm={() => apply(confirmField(fields, field.path, new Date().toISOString()))}
+                          onEdit={(text) => apply(editField(fields, field.path, text, new Date().toISOString()))}
+                          onNotPresent={() => apply(markNotPresent(fields, field.path, new Date().toISOString()))}
+                          onReset={() => void apply(resetField(fields, field.path))}
+                        />
+                      ))}
+                    </div>
+                  </section>
+                );
+              })}
+            </div>
+          )}
+
+          {saveError && (
+            <div className="rx-review-error-box" role="alert">
+              <p className="rx-review-error-box__title">Rețeta nu a fost salvată.</p>
+              <p>{saveError} Puteți încerca din nou.</p>
+            </div>
+          )}
+          <div className="rx-review-actions">
+            {total > 0 && (
+              <button
+                type="button"
+                className="ui-button ui-button--primary"
+                disabled={saving || (fixing !== 'none' && !ready)}
+                aria-busy={saving || undefined}
+                onClick={() => {
+                  if (fixing !== 'none') { void handleSave(); return; }
+                  // "Correct": everything that was read is confirmed; only what could not be read is still asked.
+                  const next = confirmAllReadable(fields, new Date().toISOString());
+                  setFields(next);
+                  if (canConfirm(next)) void handleSave(next);
+                  else setFixing('missing');
+                }}
+              >
+                {saving ? 'Se salvează…' : 'Confirmați rețeta'}
+              </button>
+            )}
+            {total > 0 && fixing === 'none' && (
+              <button type="button" className="ui-button ui-button--secondary" disabled={saving} onClick={() => setFixing('all')}>Corectez</button>
+            )}
+            <button type="button" className="ui-button ui-button--secondary" disabled={saving} onClick={scanAnother}>Altă poză</button>
+          </div>
+        </div>
+      )}
+
+      {!compact && step.kind === 'review' && extracted && (
         <div className="rx-review-step">
           <h3 ref={headingRef} tabIndex={-1} className="rx-review-step__title">
             {compact ? 'Verificați rețeta față de hârtie' : 'Pasul 2: Verificați fiecare câmp în raport cu hârtia'}
           </h3>
-          {compact && total > 0 && (
-            <div className="rx-review-actions">
-              <button
-                type="button"
-                className="ui-button ui-button--primary"
-                disabled={saving || !fields.some((field) => field.resolution.kind === 'pending' && field.extracted !== null)}
-                onClick={() => setFields(confirmAllReadable(fields, new Date().toISOString()))}
-              >
-                Toate sunt corecte
-              </button>
-            </div>
-          )}
+
           <div className="rx-review-layout">
             {document && <OriginalPreview document={document} />}
             <div className="rx-review-column">
