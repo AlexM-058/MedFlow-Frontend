@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { brand } from '../../brand/brand.config';
 import { AppHeader } from '../../components/AppHeader';
 import '../cases/cases.css';
 
@@ -73,7 +74,7 @@ export function LocalChat({ heading = 'h2' }: { heading?: 'h1' | 'h2' }) {
   return <section className="case-inbox" aria-label="Conversație de test cu agentul local">
         <Heading>Conversație cu asistentul local</Heading>
         <p>Test tehnic cu modelul care rulează pe laptop. Folosiți numai informații fictive. Conversația nu este salvată și nu este trimisă unui medic; se șterge la reîncărcarea paginii.</p>
-        <p>MedFlow ajută la colectarea informațiilor pentru comunicarea cu medicul. Asistentul nu diagnostichează, nu prescrie și nu monitorizează urgențe.</p>
+        <p>{brand.productName} ajută la colectarea informațiilor pentru comunicarea cu medicul. Asistentul nu diagnostichează, nu prescrie și nu monitorizează urgențe.</p>
         <button type="button" className="ui-button ui-button--secondary" disabled={pending} onClick={restart}>Conversație nouă</button>
         {messages.length === 0 && <p>Începeți cu un mesaj fictiv despre ce ați dori să comunicați medicului.</p>}
         <ol className="case-inbox__messages" aria-label="Mesaje">

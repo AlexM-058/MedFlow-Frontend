@@ -3,7 +3,6 @@ import { AppHeader } from './components/AppHeader';
 import { brand } from './brand/brand.config';
 import { AuthProvider } from './auth/AuthProvider';
 import { useAuth } from './auth/authContext';
-import { CaseInbox } from './features/cases/CaseInbox';
 import { DoctorMessageNotice } from './features/doctor-notice';
 import { LivePatientContext } from './features/patient-context/LivePatientContext';
 import { LocalChatPage } from './features/local-chat/LocalChatPage';
@@ -64,7 +63,7 @@ function PatientAccount() {
   if (profile?.role === 'doctor') return <section className="account-card"><h1>Contul dumneavoastră de medic este pregătit</h1><a className="ui-button ui-button--primary" href="#/doctor">Deschideți spațiul de lucru al medicului</a><AccountSessionControls /></section>;
   // Nothing but the current step until a doctor is connected; then the doctor's message comes first.
   const connected = (profile?.activeDoctors.length ?? 0) > 0;
-  return <>{connected && <DoctorMessageNotice />}{connected && <LivePatientContext />}<PatientJourney />{connected && <CaseInbox />}<AccountSessionControls /></>;
+  return <>{connected && <DoctorMessageNotice />}<PatientJourney />{connected && <LivePatientContext />}<AccountSessionControls /></>;
 }
 
 function SignedInControls() {
