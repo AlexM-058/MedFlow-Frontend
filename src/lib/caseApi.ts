@@ -90,6 +90,33 @@ export interface CaseDocumentRecord {
   createdAt: string;
 }
 
+export interface ControlQuestions {
+  summary: string;
+  questions: { id: string; text: string; answerType: 'yes_no' | 'number' | 'short_text' }[];
+  model: string;
+  generatedAt: string;
+  /** Exactly what left for the cloud AI: the anonymized summary. Shown to the doctor, never edited. */
+  sentToCloud: unknown;
+}
+
+function controlQuestions(value: unknown): ControlQuestions | null {
+  if (value === null) return null;
+  const data = record(value);
+  if (!Array.isArray(data.questions) || data.questions.length < 1 || data.questions.length > 8) throw invalid();
+  return {
+    summary: text(data.summary),
+    questions: data.questions.map((entry) => {
+      const item = record(entry);
+      const answerType = item.answerType;
+      if (answerType !== 'yes_no' && answerType !== 'number' && answerType !== 'short_text') throw invalid();
+      return { id: string(item.id), text: string(item.text), answerType };
+    }),
+    model: string(data.model),
+    generatedAt: string(data.generatedAt),
+    sentToCloud: data.sentToCloud ?? null,
+  };
+}
+
 export type CaseApiErrorCode =
   | 'INVALID_REQUEST'
   | 'UNAUTHORIZED'
@@ -345,6 +372,17 @@ export const caseApi = {
       return { messageId, text };
     });
     return { items, originals, uncoveredMessageIds: data.uncoveredMessageIds.map(string) };
+  },
+  /** Doctor: the cloud AI proposes a summary and control questions from the anonymized summary (up to ~2 min). */
+  async generateControlQuestions(token: string, caseId: string, signal?: AbortSignal): Promise<ControlQuestions> {
+    const data = record(await request(`${caseUrl(caseId)}/control-questions`, { method: 'POST', token, operation: 'case', json: {}, timeoutMs: 110000, signal }));
+    const result = controlQuestions(data.controlQuestions);
+    if (!result) throw invalid();
+    return result;
+  },
+  /** The questions stored for this case's patient, or null when none were generated yet. */
+  async getControlQuestions(token: string, caseId: string, signal?: AbortSignal): Promise<ControlQuestions | null> {
+    return controlQuestions(record(await request(`${caseUrl(caseId)}/control-questions`, { method: 'GET', token, operation: 'case', signal })).controlQuestions);
   },
   async askLocalQuestion(token: string, caseId: string): Promise<{ message: CaseMessageRecord | null; notice: string | null }> {
     const data = record(await request(`${caseUrl(caseId)}/intake-question`, { method: 'POST', token, operation: 'case', json: {}, timeoutMs: 110000 }));

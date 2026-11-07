@@ -4,6 +4,7 @@ import type { AccountProfile } from '../../auth/contracts';
 import { formatDateTime, statusLabel } from '../patient-context/contextLogic';
 import { caseApi, type CaseDecision, type CaseMessageRecord, type LocalCaseSummary } from '../../lib/caseApi';
 import { CaseDocuments } from './CaseDocuments';
+import { ControlQuestionsPanel } from './ControlQuestionsPanel';
 import './cases.css';
 
 function errorText(error: unknown) { return error instanceof Error ? error.message : 'Datele nu au putut fi încărcate.'; }
@@ -201,6 +202,7 @@ export function CaseConversation({ caseId, token, profile, drafts, changeDraft }
         <textarea id={feedbackFieldId} value={feedbackDraft} onChange={(event) => changeDraft('feedback', event.target.value)} maxLength={10000} required readOnly={!!sending} />
         <button className="ui-button ui-button--primary" disabled={!!sending || !feedbackDraft.trim() || !result || !!result.error}>{sending === 'feedback' ? 'Se salvează…' : 'Trimiteți feedback-ul ca medic'}</button>
       </form>}
+      {profile.role === 'doctor' && <ControlQuestionsPanel caseId={caseId} token={token} />}
       {profile.role === 'doctor' && <section className="case-inbox__feedback" aria-label="Rezumat local cu surse">
         <h4>Organizarea mesajelor pentru medic</h4>
         <button type="button" className="ui-button ui-button--secondary" disabled={!!sending || !result || !!result.error}
