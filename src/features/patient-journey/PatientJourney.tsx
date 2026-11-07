@@ -1,15 +1,13 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../../auth/authContext';
-import { navigate } from '../../auth/navigation';
-import { PatientAccountPage } from '../connections';
 import { DataSourceBadge } from '../care-scenario';
 import type { ConfirmedMedication } from '../care-scenario/contracts';
 import { createFixtureScenario } from '../care-scenario/fixture';
 import { IntakeChatPanel } from '../intake-chat';
 import { PatientContextPanel } from '../patient-context';
 import { PrescriptionReviewPanel } from '../prescription-review';
-import { extractConnectCode, journeyStage, type JourneyStage } from './journeyLogic';
-import { QrScanner } from './QrScanner';
+import { ConnectStage } from './ConnectStage';
+import { journeyStage, type JourneyStage } from './journeyLogic';
 import './patient-journey.css';
 
 const STEPS: readonly { stage: JourneyStage; label: string }[] = [
@@ -56,21 +54,7 @@ export function PatientJourney() {
 
   return (
     <div className="journey">
-      <p className="journey__progress" aria-live="polite">Pasul {activeIndex + 1} din {STEPS.length}</p>
-      <ol className="journey__steps" aria-label="Pașii dumneavoastră">
-        {STEPS.map((step, index) => (
-          <li
-            key={step.stage}
-            className="journey__step"
-            aria-current={index === activeIndex ? 'step' : undefined}
-            data-done={index < activeIndex}
-          >
-            <span className="journey__step-number" aria-hidden="true">{index < activeIndex ? '✓' : index + 1}</span>
-            {step.label}
-          </li>
-        ))}
-      </ol>
-
+      <p className="journey__progress" aria-live="polite">Pasul {activeIndex + 1} din {STEPS.length}: {STEPS[activeIndex]?.label}</p>
       {stage === 'connect' && <ConnectStage />}
 
       {stage === 'prescription' && (
@@ -87,54 +71,6 @@ export function PatientJourney() {
 
       {stage === 'chat' && <ChatStage scenario={scenario} medications={medications} />}
     </div>
-  );
-}
-
-/** Step 1. The doctor's QR is scanned in this page (camera), or a pasted code or link works too. */
-function ConnectStage() {
-  const [value, setValue] = useState('');
-  const [invalid, setInvalid] = useState(false);
-  const [scanning, setScanning] = useState(false);
-
-  function submit(event: FormEvent) {
-    event.preventDefault();
-    const code = extractConnectCode(value);
-    if (!code) { setInvalid(true); return; }
-    setInvalid(false);
-    navigate(`/connect/${code}`);
-  }
-
-  return (
-    <>
-      <section className="journey__panel" aria-labelledby="journey-connect-title">
-        <h2 id="journey-connect-title">Conectați-vă la medicul dumneavoastră</h2>
-        <p>Scanați codul QR al medicului cu camera din această pagină. Dacă nu puteți scana, lipiți mai jos codul sau linkul primit de la medic.</p>
-        {scanning ? (
-          <QrScanner onCode={(code) => navigate(`/connect/${code}`)} onClose={() => setScanning(false)} />
-        ) : (
-          <button type="button" className="ui-button ui-button--primary" onClick={() => setScanning(true)}>Scanați codul QR</button>
-        )}
-        <p className="journey__help">Un apropiat vă poate trimite linkul medicului pe telefon. Lipiți-l aici și apăsați „Continuați”.</p>
-        <form className="journey__code-form" onSubmit={submit} noValidate>
-          <label htmlFor="journey-code">Cod sau link de conectare</label>
-          <div className="journey__code-row">
-            <input
-              id="journey-code"
-              className="journey__code-input"
-              value={value}
-              onChange={(event) => { setValue(event.target.value); setInvalid(false); }}
-              autoComplete="off"
-              spellCheck={false}
-              aria-invalid={invalid || undefined}
-              aria-describedby={invalid ? 'journey-code-error' : undefined}
-            />
-            <button type="submit" className="ui-button ui-button--primary">Continuați</button>
-          </div>
-          {invalid && <p id="journey-code-error" className="account-error" role="alert">Codul nu este valid. Verificați dacă ați copiat tot codul sau tot linkul.</p>}
-        </form>
-      </section>
-      <PatientAccountPage />
-    </>
   );
 }
 
