@@ -1,9 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import { HealthDataModal } from '../patient-context/AddHealthData';
 
-export function ChatAttachments({ token, onOpenDocuments }: { token: string; onOpenDocuments?: () => void }) {
+export function ChatAttachments({ onOpenHealthData, onOpenDocuments }: { onOpenHealthData: () => void; onOpenDocuments?: () => void }) {
   const [expanded, setExpanded] = useState(false);
-  const [healthDataOpen, setHealthDataOpen] = useState(false);
   const container = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const optionsId = useId();
@@ -40,10 +38,9 @@ export function ChatAttachments({ token, onOpenDocuments }: { token: string; onO
         </button>
         <div id={optionsId} className="chat-attachments__options" hidden={!expanded} role="group" aria-label="Adăugați în conversație">
           {onOpenDocuments && <button type="button" onClick={() => { setExpanded(false); onOpenDocuments(); }}>Documente medicale</button>}
-          <button type="button" onClick={() => { setExpanded(false); setHealthDataOpen(true); }}>Alergii, afecțiuni sau medicamente</button>
+          <button type="button" onClick={() => { setExpanded(false); trigger.current?.focus(); onOpenHealthData(); }}>Alergii, afecțiuni sau medicamente</button>
         </div>
       </div>
-      <HealthDataModal token={token} open={healthDataOpen} onClose={() => { setHealthDataOpen(false); trigger.current?.focus(); }} />
     </>
   );
 }

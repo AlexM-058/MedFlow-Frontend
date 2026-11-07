@@ -9,39 +9,16 @@
   overflow: hidden;
 }
 
-.patient-chat__intro {
-  display: grid;
-  gap: var(--space-2);
-  flex: none;
-  padding: var(--space-3) var(--gutter);
-  border-bottom: 1px solid var(--color-border-decorative);
-  background: var(--color-surface);
-  font-size: var(--font-size-sm);
-}
-
-.patient-chat__urgent {
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-sm);
-  background: var(--status-error-bg);
-  border: 1px solid var(--status-error-border);
-  color: var(--status-error-text);
-}
-
-.patient-chat__intro .ui-button { justify-self: start; }
-
 .patient-chat .chat__empty {
   color: var(--color-text-secondary);
 }
 
 /* ---- Presentation polish: roomy, calm, readable. Scoped to this chat only. ---- */
 .patient-chat { font-size: 1.0625rem; }
-.patient-chat__intro { gap: var(--space-3); padding: var(--space-4) var(--gutter); font-size: 1rem; line-height: 1.55; color: var(--color-text-secondary); }
-.patient-chat__urgent { padding: var(--space-2) var(--space-3); border-width: 0 0 0 4px; border-style: solid; border-color: var(--status-error-border); background: var(--status-error-bg); color: var(--color-text); font-size: 1rem; }
-.patient-chat__intro .ui-button { min-height: 3rem; font-size: 1rem; }
 
 .patient-chat .chat__scroll { scroll-padding-block-end: var(--space-6); }
 .patient-chat .chat__column { gap: var(--space-4); padding-block: var(--space-6); }
-.patient-chat .chat__empty { margin-block: var(--space-4); padding: var(--space-6); border: 1px dashed var(--color-border-control); background: transparent; text-align: center; font-size: 1.125rem; line-height: 1.6; }
+.patient-chat .chat__empty { margin-block: auto; padding: var(--space-4); border: 0; background: transparent; text-align: center; font-size: 1.0625rem; line-height: 1.6; }
 .patient-chat .message-list { gap: var(--space-6); }
 .patient-chat .message { gap: var(--space-2); }
 .patient-chat .message__meta { font-size: 0.9375rem; color: var(--color-text-secondary); }
@@ -57,22 +34,30 @@
 .patient-chat .notice { font-size: 1rem; line-height: 1.5; }
 .patient-chat .notice .ui-button { min-height: 3rem; font-size: 1rem; }
 
-/* Composer: pinned to the bottom, roomy rounded box and an obvious send button. */
+/* One compact composer, with attachment actions inside the same rounded field. */
 .patient-chat .composer { border-top: 1px solid var(--color-border-decorative); background: var(--color-surface); padding-bottom: env(safe-area-inset-bottom); }
 .patient-chat .composer__column { padding: var(--space-3) var(--gutter); }
-.patient-chat .composer__row { align-items: flex-end; gap: var(--space-3); }
-.patient-chat .composer__input { min-height: 3.5rem; padding: 0.875rem var(--space-4); border-radius: 1.75rem; font: inherit; font-size: 1.0625rem; line-height: 1.5; }
-.patient-chat .composer__input:focus-visible { outline: 3px solid var(--color-focus-ring); outline-offset: 2px; }
-.patient-chat .composer__send { min-height: 3.5rem; min-width: 3.5rem; padding: 0 var(--space-4); font-size: 1rem; }
-.patient-chat .composer__send-label { position: static; width: auto; height: auto; overflow: visible; clip-path: none; }
+.patient-chat .composer__row { align-items: flex-end; gap: var(--space-1); padding: var(--space-2); border: 1px solid var(--color-border-control); border-radius: 1.75rem; background: var(--color-surface); }
+.patient-chat .composer__row:focus-within { border-color: var(--brand-primary); }
+.patient-chat .composer__input { min-height: 2.75rem; padding: 0.625rem var(--space-1); border: 0; border-radius: 0; background: transparent; font: inherit; font-size: 1rem; line-height: 1.5; }
+.patient-chat .composer__input:focus-visible { outline: none; }
+.patient-chat .composer__row:has(.composer__input:focus-visible) { outline: 3px solid var(--color-focus-ring); outline-offset: 2px; }
+.patient-chat .composer__send { width: 2.75rem; height: 2.75rem; min-height: 2.75rem; min-width: 2.75rem; padding: 0; }
 .patient-chat .composer__hint { margin-top: var(--space-2); font-size: var(--font-size-sm); color: var(--color-text-secondary); }
 @media (pointer: coarse) {
   .patient-chat .composer__hint { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 }
-@media (max-width: 359px) {
-  .patient-chat .composer__send { padding: 0 var(--space-3); }
-  .patient-chat .composer__send-label { display: none; }
-}
+
+.chat-attachments { position: relative; flex: none; }
+.chat-attachments__trigger { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--color-text-secondary); cursor: pointer; }
+.chat-attachments__trigger:hover, .chat-attachments__trigger[aria-expanded='true'] { background: var(--color-surface-subtle); color: var(--color-text); }
+.chat-attachments__trigger:focus-visible, .chat-attachments__options button:focus-visible { outline: 3px solid var(--color-focus-ring); outline-offset: 2px; }
+.chat-attachments__options { position: absolute; z-index: 10; inset-inline-start: 0; bottom: calc(100% + var(--space-3)); width: min(18rem, calc(100vw - 4rem)); padding: var(--space-2); border: 1px solid var(--color-border-decorative); border-radius: var(--radius-md); background: var(--color-surface); box-shadow: var(--shadow-float); }
+.chat-attachments__options button { display: block; width: 100%; min-height: 2.75rem; padding: var(--space-2) var(--space-3); border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--color-text); text-align: start; font: inherit; font-size: 1rem; line-height: 1.4; cursor: pointer; }
+.chat-attachments__options button:hover { background: var(--color-surface-subtle); }
+.patient-chat__introduction { display: grid; gap: var(--space-4); font-size: 1rem; line-height: 1.6; }
+.patient-chat__introduction p { margin: 0; }
+.patient-chat__introduction .ui-button { justify-self: start; }
 
 @media (prefers-reduced-motion: no-preference) {
   .patient-chat .message { animation: chat-message-in 0.22s ease-out; }

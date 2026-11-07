@@ -6,6 +6,7 @@ import type { ChatMessage } from '../chat/types';
 import { mergeMessages, orderMessages, toChatMessage, validDraft } from './chatLogic';
 import { ChatAttachments } from './ChatAttachments';
 import { ChatIntroduction } from './ChatIntroduction';
+import { HealthDataModal } from '../patient-context/AddHealthData';
 import './patient-chat.css';
 
 const REFRESH_MS = 15_000;
@@ -26,6 +27,7 @@ export function PatientChat({ caseId, token, onOpenDocuments }: { caseId: string
   const [revision, setRevision] = useState(0);
   const [assistantNote, setAssistantNote] = useState<string | null>(null);
   const [finishedNote, setFinishedNote] = useState<string | null>(null);
+  const [healthDataOpen, setHealthDataOpen] = useState(false);
   const busy = useRef(false);
   const end = useRef<HTMLDivElement>(null);
 
@@ -107,6 +109,7 @@ export function PatientChat({ caseId, token, onOpenDocuments }: { caseId: string
   return (
     <section className="chat patient-chat" aria-label="Conversație cu asistentul">
       <ChatIntroduction />
+      <HealthDataModal token={token} open={healthDataOpen} onClose={() => setHealthDataOpen(false)} />
       <div className="chat__scroll">
         <div className="chat__column">
           {messages.length === 0 && <p className="chat__empty">Scrieți mai jos ce vă supără sau ce doriți să știe medicul.</p>}
@@ -123,7 +126,7 @@ export function PatientChat({ caseId, token, onOpenDocuments }: { caseId: string
           <div ref={end} />
         </div>
       </div>
-      <Composer onSend={send} isSending={sending} actions={<ChatAttachments token={token} onOpenDocuments={onOpenDocuments} />} />
+      <Composer onSend={send} isSending={sending} actions={<ChatAttachments onOpenHealthData={() => setHealthDataOpen(true)} onOpenDocuments={onOpenDocuments} />} />
     </section>
   );
 }
