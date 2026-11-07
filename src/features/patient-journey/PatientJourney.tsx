@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../../auth/authContext';
 import { DocumentsStep, PrescriptionStep } from '../cases/DocumentSteps';
+import { AddHealthData } from '../patient-context/AddHealthData';
 import { PatientChat } from '../patient-chat';
 import { usePatientCase } from '../patient-chat/usePatientCase';
 import { ConnectStage } from './ConnectStage';
@@ -53,6 +54,7 @@ export function PatientJourney() {
         <>
           {stage === 'prescription' && <PrescriptionStep caseId={state.caseId} token={token} onContinue={() => setStep('documents')} onSkip={() => setStep('documents')} />}
           {stage === 'documents' && <DocumentsStep caseId={state.caseId} token={token} onContinue={() => setStep('chat')} onSkip={() => setStep('chat')} />}
+          <AddHealthData token={token} raised={stage === 'chat'} />
           {stage === 'chat' && <PatientChat caseId={state.caseId} token={token} onOpenDocuments={() => setStep('documents')} />}
         </>
       )}

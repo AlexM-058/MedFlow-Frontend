@@ -97,3 +97,22 @@
   .modal { width: 100vw; height: 100dvh; max-height: 100dvh; }
   .modal__sheet { height: 100dvh; max-height: 100dvh; border-radius: 0; }
 }
+
+/* ---- Round "+" button: add health data from anywhere in the journey ---- */
+.fab { position: fixed; z-index: 50; inset-inline-end: var(--gutter); bottom: calc(5.5rem + env(safe-area-inset-bottom)); display: grid; place-items: center; width: 3.75rem; height: 3.75rem; border: 0; border-radius: 50%; background: var(--brand-primary); color: var(--brand-on-primary); box-shadow: 0 4px 14px rgb(0 0 0 / 0.28); cursor: pointer; }
+.fab--raised { bottom: calc(8.5rem + env(safe-area-inset-bottom)); }
+.fab:hover { filter: brightness(1.06); }
+.fab:focus-visible { outline: 3px solid var(--color-focus-ring); outline-offset: 3px; }
+
+.add-data { display: grid; gap: var(--space-4); }
+.add-data__kinds { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-2); }
+.add-data__kinds .ui-button { justify-content: center; min-height: 3.25rem; padding-inline: var(--space-2); }
+.add-data__form { display: grid; gap: var(--space-2); }
+.add-data__form label { font-weight: 600; }
+.add-data__form input { min-height: 3rem; padding: var(--space-2) var(--space-3); border: 1px solid var(--color-border-control); border-radius: var(--radius-sm); background: var(--color-surface); color: var(--color-text); font: inherit; font-size: 1.125rem; }
+.add-data__message { margin: 0; padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm); border: 1px solid var(--status-info-border); background: var(--status-info-bg); color: var(--status-on-tint); }
+.add-data__message--error { border-color: var(--status-error-border); background: var(--status-error-bg); }
+.add-data__list-title { font-size: 1rem; margin-bottom: var(--space-2); }
+.add-data__items { display: grid; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.add-data__items li { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2); padding: var(--space-2) var(--space-3); border: 1px solid var(--color-border-decorative); border-radius: var(--radius-sm); overflow-wrap: anywhere; }
+.add-data__tag { padding: 0 var(--space-2); border-radius: var(--radius-pill); background: var(--color-surface-subtle); font-size: var(--font-size-sm); font-weight: 600; }
