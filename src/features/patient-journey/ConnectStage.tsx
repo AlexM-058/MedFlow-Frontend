@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { navigate } from '../../auth/navigation';
 import { PendingConnections } from '../connections';
 import { QrScanner } from './QrScanner';
+import { StepShell } from './StepShell';
 
 /**
  * Step 1, one action at a time: scan the doctor's QR with the camera. Nothing else is shown
@@ -12,15 +13,13 @@ export function ConnectStage() {
 
   return (
     <>
-      <section className="journey__panel" aria-labelledby="journey-connect-title">
-        <h2 id="journey-connect-title">Conectați-vă la medicul dumneavoastră</h2>
-        <p>Cereți medicului codul QR și scanați-l cu camera telefonului.</p>
-        {scanning ? (
-          <QrScanner onCode={(code) => navigate(`/connect/${code}`)} onClose={() => setScanning(false)} />
-        ) : (
-          <button type="button" className="ui-button ui-button--primary journey__big-button" onClick={() => setScanning(true)}>Scanați codul QR</button>
-        )}
-      </section>
+      <StepShell
+        title="Conectare la medic"
+        hint="Scanați codul QR primit de la medicul dumneavoastră."
+        primary={scanning ? undefined : { label: 'Scanați codul QR', onClick: () => setScanning(true) }}
+      >
+        {scanning && <QrScanner onCode={(code) => navigate(`/connect/${code}`)} onClose={() => setScanning(false)} />}
+      </StepShell>
       <PendingConnections />
     </>
   );

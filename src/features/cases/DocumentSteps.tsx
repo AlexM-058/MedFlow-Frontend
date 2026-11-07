@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ConfirmedMedication } from '../care-scenario/contracts';
 import { createLivePrescriptionAdapter } from '../care-scenario/live/liveAdapters';
+import { StepShell } from '../patient-journey/StepShell';
 import { PrescriptionReviewPanel } from '../prescription-review';
 import { DocumentBatch } from './DocumentBatch';
 import { MedicationListReview } from './MedicationListReview';
@@ -13,10 +14,9 @@ interface StepProps {
 }
 
 /**
- * Step "Add the prescription": the patient photographs it, the server reads it, and the patient checks every row
- * against the paper prescription before it counts. What the reader extracted is never shown as confirmed until the
- * patient confirms it (the Backend enforces this too). Optional: "Continue" appears once a prescription is confirmed,
- * "Skip" is always there.
+ * Step "Rețeta": one photo of the prescription, read automatically; the patient checks it against the paper and
+ * confirms. What the reader extracted is never shown as confirmed until the patient confirms it (the Backend enforces
+ * this too). Optional: "Continuați" is enabled once a prescription is confirmed, "Sari peste" is always there.
  */
 export function PrescriptionStep({ caseId, token, onContinue, onSkip }: StepProps) {
   const adapter = useMemo(
@@ -46,46 +46,60 @@ export function PrescriptionStep({ caseId, token, onContinue, onSkip }: StepProp
   }, []);
 
   return (
-    <section className="journey__panel" aria-labelledby="journey-rx-title">
-      <h2 id="journey-rx-title">Adăugați rețeta</h2>
-      <p>Faceți o fotografie rețetei. Citirea se face automat, apoi verificați fiecare rând față de rețeta de hârtie. Medicul vede ce ați confirmat. Puteți sări peste acest pas.</p>
+    <StepShell
+      title="Rețeta"
+      hint="Încărcați o fotografie a rețetei și verificați ce am citit."
+      primary={{ label: 'Continuați', onClick: onContinue, disabled: confirmed.length === 0 }}
+      secondary={{ label: 'Sari peste', onClick: onSkip }}
+    >
       {loadError && <p role="alert">{loadError}</p>}
       {confirmed.length > 0 && (
-        <ul aria-label="Medicamente confirmate">
+        <ul className="step__list" aria-label="Medicamente confirmate">
           {confirmed.map((medication) => (
             <li key={medication.id}>
-              <strong>{medication.name}</strong> · {medication.doseText}
-              <p>{medication.instructionOriginal}</p>
-              {medication.durationText && <p>Durată: {medication.durationText}</p>}
+              <strong>{medication.name}</strong>
+              <span>{[medication.doseText, medication.instructionOriginal, medication.durationText].filter(Boolean).join(' · ')}</span>
             </li>
           ))}
         </ul>
       )}
-      <PrescriptionReviewPanel adapter={adapter} onConfirmed={onConfirmed} />
-      <div className="journey__actions">
-        <button type="button" className="ui-button ui-button--primary" disabled={confirmed.length === 0} onClick={onContinue}>Continuați</button>
-        <button type="button" className="ui-button ui-button--secondary" onClick={onSkip}>Sari peste</button>
-      </div>
-    </section>
+      <PrescriptionReviewPanel adapter={adapter} onConfirmed={onConfirmed} compact />
+    </StepShell>
   );
 }
 
 /**
- * Step "Upload or update the medical documentation": many sheets or a RAR archive, read one by one, then ONE list of
- * medicines to confirm. Optional: the patient can continue to the conversation at any time or skip.
+ * Step "Documentația medicală": two actions. "Încărcați" adds sheets (photos, PDF or a RAR archive), read one by one;
+ * "Actualizați" opens the medicines already confirmed so they can be corrected. New sheets always come with ONE list
+ * of medicines to confirm. Optional: the patient can continue to the conversation at any time or skip.
  */
 export function DocumentsStep({ caseId, token, onContinue, onSkip }: StepProps) {
   const [revision, setRevision] = useState(0);
+  const [updating, setUpdating] = useState(false);
   return (
-    <section className="journey__panel" aria-labelledby="journey-docs-title">
-      <h2 id="journey-docs-title">Documentația medicală</h2>
-      <p>Încărcați sau actualizați documentele medicale: analize, scrisori, rețete mai vechi. Puteți alege mai multe fotografii deodată sau o arhivă RAR. Puteți sări peste acest pas.</p>
-      <DocumentBatch caseId={caseId} token={token} onFinished={() => setRevision((value) => value + 1)} />
-      <MedicationListReview caseId={caseId} token={token} refreshKey={revision} onSaved={() => setRevision((value) => value + 1)} />
-      <div className="journey__actions">
-        <button type="button" className="ui-button ui-button--primary" onClick={onContinue}>Continuați la conversație</button>
-        <button type="button" className="ui-button ui-button--secondary" onClick={onSkip}>Sari peste</button>
-      </div>
-    </section>
+    <StepShell
+      title="Documentația medicală"
+      hint="Încărcați documente noi sau actualizați medicamentele confirmate."
+      primary={{ label: 'Continuați la conversație', onClick: onContinue }}
+      secondary={{ label: 'Sari peste', onClick: onSkip }}
+    >
+      <DocumentBatch
+        caseId={caseId}
+        token={token}
+        onFinished={() => setRevision((value) => value + 1)}
+        extraAction={(
+          <button type="button" className="ui-button ui-button--secondary" aria-expanded={updating} onClick={() => setUpdating((value) => !value)}>
+            Actualizați
+          </button>
+        )}
+      />
+      <MedicationListReview
+        caseId={caseId}
+        token={token}
+        refreshKey={revision}
+        mode={updating ? 'update' : 'pending'}
+        onSaved={() => setRevision((value) => value + 1)}
+      />
+    </StepShell>
   );
 }

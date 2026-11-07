@@ -10,6 +10,7 @@ import { DocumentScanner, revokeScannedDocumentUri } from '../document-scanner';
 import {
   buildReviewFields,
   canConfirm,
+  confirmAllReadable,
   confirmField,
   editField,
   markNotPresent,
@@ -25,6 +26,8 @@ import './prescription-review.css';
 
 export interface PrescriptionReviewPanelProps {
   adapter: PrescriptionAdapter;
+  /** Simple mode for the patient journey: short texts, no step list, no badge, no document dates. */
+  compact?: boolean;
   onConfirmed?: (medications: ConfirmedMedication[]) => void;
 }
 
@@ -62,7 +65,7 @@ function medicationTitle(index: number, total: number): string {
 }
 
 /** Scan → review every extracted field → confirm. Nothing is filled in from assumptions. */
-export function PrescriptionReviewPanel({ adapter, onConfirmed }: PrescriptionReviewPanelProps) {
+export function PrescriptionReviewPanel({ adapter, onConfirmed, compact = false }: PrescriptionReviewPanelProps) {
   const uid = useId();
   const titleId = `${uid}-title`;
   const missingId = `${uid}-missing`;
@@ -175,9 +178,10 @@ export function PrescriptionReviewPanel({ adapter, onConfirmed }: PrescriptionRe
 
   return (
     <section className="rx-review" aria-labelledby={titleId}>
-      <header className="rx-review-header">
+      {compact && <h2 id={titleId} className="visually-hidden">Verificarea rețetei</h2>}
+      <header className="rx-review-header" hidden={compact}>
         <div className="rx-review-header__title">
-          <h2 id={titleId}>Verificarea rețetei</h2>
+          <h2 id={compact ? undefined : titleId}>Verificarea rețetei</h2>
           <DataSourceBadge source={adapter.source} />
         </div>
         <p className="rx-review-muted">
@@ -203,20 +207,20 @@ export function PrescriptionReviewPanel({ adapter, onConfirmed }: PrescriptionRe
 
       {step.kind === 'scan' && (
         <div className="rx-review-step">
-          <h3 ref={headingRef} tabIndex={-1} className="rx-review-step__title">
-            Pasul 1: Scanați rețeta
+          <h3 ref={headingRef} tabIndex={-1} className={compact ? 'visually-hidden' : 'rx-review-step__title'}>
+            {compact ? 'Încărcați rețeta' : 'Pasul 1: Scanați rețeta'}
           </h3>
           {adapter.source !== 'live' && (
             <p className="rx-review-note">Demo: folosiți doar o rețetă tipărită sintetică, niciodată una reală.</p>
           )}
-          <DocumentScanner title="Scanare rețetă" onConfirm={handleScanned} />
+          <DocumentScanner title="Scanare rețetă" onConfirm={handleScanned} compact={compact} uploadLabel="Încărcați rețeta" />
         </div>
       )}
 
       {(step.kind === 'extracting' || step.kind === 'extract-error') && (
         <div className="rx-review-step">
           <h3 ref={headingRef} tabIndex={-1} className="rx-review-step__title">
-            Pasul 1: Citirea rețetei dumneavoastră
+            {compact ? 'Se citește rețeta' : 'Pasul 1: Citirea rețetei dumneavoastră'}
           </h3>
           <div className="rx-review-layout">
             {document && <OriginalPreview document={document} />}
@@ -256,8 +260,20 @@ export function PrescriptionReviewPanel({ adapter, onConfirmed }: PrescriptionRe
       {step.kind === 'review' && extracted && (
         <div className="rx-review-step">
           <h3 ref={headingRef} tabIndex={-1} className="rx-review-step__title">
-            Pasul 2: Verificați fiecare câmp în raport cu hârtia
+            {compact ? 'Verificați rețeta față de hârtie' : 'Pasul 2: Verificați fiecare câmp în raport cu hârtia'}
           </h3>
+          {compact && total > 0 && (
+            <div className="rx-review-actions">
+              <button
+                type="button"
+                className="ui-button ui-button--primary"
+                disabled={saving || !fields.some((field) => field.resolution.kind === 'pending' && field.extracted !== null)}
+                onClick={() => setFields(confirmAllReadable(fields, new Date().toISOString()))}
+              >
+                Toate sunt corecte
+              </button>
+            </div>
+          )}
           <div className="rx-review-layout">
             {document && <OriginalPreview document={document} />}
             <div className="rx-review-column">
@@ -279,7 +295,7 @@ export function PrescriptionReviewPanel({ adapter, onConfirmed }: PrescriptionRe
                 </div>
               )}
 
-              {extracted.dates.length > 0 && (
+              {!compact && extracted.dates.length > 0 && (
                 <div className="rx-review-card">
                   <h4>Date de pe document</h4>
                   <dl className="rx-review-dates">
@@ -357,7 +373,7 @@ export function PrescriptionReviewPanel({ adapter, onConfirmed }: PrescriptionRe
                     {saving ? 'Se salvează…' : saveError ? 'Încercați din nou salvarea' : 'Confirmați rețeta'}
                   </button>
                   <button type="button" className="ui-button ui-button--secondary" disabled={saving} onClick={scanAnother}>
-                    Scanați altul
+                    {compact ? 'Altă poză' : 'Scanați altul'}
                   </button>
                 </div>
               </div>
@@ -369,7 +385,7 @@ export function PrescriptionReviewPanel({ adapter, onConfirmed }: PrescriptionRe
       {step.kind === 'saved' && (
         <div className="rx-review-step">
           <h3 ref={headingRef} tabIndex={-1} className="rx-review-step__title">
-            Pasul 3: Rețeta a fost confirmată
+            {compact ? 'Rețeta a fost confirmată' : 'Pasul 3: Rețeta a fost confirmată'}
           </h3>
           {step.medications.length === 0 ? (
             <p className="rx-review-warning-box" role="status">
@@ -399,10 +415,10 @@ export function PrescriptionReviewPanel({ adapter, onConfirmed }: PrescriptionRe
               ))}
             </ul>
           )}
-          <p className="rx-review-muted">Orele de reamintire se aleg separat; ele nu modifică niciodată indicația.</p>
+          {!compact && <p className="rx-review-muted">Orele de reamintire se aleg separat; ele nu modifică niciodată indicația.</p>}
           <div className="rx-review-actions">
             <button type="button" className="ui-button ui-button--secondary" onClick={scanAnother}>
-              Scanați altă rețetă
+              {compact ? 'Încărcați altă rețetă' : 'Scanați altă rețetă'}
             </button>
           </div>
         </div>

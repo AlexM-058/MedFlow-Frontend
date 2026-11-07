@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { caseApi } from '../../lib/caseApi';
 import { ArchiveError, extractRar, isRarFile } from './archive';
 import {
@@ -30,7 +30,7 @@ const STOP_TEXT: Record<Exclude<BatchStop, null>, string> = {
  * stops the others and can be retried. The photos stay on this device; the server keeps only what it read.
  * Nothing counts as confirmed here: the patient verifies the medicines afterwards.
  */
-export function DocumentBatch({ caseId, token, onFinished }: { caseId: string; token: string; onFinished: () => void }) {
+export function DocumentBatch({ caseId, token, onFinished, extraAction }: { caseId: string; token: string; onFinished: () => void; extraAction?: ReactNode }) {
   const inputId = useId();
   const [items, setItems] = useState<BatchItem[]>([]);
   const [running, setRunning] = useState(false);
@@ -84,10 +84,13 @@ export function DocumentBatch({ caseId, token, onFinished }: { caseId: string; t
 
   return (
     <section className="case-inbox__batch" aria-label="Încărcare mai multe foi">
-      <p>Alegeți toate foile deodată (cel mult {BATCH_MAX_FILES}, JPG, PNG sau PDF) sau o arhivă RAR cu ele. Arhiva se deschide pe acest dispozitiv, nu se încarcă. Foile se citesc pe rând, iar ce eșuează poate fi reîncercat.</p>
-      <label htmlFor={inputId} className="ui-button ui-button--secondary">Alegeți fotografiile sau o arhivă RAR</label>
+      <div className="step__choices">
+        <label htmlFor={inputId} className={`ui-button ui-button--primary${running || preparing ? ' is-disabled' : ''}`}>Încărcați</label>
+        {extraAction}
+      </div>
       <input id={inputId} type="file" multiple accept="image/jpeg,image/png,application/pdf,.rar,application/vnd.rar,application/x-rar-compressed" disabled={running || preparing}
         className="doctor-sr-only" onChange={(event) => { const chosen = event.target.files; void choose(chosen); event.target.value = ''; }} />
+      <p className="step__hint">Fotografii (JPG, PNG), PDF sau o arhivă RAR, cel mult {BATCH_MAX_FILES} fișiere. Arhiva se deschide pe acest dispozitiv.</p>
       {preparing && <p role="status">Se deschid arhivele…</p>}
       {items.length > 0 && (
         <>
@@ -95,14 +98,17 @@ export function DocumentBatch({ caseId, token, onFinished }: { caseId: string; t
             {running ? `Se citește foaia ${Math.min(stats.done + stats.failed + 1, stats.total)} din ${stats.total}…` : `Terminat: ${stats.done} din ${stats.total} citite${stats.failed ? `, ${stats.failed} cu probleme` : ''}.`}
           </p>
           <progress max={stats.total} value={stats.done + stats.failed} aria-label="Progres citire" />
-          <ul aria-label="Foile încărcate">
-            {items.map((item) => (
-              <li key={item.id}>
-                <strong>{item.name}</strong>: {STATUS_TEXT[item.status]}
-                {item.message && item.status === 'failed' && <span role="alert"> {item.message}</span>}
-              </li>
-            ))}
-          </ul>
+          <details open={stats.failed > 0 || undefined}>
+            <summary>Detalii pe foi ({stats.total})</summary>
+            <ul aria-label="Foile încărcate">
+              {items.map((item) => (
+                <li key={item.id}>
+                  <strong>{item.name}</strong>: {STATUS_TEXT[item.status]}
+                  {item.message && item.status === 'failed' && <span role="alert"> {item.message}</span>}
+                </li>
+              ))}
+            </ul>
+          </details>
           {running && <button type="button" className="ui-button ui-button--secondary" onClick={() => controller.current?.abort()}>Opriți citirea</button>}
           {!running && stopped && <p role="alert">{STOP_TEXT[stopped]}</p>}
           {!running && (stats.failed > 0 || left > 0) && (

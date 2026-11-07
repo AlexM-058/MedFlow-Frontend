@@ -157,3 +157,6 @@
   color: var(--color-text);
   font-size: 0.75rem;
 }
+
+/* Compact scanner: the file details are hidden (the [hidden] attribute would otherwise lose to display:grid). */
+.doc-scanner__meta-list[hidden], .rx-review-header[hidden] { display: none; }

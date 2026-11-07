@@ -48,16 +48,18 @@ export function GoogleSignIn({ destination = '/patient', doctor = false }: { des
 
   return (
     <section className="account-card" aria-labelledby="sign-in-heading">
-      <p className="account-eyebrow">{`${brand.productName.toUpperCase()} ${doctor ? 'PENTRU MEDICI' : 'PENTRU PACIENȚI'}`}</p>
-      <h1 id="sign-in-heading">{doctor ? 'Autentificare medic' : 'Autentificare pacient'}</h1>
-      <p>{doctor ? `Folosiți contul Google asociat invitației dumneavoastră ${brand.productName}. Accesul medicilor este acordat de echipa ${brand.productName}.` : 'Autentificați-vă cu Google pentru a vă conecta cu medicul dumneavoastră. Puteți vedea profilul medicului înainte de a trimite o cerere de conectare.'}</p>
+      <h1 id="sign-in-heading">{doctor ? 'Autentificare medic' : 'Bun venit'}</h1>
+      <p>{doctor ? 'Folosiți contul Google al invitației dumneavoastră.' : 'Autentificați-vă cu Google pentru a vă conecta cu medicul dumneavoastră.'}</p>
       {(failure || error) && <p className="account-error" role="alert">{failure || error}</p>}
       {status === 'unconfigured' && <p className="account-notice" role="status">Autentificarea cu Google nu este configurată în acest mediu. Încercați din nou mai târziu.</p>}
       <button className="ui-button ui-button--primary" type="button" onClick={() => void start()} disabled={pending || status === 'unconfigured'} aria-busy={pending || undefined}>
         <span className="account-google-mark" aria-hidden="true">G</span>
         {pending ? 'Se deschide Google…' : 'Continuă cu Google'}
       </button>
-      <p className="account-small">Vă solicităm numele și adresa de email pentru a vă identifica contul. Nu solicităm acces la mesajele dumneavoastră Gmail.</p>
+      <details className="account-small">
+        <summary>Ce date cerem?</summary>
+        <p>Doar numele și adresa de email, pentru a vă identifica contul. Nu cerem acces la mesajele dumneavoastră Gmail.{doctor ? ` Accesul medicilor este acordat de echipa ${brand.productName}.` : ''}</p>
+      </details>
     </section>
   );
 }

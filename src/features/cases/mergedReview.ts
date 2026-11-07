@@ -2,7 +2,9 @@
 // and confirms or corrects each row once. The decision is then written to every document it came from, with the
 // per-document review route that already exists (the Backend still checks each review against what the reader
 // extracted, so nothing is trusted from here). A sheet is only reviewed when ALL its medicines were confirmed;
-// otherwise it stays unreviewed and its medicines are not used. No network, no import.meta.env: Node-test safe.
+// otherwise it stays unreviewed and its medicines are not used. "Update" mode (includeReviewed) also lists the sheets
+// already confirmed, showing what the patient confirmed, so it can be corrected; the reader's text is still what the
+// server compares the review with. No network, no import.meta.env: Node-test safe.
 import type { CaseDocumentRecord } from '../../lib/caseApi.ts';
 import type { ReviewedField } from '../care-scenario/contracts.ts';
 
@@ -23,6 +25,8 @@ export interface DocumentMedication {
   dose: string | null;
   frequency: string | null;
   duration: string | null;
+  /** What the patient confirmed earlier for this medicine, when the sheet was already reviewed. */
+  confirmed?: { name: string; dose: string; frequency: string };
 }
 
 export interface MergedRow {
@@ -43,22 +47,49 @@ export function pendingDocuments(documents: CaseDocumentRecord[]): CaseDocumentR
   });
 }
 
-function medicationsOf(document: CaseDocumentRecord): DocumentMedication[] {
-  const raw = isRecord(document.extractedData) && Array.isArray(document.extractedData.medications) ? document.extractedData.medications : [];
-  return raw.map((entry, index) => {
-    const row = isRecord(entry) ? entry : {};
-    return { documentId: document.id, index, name: text(row.name), dose: text(row.dose), frequency: text(row.frequency), duration: text(row.duration) };
+/** Sheets that were read and have medicines: the unreviewed ones, plus the already confirmed ones in update mode. */
+function reviewableDocuments(documents: CaseDocumentRecord[], includeReviewed: boolean): CaseDocumentRecord[] {
+  const pending = new Set(pendingDocuments(documents).map((document) => document.id));
+  return documents.filter((document) => {
+    if (pending.has(document.id)) return true;
+    if (!includeReviewed || document.documentType !== 'prescription' || !isRecord(document.extractedData)) return false;
+    if (document.extractedData.extraction_status === 'unavailable') return false;
+    return Array.isArray(document.extractedData.medications) && document.extractedData.medications.length > 0;
   });
 }
 
-export function mergeMedications(documents: CaseDocumentRecord[]): MergedRow[] {
+function medicationsOf(document: CaseDocumentRecord): DocumentMedication[] {
+  const raw = isRecord(document.extractedData) && Array.isArray(document.extractedData.medications) ? document.extractedData.medications : [];
+  const reviewed = isRecord(document.review) && Array.isArray(document.review.medications) ? document.review.medications : [];
+  return raw.map((entry, index) => {
+    const row = isRecord(entry) ? entry : {};
+    const medication: DocumentMedication = { documentId: document.id, index, name: text(row.name), dose: text(row.dose), frequency: text(row.frequency), duration: text(row.duration) };
+    // A broken or incomplete earlier review is ignored (the sheet is then treated like an unreviewed one).
+    const earlier = reviewed[index];
+    if (isRecord(earlier)) {
+      const name = text(earlier.name);
+      const dose = text(earlier.dose);
+      const frequency = text(earlier.frequency);
+      if (name && dose && frequency) medication.confirmed = { name, dose, frequency };
+    }
+    return medication;
+  });
+}
+
+/** The values the patient sees for one occurrence: what was confirmed before, otherwise what the reader extracted. */
+function shownOf(medication: DocumentMedication) {
+  return medication.confirmed ?? { name: medication.name, dose: medication.dose, frequency: medication.frequency };
+}
+
+export function mergeMedications(documents: CaseDocumentRecord[], options: { includeReviewed?: boolean } = {}): MergedRow[] {
   const rows = new Map<string, MergedRow>();
-  for (const document of pendingDocuments(documents)) {
+  for (const document of reviewableDocuments(documents, options.includeReviewed === true)) {
     for (const medication of medicationsOf(document)) {
-      const key = [medication.name, medication.dose, medication.frequency].map(normalizeText).join('|');
+      const shown = shownOf(medication);
+      const key = [shown.name, shown.dose, shown.frequency].map(normalizeText).join('|');
       const row = rows.get(key);
       if (row) row.occurrences.push(medication);
-      else rows.set(key, { key, name: medication.name, dose: medication.dose, frequency: medication.frequency, occurrences: [medication] });
+      else rows.set(key, { key, name: shown.name, dose: shown.dose, frequency: shown.frequency, occurrences: [medication] });
     }
   }
   return [...rows.values()].sort((a, b) => normalizeText(a.name).localeCompare(normalizeText(b.name), 'ro'));
@@ -88,13 +119,14 @@ export function buildReviews(
   rows: MergedRow[],
   decisions: Record<string, RowDecision | undefined>,
   at: string,
+  options: { includeReviewed?: boolean } = {},
 ): { reviews: { documentId: string; fields: ReviewedField[] }[]; skipped: string[] } {
   const rowOf = new Map<string, MergedRow>();
   for (const row of rows) for (const occurrence of row.occurrences) rowOf.set(`${occurrence.documentId}#${occurrence.index}`, row);
 
   const reviews: { documentId: string; fields: ReviewedField[] }[] = [];
   const skipped: string[] = [];
-  for (const document of pendingDocuments(documents)) {
+  for (const document of reviewableDocuments(documents, options.includeReviewed === true)) {
     const fields: ReviewedField[] = [];
     let complete = true;
     for (const medication of medicationsOf(document)) {

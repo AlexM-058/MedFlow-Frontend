@@ -76,5 +76,41 @@ check('a malformed entry is a row that must be typed', oddRows.length === 2);
 const oddBuilt = buildReviews(odd, oddRows, Object.fromEntries(oddRows.map((row) => [row.key, { confirmed: true, name: row.name ?? 'Necunoscut', dose: row.dose ?? '1 mg', frequency: row.frequency ?? 'zilnic' }])), at);
 check('positions are preserved', oddBuilt.reviews[0]?.fields.some((field) => field.path === 'medications.1.name' && field.value === 'Z') === true);
 
+// ---------- update mode: sheets already confirmed can be corrected ----------
+const confirmedDoc = (id: string, name: string, dose: string, frequency: string, extractedDose: string | null = dose) => doc(id,
+  [med(name, extractedDose, frequency, '30 zile')],
+  { review: { medications: [{ name, dose, frequency, duration: '30 zile' }] }, reviewedAt: at });
+
+const confirmedSheets = [confirmedDoc('c1', 'Amlodipină', '10 mg', 'zilnic', '5 mg'), confirmedDoc('c2', 'Amlodipină', '10 mg', 'zilnic', '5 mg')];
+check('by default confirmed sheets are not listed again', mergeMedications(confirmedSheets).length === 0);
+const updateRows = mergeMedications(confirmedSheets, { includeReviewed: true });
+check('update mode lists them, once, with what the patient confirmed (not what the reader saw)',
+  updateRows.length === 1 && updateRows[0]?.dose === '10 mg' && updateRows[0]?.occurrences.length === 2);
+check('the reader text is kept on each occurrence', updateRows[0]?.occurrences[0]?.dose === '5 mg' && updateRows[0]?.occurrences[0]?.confirmed?.dose === '10 mg');
+
+const mixedUpdate = mergeMedications([confirmedSheets[0]!, doc('p1', [med('Amlodipină', '10 mg', 'zilnic')])], { includeReviewed: true });
+check('a confirmed sheet and a new one with the same medicine are one row', mixedUpdate.length === 1 && mixedUpdate[0]?.occurrences.length === 2);
+
+// A correction in update mode is written to every sheet; `extracted` is still the reader text (the server compares it).
+const row = updateRows[0]!;
+const fix: Record<string, RowDecision> = { [row.key]: { confirmed: true, name: 'Amlodipină', dose: '5 mg', frequency: 'seara' } };
+const updated = buildReviews(confirmedSheets, updateRows, fix, at, { includeReviewed: true });
+check('update rewrites the review of both sheets', updated.reviews.length === 2 && updated.skipped.length === 0);
+const updatedFields = updated.reviews[0]!.fields;
+check('the corrected value is saved while extracted stays the reader text',
+  updatedFields[1]?.value === '5 mg' && updatedFields[1]?.extracted === '5 mg' && updatedFields[2]?.value === 'seara' && updatedFields[2]?.extracted === 'zilnic');
+check('without update mode the same call touches nothing', buildReviews(confirmedSheets, updateRows, fix, at).reviews.length === 0);
+
+// A broken earlier review is not trusted: the row shows what the reader extracted.
+const broken = doc('b1', [med('Metformin', '500 mg', 'zilnic')], { review: { medications: [{ name: 'Metformin' }] } });
+const brokenRows = mergeMedications([broken], { includeReviewed: true });
+check('an incomplete earlier review falls back to the reader text', brokenRows.length === 1 && brokenRows[0]?.dose === '500 mg' && brokenRows[0]?.occurrences[0]?.confirmed === undefined);
+
+// Failed readings and other document types never appear, even in update mode.
+check('failed readings and lab results stay out in update mode', mergeMedications([
+  doc('f', [med('X', '1', '2')], { extractedData: { extraction_status: 'unavailable' } }),
+  doc('l', [med('Y', '1', '2')], { documentType: 'lab_result' }),
+], { includeReviewed: true }).length === 0);
+
 console.log(`${passed} passed, ${failures.length} failed`);
 if (failures.length > 0) throw new Error(`Failed: ${failures.join('; ')}`);

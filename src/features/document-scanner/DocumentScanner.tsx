@@ -14,12 +14,21 @@ export type DocumentScannerProps = {
   onConfirm: (document: ScannedDocument) => void;
   onCancel?: () => void;
   title?: string;
+  /**
+   * Simple mode for the patient journey: no explanations, no file details; just the picture and two big buttons.
+   * The default (false) keeps the full screen used by the demo page.
+   */
+  compact?: boolean;
+  /** Label of the main button in compact mode (default "Încărcați"). */
+  uploadLabel?: string;
 };
 
 export function DocumentScanner({
   onConfirm,
   onCancel,
   title = 'Scanare document medical',
+  compact = false,
+  uploadLabel = 'Încărcați',
 }: DocumentScannerProps) {
   const [phase, setPhase] = useState<ScannerPhase>('idle');
   const [draft, setDraft] = useState<ScannedDocument | null>(null);
@@ -83,14 +92,18 @@ export function DocumentScanner({
 
   return (
     <section className="doc-scanner" aria-labelledby="doc-scanner-title">
-      <header className="doc-scanner__header">
-        <p className="doc-scanner__eyebrow">DOAR LOCAL</p>
-        <h2 id="doc-scanner-title">{title}</h2>
-        <p className="doc-scanner__hint">
-          Capturați o rețetă tipărită, un rezultat de laborator sau o scrisoare medicală. Nimic nu este încărcat până
-          nu confirmați, iar un flux ulterior al cazului îl trimite către backend.
-        </p>
-      </header>
+      {compact ? (
+        <h2 id="doc-scanner-title" className="visually-hidden">{title}</h2>
+      ) : (
+        <header className="doc-scanner__header">
+          <p className="doc-scanner__eyebrow">DOAR LOCAL</p>
+          <h2 id="doc-scanner-title">{title}</h2>
+          <p className="doc-scanner__hint">
+            Capturați o rețetă tipărită, un rezultat de laborator sau o scrisoare medicală. Nimic nu este încărcat până
+            nu confirmați, iar un flux ulterior al cazului îl trimite către backend.
+          </p>
+        </header>
+      )}
 
       {error && (
         <p className="doc-scanner__error" role="alert">
@@ -112,7 +125,7 @@ export function DocumentScanner({
               <p className="doc-scanner__meta">{draft.fileName}</p>
             </div>
           )}
-          <dl className="doc-scanner__meta-list">
+          <dl className="doc-scanner__meta-list" hidden={compact}>
             <div>
               <dt>Fișier</dt>
               <dd>{draft.fileName}</dd>
@@ -135,39 +148,43 @@ export function DocumentScanner({
             )}
           </dl>
           <div className="doc-scanner__actions">
-            <button type="button" className="ui-button ui-button--secondary" onClick={handleCancel}>
-              Anulați
-            </button>
+            {!compact && (
+              <button type="button" className="ui-button ui-button--secondary" onClick={handleCancel}>
+                Anulați
+              </button>
+            )}
             <button type="button" className="ui-button ui-button--secondary" onClick={handleRetake}>
-              Refaceți
+              {compact ? 'Altă poză' : 'Refaceți'}
             </button>
             <button type="button" className="ui-button ui-button--primary doc-scanner__primary" onClick={handleUse}>
-              Folosiți documentul
+              {compact ? 'Folosiți' : 'Folosiți documentul'}
             </button>
           </div>
         </div>
       ) : (
         <div className="doc-scanner__idle">
-          <p className="doc-scanner__synthetic">
-            Folosiți pentru testare un document tipărit sintetic (rețetă / fișă de laborator fictivă).
-          </p>
+          {!compact && (
+            <p className="doc-scanner__synthetic">
+              Folosiți pentru testare un document tipărit sintetic (rețetă / fișă de laborator fictivă).
+            </p>
+          )}
           <div className="doc-scanner__actions">
             <button
               type="button"
               className="ui-button ui-button--primary doc-scanner__primary"
               disabled={phase === 'capturing'}
               aria-busy={phase === 'capturing' || undefined}
-              onClick={() => void startCapture(false)}
+              onClick={() => void startCapture(compact)}
             >
-              {phase === 'capturing' ? 'Se deschide camera…' : 'Scanați documentul'}
+              {phase === 'capturing' ? 'Se deschide camera…' : compact ? uploadLabel : 'Scanați documentul'}
             </button>
             <button
               type="button"
               className="ui-button ui-button--secondary"
               disabled={phase === 'capturing'}
-              onClick={() => void startCapture(true)}
+              onClick={() => void startCapture(!compact)}
             >
-              Alegeți din galerie
+              {compact ? 'Fotografiați' : 'Alegeți din galerie'}
             </button>
             {onCancel && (
               <button type="button" className="ui-button ui-button--secondary" onClick={handleCancel}>

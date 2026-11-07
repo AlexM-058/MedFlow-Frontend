@@ -101,6 +101,19 @@ export function confirmField(fields: ReviewFieldState[], path: string, at: strin
   });
 }
 
+/**
+ * "All correct": confirms, in one step, every field that was READ and is still undecided. It never touches an
+ * unreadable field or one the patient already decided, and it cannot mark anything as absent: whatever could not be
+ * read still has to be typed from the paper prescription (or the duration marked as not written).
+ */
+export function confirmAllReadable(fields: ReviewFieldState[], at: string): ReviewFieldState[] {
+  return fields.map((field) =>
+    field.resolution.kind === 'pending' && field.extracted !== null
+      ? { ...field, resolution: { kind: 'confirmed' as const, value: field.extracted, edited: false, at } }
+      : field,
+  );
+}
+
 /** "Edit": the patient's own transcription. Whitespace-only text is rejected. */
 export function editField(fields: ReviewFieldState[], path: string, text: string, at: string): ActionResult {
   const value = text.trim();

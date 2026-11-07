@@ -34,11 +34,17 @@ export function PatientJourney() {
 
   return (
     <div className="journey">
-      <p className="journey__progress" aria-live="polite">Pasul {activeIndex + 1} din {STEPS.length}: {STEPS[activeIndex]?.label}</p>
+      <ol className="journey__dots" aria-label={`Pasul ${activeIndex + 1} din ${STEPS.length}: ${STEPS[activeIndex]?.label ?? ''}`}>
+        {STEPS.map((entry, index) => (
+          <li key={entry.stage} data-state={index < activeIndex ? 'done' : index === activeIndex ? 'current' : 'todo'} aria-current={index === activeIndex ? 'step' : undefined}>
+            <span className="visually-hidden">{entry.label}</span>
+          </li>
+        ))}
+      </ol>
       {stage === 'connect' && <ConnectStage />}
       {stage !== 'connect' && state.phase === 'loading' && <p role="status">Se pregătește dosarul…</p>}
       {stage !== 'connect' && state.phase === 'error' && (
-        <section className="journey__panel">
+        <section className="step">
           <p role="alert">{state.message}</p>
           <button type="button" className="ui-button ui-button--primary" onClick={retry}>Încercați din nou</button>
         </section>
