@@ -114,7 +114,6 @@ export function DoctorAccountWorkspace({ profile }: DoctorAccountWorkspaceProps)
         {section === 'patients' && (
           <DoctorBacklog
             token={token}
-            profile={profile}
             requests={requests.state.requests}
             requestsPhase={requests.state.phase}
             onShowQr={() => setQrOpen(true)}

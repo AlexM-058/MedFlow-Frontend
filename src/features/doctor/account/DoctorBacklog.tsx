@@ -1,7 +1,7 @@
 import { useEffect, useId, useMemo, useState } from 'react';
-import type { AccountProfile, ConnectionRequest } from '../../../auth/contracts';
+import type { ConnectionRequest } from '../../../auth/contracts';
 import { caseApi, type CaseRecord } from '../../../lib/caseApi';
-import { CaseConversation, type Drafts } from '../../cases/CaseInbox';
+import type { Drafts } from '../../cases/CaseInbox';
 import {
   buildBacklog,
   countByFilter,
@@ -11,7 +11,7 @@ import {
   type BacklogFilter,
   type BacklogRow,
 } from './backlogLogic';
-import { DoctorPatientDocuments } from './DoctorPatientDocuments';
+import { PatientDossier } from './PatientDossier';
 import './doctor-backlog.css';
 
 const REFRESH_MS = 30_000;
@@ -27,7 +27,6 @@ const FILTERS: readonly { id: BacklogFilter; label: string }[] = [
 
 export interface DoctorBacklogProps {
   token: string | null;
-  profile: AccountProfile;
   /** Connection requests of this doctor; only the accepted ones become patients. */
   requests: readonly ConnectionRequest[];
   requestsPhase: 'loading' | 'ready' | 'error';
@@ -38,7 +37,7 @@ export interface DoctorBacklogProps {
  * The doctor's patient backlog: connected patients (from accepted connection requests) joined with
  * their newest case (state and last message come from the Backend). It never shows sample data.
  */
-export function DoctorBacklog({ token, profile, requests, requestsPhase, onShowQr }: DoctorBacklogProps) {
+export function DoctorBacklog({ token, requests, requestsPhase, onShowQr }: DoctorBacklogProps) {
   const titleId = useId();
   const searchId = useId();
   const [revision, setRevision] = useState(0);
@@ -84,12 +83,10 @@ export function DoctorBacklog({ token, profile, requests, requestsPhase, onShowQ
           </button>
           <h2>{openRow.patientName}</h2>
         </div>
-        {token && <DoctorPatientDocuments token={token} caseId={caseId} />}
         {token && (
-          <CaseConversation
-            caseId={caseId}
+          <PatientDossier
             token={token}
-            profile={profile}
+            caseId={caseId}
             drafts={drafts[caseId] ?? EMPTY_DRAFTS}
             changeDraft={(kind, text) => setDrafts((current) => ({ ...current, [caseId]: { ...(current[caseId] ?? EMPTY_DRAFTS), [kind]: text } }))}
           />

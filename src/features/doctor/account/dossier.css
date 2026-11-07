@@ -1,0 +1,29 @@
+/* The doctor's page for one patient: big buttons, no scrolling on the page. Windows (pop-ups) hold the content and
+   scroll inside themselves. Colors and spacing come from the design tokens. */
+.backlog-detail { display: grid; gap: var(--space-4); align-content: start; min-height: calc(100dvh - 7rem); grid-template-rows: auto 1fr; }
+.dossier__tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: var(--space-4); align-content: center; }
+.dossier__tile { position: relative; display: grid; gap: var(--space-1); align-content: center; min-height: 8rem; padding: var(--space-4); border: 1px solid var(--color-border-decorative); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-text); text-align: start; cursor: pointer; transition: transform 0.12s ease, border-color 0.12s ease; }
+.dossier__tile:hover { border-color: var(--brand-primary); }
+.dossier__tile:active { transform: scale(0.985); }
+.dossier__tile:focus-visible { outline: 3px solid var(--color-focus-ring); outline-offset: 3px; }
+.dossier__tile-title { font-size: 1.25rem; font-weight: 700; }
+.dossier__tile-detail { color: var(--color-text-secondary); }
+.dossier__badge { position: absolute; inset-block-start: var(--space-3); inset-inline-end: var(--space-3); padding: 0.125rem var(--space-2); border-radius: var(--radius-pill); background: var(--brand-primary); color: var(--brand-on-primary); font-size: var(--font-size-sm); font-weight: 600; }
+
+.dossier__panel { display: grid; gap: var(--space-4); }
+.dossier__panel h3 { font-size: 1.125rem; }
+.dossier__meta { margin: 0; color: var(--color-text-secondary); font-size: var(--font-size-sm); }
+.dossier__alert { margin: 0; padding: var(--space-3); border-left: 4px solid var(--status-error-border); border-radius: var(--radius-sm); background: var(--status-error-bg); color: var(--color-text); font-weight: 600; }
+.dossier__messages, .dossier__list, .dossier__qa { display: grid; gap: var(--space-3); margin: 0; padding: 0; list-style: none; }
+.dossier__messages li { display: grid; gap: 0.125rem; padding: var(--space-3); border: 1px solid var(--color-border-decorative); border-radius: var(--radius-sm); background: var(--color-surface); overflow-wrap: anywhere; }
+.dossier__messages li[data-sender='patient'] { border-inline-start: 4px solid var(--brand-primary); }
+.dossier__messages li[data-sender='system'] { border-color: var(--status-error-border); background: var(--status-error-bg); }
+.dossier__messages time { color: var(--color-text-secondary); font-size: var(--font-size-sm); }
+.dossier__messages p, .dossier__list p { margin: 0; }
+.dossier__qa > li { display: grid; gap: var(--space-2); padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-border-decorative); }
+.dossier__panel blockquote { margin: 0; padding: var(--space-2) var(--space-3); border-inline-start: 3px solid var(--color-border-control); background: var(--color-surface-subtle); overflow-wrap: anywhere; }
+.dossier__form { display: grid; gap: var(--space-2); }
+.dossier__form label { font-weight: 600; }
+.dossier__form textarea { padding: var(--space-3); border: 1px solid var(--color-border-control); border-radius: var(--radius-sm); background: var(--color-surface); color: var(--color-text); font: inherit; resize: vertical; }
+.dossier__row { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.dossier__row .ui-button { flex: 1 1 10rem; justify-content: center; }
