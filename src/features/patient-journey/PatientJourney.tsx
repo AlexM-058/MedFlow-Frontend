@@ -9,6 +9,7 @@ import { IntakeChatPanel } from '../intake-chat';
 import { PatientContextPanel } from '../patient-context';
 import { PrescriptionReviewPanel } from '../prescription-review';
 import { extractConnectCode, journeyStage, type JourneyStage } from './journeyLogic';
+import { QrScanner } from './QrScanner';
 import './patient-journey.css';
 
 const STEPS: readonly { stage: JourneyStage; label: string }[] = [
@@ -89,10 +90,11 @@ export function PatientJourney() {
   );
 }
 
-/** Step 1. The doctor's QR is scanned with the phone camera, which opens #/connect/<code>; a pasted code or link works too. */
+/** Step 1. The doctor's QR is scanned in this page (camera), or a pasted code or link works too. */
 function ConnectStage() {
   const [value, setValue] = useState('');
   const [invalid, setInvalid] = useState(false);
+  const [scanning, setScanning] = useState(false);
 
   function submit(event: FormEvent) {
     event.preventDefault();
@@ -106,7 +108,12 @@ function ConnectStage() {
     <>
       <section className="journey__panel" aria-labelledby="journey-connect-title">
         <h2 id="journey-connect-title">Conectați-vă la medicul dumneavoastră</h2>
-        <p>Scanați codul QR al medicului cu camera telefonului. Dacă nu puteți scana, lipiți mai jos codul sau linkul primit de la medic.</p>
+        <p>Scanați codul QR al medicului cu camera din această pagină. Dacă nu puteți scana, lipiți mai jos codul sau linkul primit de la medic.</p>
+        {scanning ? (
+          <QrScanner onCode={(code) => navigate(`/connect/${code}`)} onClose={() => setScanning(false)} />
+        ) : (
+          <button type="button" className="ui-button ui-button--primary" onClick={() => setScanning(true)}>Scanați codul QR</button>
+        )}
         <p className="journey__help">Un apropiat vă poate trimite linkul medicului pe telefon. Lipiți-l aici și apăsați „Continuați”.</p>
         <form className="journey__code-form" onSubmit={submit} noValidate>
           <label htmlFor="journey-code">Cod sau link de conectare</label>
