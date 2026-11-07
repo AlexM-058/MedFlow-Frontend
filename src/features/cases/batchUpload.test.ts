@@ -73,6 +73,14 @@ async function main() {
   check('cancel stops cleanly', cancelled.stopped === 'cancelled' && cancelled.items[0]?.status === 'done'
     && cancelled.items[1]?.status === 'pending' && cancelled.items[2]?.status === 'pending');
 
+    // The reader's result travels with each sheet: what was found, and a sheet with nothing is flagged.
+  const noted = await runBatch(createBatch([png('a.png'), png('b.png')]), async (file) => (file.name === 'a.png'
+    ? { id: 'a', note: 'Am găsit: 2 medicamente.' }
+    : { id: 'b', note: 'Nu am găsit date în această foaie.', empty: true }), () => {}, never);
+  check('a sheet keeps what was found', noted.items[0]?.note === 'Am găsit: 2 medicamente.' && noted.items[0]?.empty === undefined);
+  check('an empty sheet is flagged and counted, not just "done"', noted.items[1]?.empty === true && summarizeBatch(noted.items).empty === 1 && summarizeBatch(noted.items).done === 2);
+  check('a failed sheet is not counted as empty', summarizeBatch(createBatch([new File(['x'], 'b.txt', { type: 'text/plain' })])).empty === 0);
+
   console.log(`${passed} passed, ${failures.length} failed`);
   if (failures.length > 0) throw new Error(`Failed: ${failures.join('; ')}`);
 }

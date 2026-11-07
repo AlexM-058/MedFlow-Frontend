@@ -107,13 +107,13 @@ export function QrScanner({ onCode, onClose }: { onCode: (code: string) => void;
             <video ref={videoRef} className="qr-scanner__video" playsInline muted aria-label="Imagine de la cameră" />
             <div className="qr-scanner__frame" aria-hidden="true" />
           </div>
-          <p role="status" aria-live="polite">
+          <p className="qr-scanner__hint" role="status" aria-live="polite">
             {ready ? 'Îndreptați camera spre codul QR al medicului.' : 'Se pornește camera…'}
           </p>
           {foreign && <p className="account-error" role="alert">Acest cod QR nu este un cod de conectare. Scanați codul medicului dumneavoastră.</p>}
         </>
       )}
-      <button type="button" className="ui-button ui-button--secondary" onClick={onClose}>Închideți camera</button>
+      <button type="button" className="ui-button ui-button--secondary qr-scanner__close" onClick={onClose}>Închideți camera</button>
     </div>
   );
 }

@@ -115,7 +115,7 @@ export function PatientChat({ caseId, token, onOpenDocuments }: { caseId: string
         <div className="chat__column">
           {messages.length === 0 && <p className="chat__empty">Scrieți mai jos ce vă supără sau ce doriți să știe medicul.</p>}
           <MessageList messages={messages} isBusy={sending} />
-          {asking && <p className="chat__status" role="status">Asistentul pregătește următoarea întrebare…</p>}
+          {asking && <p className="chat__status chat__typing" role="status"><span className="chat__dots" aria-hidden="true"><i /><i /><i /></span>Asistentul pregătește următoarea întrebare…</p>}
           {assistantNote && <p className="chat__status" role="status">{assistantNote}</p>}
           {finishedNote && !sending && <p className="chat__status" role="status">{finishedNote}</p>}
           {failed.map((item) => (

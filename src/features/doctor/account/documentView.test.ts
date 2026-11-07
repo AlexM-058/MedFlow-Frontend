@@ -74,4 +74,24 @@ assert.equal(reviewed.medications[0]?.corrections, [{ label: 'Doză', readerSaw:
 // A broken review is never shown as confirmed.
 assert.equal(describeDocument(doc({ medications: [{ name: 'X', dose: '1 mg', frequency: 'zilnic', duration: null }] }, { review: { medications: [{ name: 'X' }] } })).review, 'unreviewed');
 
+// Everything the reader found is shown, not only the medicines; it is marked as not confirmed by the patient.
+const all = describeDocument(doc({
+  medications: [], dates: [],
+  diagnoses: ['Hipertensiune arterială'],
+  lab_results: [{ test: 'Glicemie', value: '130', unit: 'mg/dL', reference_range: '70 - 110' }],
+  allergies: ['penicilină'],
+  observations: [{ label: 'Puls', value: '72 bătăi/min' }],
+}));
+assert.equal(all.status, 'extracted');
+assert.equal(all.diagnoses, ['Hipertensiune arterială']);
+assert.equal(all.labs, [{ test: 'Glicemie', value: '130', unit: 'mg/dL', range: '70 - 110' }]);
+assert.equal(all.allergies, ['penicilină']);
+assert.equal(all.observations, [{ label: 'Puls', value: '72 bătăi/min' }]);
+// A document with only a diagnosis is not "empty"; one with nothing at all still is.
+assert.equal(describeDocument(doc({ medications: [], dates: [], diagnoses: ['Astm'] })).status, 'extracted');
+assert.equal(describeDocument(doc({ medications: [], dates: [], diagnoses: [], lab_results: [] })).status, 'empty');
+// Old service versions without the new fields keep working.
+const legacy = describeDocument(doc({ medications: [{ name: 'X', dose: '1 mg', frequency: 'zilnic', duration: null }], dates: [] }));
+assert.equal([legacy.diagnoses, legacy.labs, legacy.allergies, legacy.observations], [[], [], [], []]);
+
 console.log('documentView: ok');

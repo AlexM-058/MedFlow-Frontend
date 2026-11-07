@@ -14,6 +14,10 @@ export interface BatchItem {
   status: BatchStatus;
   message?: string;
   documentId?: string;
+  /** What was found on this sheet (shown next to "Citit"), e.g. "Am găsit: 4 medicamente, 2 analize." */
+  note?: string;
+  /** The sheet was read but nothing was found on it: shown as a warning, never as a plain success. */
+  empty?: boolean;
 }
 
 export type BatchStop = null | 'session' | 'unavailable' | 'cancelled';
@@ -52,7 +56,11 @@ export function createBatch(files: File[], rejected: { name: string; reason: str
 
 export function summarizeBatch(items: BatchItem[]) {
   const count = (status: BatchStatus) => items.filter((item) => item.status === status).length;
-  return { total: items.length, done: count('done'), failed: count('failed'), pending: count('pending'), reading: count('reading') };
+  return {
+    total: items.length, done: count('done'), failed: count('failed'), pending: count('pending'), reading: count('reading'),
+    /** Sheets that were read but had nothing on them (a poor photo, a blank page). */
+    empty: items.filter((item) => item.status === 'done' && item.empty === true).length,
+  };
 }
 
 /** Failed items go back to pending (not the ones refused by the pre-check: those cannot succeed). */
@@ -60,7 +68,7 @@ export function retryable(items: BatchItem[]): BatchItem[] {
   return items.map((item) => (item.status === 'failed' && precheck(item.file) === null ? { id: item.id, file: item.file, name: item.name, status: 'pending' as const } : item));
 }
 
-type Upload = (file: File, signal: AbortSignal) => Promise<{ id: string }>;
+type Upload = (file: File, signal: AbortSignal) => Promise<{ id: string; note?: string; empty?: boolean }>;
 
 function codeOf(error: unknown): string | undefined {
   return error && typeof error === 'object' && 'code' in error ? String((error as { code: unknown }).code) : undefined;
@@ -90,7 +98,7 @@ export async function runBatch(
     try {
       const document = await upload(item.file, signal);
       failuresInARow = 0;
-      update(item.id, { status: 'done', documentId: document.id });
+      update(item.id, { status: 'done', documentId: document.id, ...(document.note ? { note: document.note } : {}), ...(document.empty ? { empty: true } : {}) });
     } catch (error) {
       if (signal.aborted) {
         update(item.id, { status: 'pending' });

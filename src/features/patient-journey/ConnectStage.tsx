@@ -3,6 +3,7 @@ import { navigate } from '../../auth/navigation';
 import { PendingConnections } from '../connections';
 import { QrScanner } from './QrScanner';
 import { StepShell } from './StepShell';
+import './connect.css';
 
 /**
  * Step 1, one action at a time: scan the doctor's QR with the camera. Nothing else is shown

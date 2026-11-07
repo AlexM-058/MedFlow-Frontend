@@ -31,7 +31,7 @@
 /* Secondary gray text: only on white surfaces (.rx-review and .rx-review-card are surfaces). */
 .rx-review-muted {
   color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
+  font-size: 0.9375rem;
 }
 
 .rx-review-header {
@@ -61,7 +61,7 @@
   padding: var(--space-1) var(--space-3) var(--space-1) var(--space-1);
   border: 1px solid var(--color-border-decorative);
   border-radius: var(--radius-pill);
-  font-size: var(--font-size-sm);
+  font-size: 0.9375rem;
   font-weight: 500;
 }
 
@@ -199,7 +199,7 @@
 .rx-review-field__label { font-weight: 600; }
 
 .rx-review-field__status {
-  font-size: var(--font-size-sm);
+  font-size: 0.9375rem;
   font-weight: 500;
 }
 
@@ -211,7 +211,7 @@
 .rx-review-field__note,
 .rx-review-field__quote {
   color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
+  font-size: 0.9375rem;
 }
 
 .rx-review-field__unreadable {
@@ -228,7 +228,7 @@
 }
 
 .rx-review-field__edit label {
-  font-size: var(--font-size-sm);
+  font-size: 0.9375rem;
   font-weight: 500;
 }
 
@@ -254,7 +254,7 @@
 
 .rx-review-error {
   color: var(--status-error-text);
-  font-size: var(--font-size-sm);
+  font-size: 0.9375rem;
   font-weight: 500;
 }
 

@@ -5,6 +5,7 @@ import { createLivePrescriptionAdapter } from '../care-scenario/live/liveAdapter
 import { StepShell } from '../patient-journey/StepShell';
 import { PrescriptionReviewPanel } from '../prescription-review';
 import { DocumentBatch } from './DocumentBatch';
+import { FindingsSummary } from './FindingsSummary';
 import { MedicationListReview } from './MedicationListReview';
 
 interface StepProps {
@@ -100,9 +101,11 @@ export function DocumentsStep({ caseId, token, onContinue, onSkip }: StepProps) 
       <Modal open={modal === 'upload'} title="Încărcați documente" onClose={close}>
         <DocumentBatch caseId={caseId} token={token} onFinished={refresh} />
         <MedicationListReview caseId={caseId} token={token} refreshKey={revision} mode="pending" onSaved={refresh} />
+        <FindingsSummary caseId={caseId} token={token} refreshKey={revision} />
       </Modal>
       <Modal open={modal === 'update'} title="Actualizați medicamentele" onClose={close}>
         <MedicationListReview caseId={caseId} token={token} refreshKey={revision} mode="update" onSaved={refresh} />
+        <FindingsSummary caseId={caseId} token={token} refreshKey={revision} />
       </Modal>
     </>
   );

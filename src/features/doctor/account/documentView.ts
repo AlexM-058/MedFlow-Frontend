@@ -1,5 +1,6 @@
 import type { CaseDocumentRecord } from '../../../lib/caseApi.ts';
-import { mapConfirmedMedications } from '../../care-scenario/live/mapConfirmedMedications.ts';
+import { mapConfirmedMedications } from '../../care-scenario/live/mapConfirmedMedications.ts';
+import { countFindings, readFindings, type LabFinding, type ObservationFinding } from '../../cases/findings.ts';
 import { mapExtractedDocument } from '../../care-scenario/live/mapExtractedDocument.ts';
 
 export type DocumentStatus = 'extracted' | 'empty' | 'unavailable';
@@ -21,6 +22,11 @@ export interface DocumentView {
   }[];
   dates: { label: string; value: string }[];
   warnings: string[];
+  /** Everything else the reader found. Read automatically and NOT confirmed by the patient. */
+  diagnoses: string[];
+  labs: LabFinding[];
+  allergies: string[];
+  observations: ObservationFinding[];
 }
 
 export const REVIEW_LABELS = {
@@ -69,7 +75,7 @@ export function describeDocument(document: CaseDocumentRecord): DocumentView {
     sizeLabel: formatSize(document.sizeBytes),
   };
   if (extractionUnavailable(document.extractedData)) {
-    return { ...base, status: 'unavailable', statusLabel: STATUS_LABELS.unavailable, review: null, reviewLabel: null, medications: [], dates: [], warnings: [] };
+    return { ...base, status: 'unavailable', statusLabel: STATUS_LABELS.unavailable, review: null, reviewLabel: null, medications: [], dates: [], warnings: [], diagnoses: [], labs: [], allergies: [], observations: [] };
   }
   const mapped = mapExtractedDocument(document);
   // A reviewed prescription shows what the patient confirmed (and what they changed); otherwise the
@@ -96,9 +102,11 @@ export function describeDocument(document: CaseDocumentRecord): DocumentView {
       }));
   const review: DocumentView['review'] = confirmed.length > 0 ? 'confirmed' : mapped.medications.length > 0 ? 'unreviewed' : null;
   const dates = mapped.dates.map((entry) => ({ label: entry.label ?? 'Dată', value: entry.value ?? MISSING }));
-  const status: DocumentStatus = medications.length > 0 || dates.length > 0 ? 'extracted' : 'empty';
-  return {
-    ...base, status, statusLabel: STATUS_LABELS[status], review, reviewLabel: review ? REVIEW_LABELS[review] : null,
-    medications, dates, warnings: mapped.warnings,
+  const found = readFindings(document.extractedData);
+  const status: DocumentStatus = medications.length > 0 || dates.length > 0 || countFindings(found) > 0 ? 'extracted' : 'empty';
+  return {
+    ...base, status, statusLabel: STATUS_LABELS[status], review, reviewLabel: review ? REVIEW_LABELS[review] : null,
+    medications, dates, warnings: mapped.warnings,
+    diagnoses: found.diagnoses, labs: found.labs, allergies: found.allergies, observations: found.observations,
   };
 }

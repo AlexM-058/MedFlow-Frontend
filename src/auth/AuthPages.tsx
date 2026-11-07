@@ -47,12 +47,12 @@ export function GoogleSignIn({ destination = '/patient', doctor = false }: { des
   }
 
   return (
-    <section className="account-card" aria-labelledby="sign-in-heading">
+    <section className="account-card account-card--signin" aria-labelledby="sign-in-heading">
       <h1 id="sign-in-heading">{doctor ? 'Autentificare medic' : 'Bun venit'}</h1>
       <p>{doctor ? 'Folosiți contul Google al invitației dumneavoastră.' : 'Autentificați-vă cu Google pentru a vă conecta cu medicul dumneavoastră.'}</p>
       {(failure || error) && <p className="account-error" role="alert">{failure || error}</p>}
       {status === 'unconfigured' && <p className="account-notice" role="status">Autentificarea cu Google nu este configurată în acest mediu. Încercați din nou mai târziu.</p>}
-      <button className="ui-button ui-button--primary" type="button" onClick={() => void start()} disabled={pending || status === 'unconfigured'} aria-busy={pending || undefined}>
+      <button className="ui-button ui-button--primary account-google-button" type="button" onClick={() => void start()} disabled={pending || status === 'unconfigured'} aria-busy={pending || undefined}>
         <span className="account-google-mark" aria-hidden="true">G</span>
         {pending ? 'Se deschide Google…' : 'Continuă cu Google'}
       </button>

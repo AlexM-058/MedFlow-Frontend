@@ -57,9 +57,9 @@ export function Composer({ onSend, isSending, disabled = false }: ComposerProps)
             className="composer__send"
             disabled={!canSend}
             aria-busy={isSending || undefined}
-            aria-label={isSending ? 'Se așteaptă răspunsul simulat' : 'Trimiteți mesajul'}
+            aria-label={isSending ? 'Se așteaptă răspunsul' : 'Trimiteți mesajul'}
           >
-            <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" focusable="false">
+            <svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" focusable="false">
               <path fill="currentColor" d="M3.4 20.4 21 12 3.4 3.6 3.4 10l12.6 2-12.6 2z" />
             </svg>
             <span className="composer__send-label">Trimite</span>

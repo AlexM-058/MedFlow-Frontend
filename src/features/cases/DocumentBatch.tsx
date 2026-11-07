@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { caseApi } from '../../lib/caseApi';
 import { ArchiveError, extractRar, isRarFile } from './archive';
+import { countFindings, describeReading, readFindings } from './findings';
 import {
   BATCH_MAX_FILES,
   createBatch,
@@ -47,7 +48,12 @@ export function DocumentBatch({ caseId, token, onFinished }: { caseId: string; t
     setStopped(null);
     const result = await runBatch(
       batch,
-      (file, signal) => caseApi.uploadDocument(token, caseId, file, 'prescription', signal),
+      async (file, signal) => {
+        const document = await caseApi.uploadDocument(token, caseId, file, 'prescription', signal);
+        // Say what was found on the sheet, so a sheet that gave nothing is never shown as a plain success.
+        const findings = readFindings(document.extractedData);
+        return { id: document.id, note: describeReading(findings), empty: countFindings(findings) === 0 };
+      },
       setItems,
       current.signal,
     );
@@ -100,13 +106,17 @@ export function DocumentBatch({ caseId, token, onFinished }: { caseId: string; t
           <p role="status" aria-live="polite">
             {running ? `Se citește foaia ${Math.min(stats.done + stats.failed + 1, stats.total)} din ${stats.total}…` : `Terminat: ${stats.done} din ${stats.total} citite${stats.failed ? `, ${stats.failed} cu probleme` : ''}.`}
           </p>
+          {!running && stats.empty > 0 && (
+            <p role="alert">{stats.empty === 1 ? 'O foaie a fost citită, dar fără date.' : `${stats.empty} foi au fost citite, dar fără date.`} Încercați o poză mai clară, cu toată foaia în cadru și lumină bună.</p>
+          )}
           <progress max={stats.total} value={stats.done + stats.failed} aria-label="Progres citire" />
-          <details open={stats.failed > 0 || undefined}>
+          <details open={stats.failed > 0 || stats.empty > 0 || undefined}>
             <summary>Detalii pe foi ({stats.total})</summary>
             <ul aria-label="Foile încărcate">
               {items.map((item) => (
                 <li key={item.id}>
                   <strong>{item.name}</strong>: {STATUS_TEXT[item.status]}
+                  {item.note && item.status === 'done' && <span className={item.empty ? 'batch-note batch-note--empty' : 'batch-note'}> {item.note}</span>}
                   {item.message && item.status === 'failed' && <span role="alert"> {item.message}</span>}
                 </li>
               ))}

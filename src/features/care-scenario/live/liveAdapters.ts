@@ -5,7 +5,7 @@
 // have no live adapter here.
 import { CaseApiError, caseApi } from '../../../lib/caseApi';
 import type { ConfirmedMedication, ExtractedDocument, LocalDocument, PrescriptionAdapter, ReviewedField } from '../contracts';
-import { mapConfirmedMedications } from './mapConfirmedMedications';
+import { mapConfirmedMedications } from './mapConfirmedMedications';
 import { mapExtractedDocument } from './mapExtractedDocument';
 
 export { mapExtractedDocument, UNEXPECTED_FORMAT_WARNING } from './mapExtractedDocument';

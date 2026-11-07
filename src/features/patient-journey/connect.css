@@ -1,0 +1,13 @@
+/* Connect step: the camera view with a steady frame, a calm instruction and an obvious close button.
+   Colors come from the shared tokens. Selectors are prefixed with .step so they win over patient-journey.css. */
+.step .qr-scanner { width: 100%; justify-items: center; gap: var(--space-4); }
+.step .qr-scanner__viewport { width: min(100%, 24rem); border: 0; border-radius: var(--radius-md); background: var(--color-surface-subtle); box-shadow: var(--shadow-raised); }
+.step .qr-scanner__frame { inset: 16%; border: 4px solid var(--color-surface); border-radius: 1rem; box-shadow: 0 0 0 100vmax var(--color-backdrop); }
+.step .qr-scanner__hint { max-width: 24rem; padding: var(--space-3) var(--space-4); border-radius: var(--radius-pill); background: var(--color-surface); border: 1px solid var(--color-border-decorative); color: var(--color-text); font-size: 1.0625rem; font-weight: 600; text-align: center; }
+.step .qr-scanner .account-error { max-width: 24rem; font-size: 1.0625rem; }
+.step .qr-scanner__close { width: min(100%, 24rem); min-height: 3.5rem; font-size: 1.125rem; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .step .qr-scanner__frame { animation: qr-frame-pulse 2.4s ease-in-out infinite; }
+  @keyframes qr-frame-pulse { 50% { transform: scale(0.97); } }
+}

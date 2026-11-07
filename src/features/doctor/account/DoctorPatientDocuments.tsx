@@ -78,6 +78,27 @@ export function DoctorPatientDocuments({ token, caseId }: { token: string; caseI
                     ))}</tbody>
                   </table>
                 )}
+                {view.diagnoses.length > 0 && (
+                  <div className="doctor-documents__found"><strong>Diagnostice</strong><ul>{view.diagnoses.map((diagnosis, index) => <li key={index}>{diagnosis}</li>)}</ul></div>
+                )}
+                {view.labs.length > 0 && (
+                  <table className="doctor-documents__table">
+                    <caption className="doctor-sr-only">Analize citite</caption>
+                    <thead><tr><th scope="col">Analiză</th><th scope="col">Valoare</th><th scope="col">Unitate</th><th scope="col">Referință</th></tr></thead>
+                    <tbody>{view.labs.map((lab, index) => (
+                      <tr key={index}><th scope="row">{lab.test}</th><td>{lab.value ?? MISSING}</td><td>{lab.unit ?? MISSING}</td><td>{lab.range ?? MISSING}</td></tr>
+                    ))}</tbody>
+                  </table>
+                )}
+                {view.allergies.length > 0 && (
+                  <div className="doctor-documents__found"><strong>Alergii</strong><ul>{view.allergies.map((allergy, index) => <li key={index}>{allergy}</li>)}</ul></div>
+                )}
+                {view.observations.length > 0 && (
+                  <div className="doctor-documents__found"><strong>Alte informații</strong><ul>{view.observations.map((item, index) => <li key={index}><strong>{item.label}:</strong> {item.value}</li>)}</ul></div>
+                )}
+                {(view.diagnoses.length > 0 || view.labs.length > 0 || view.allergies.length > 0 || view.observations.length > 0) && (
+                  <p className="doctor-documents__note">Diagnosticele, analizele, alergiile și celelalte informații au fost citite automat și nu au fost verificate de pacient.</p>
+                )}
                 {view.dates.length > 0 && (
                   <ul className="doctor-documents__dates">{view.dates.map((entry, index) => <li key={index}><strong>{entry.label}:</strong> {entry.value}</li>)}</ul>
                 )}
